@@ -30,7 +30,7 @@ import { ReminderEngine, eventStart } from "./sync/reminders";
 import { statusCode, calendarErrorMessage } from "./calendar/provider";
 import type { CalendarInfo, Reminder, Reply, Snapshot } from "../shared/types";
 import { hotkeyPattern } from "../shared/hotkey";
-import { petPlacement } from "../shared/pet-layout";
+import { petPlacement, workflowPlacement } from "../shared/pet-layout";
 import { setStartAtLogin } from "./settings/login";
 import {
   AccountCalendarProvider,
@@ -878,20 +878,10 @@ else {
         if (workflowHome) return true;
         workflowHome = { ...petAnchor };
         const area = screen.getDisplayNearestPoint(petAnchor).workArea;
-        petLayout = { x: 135, y: 440, above: true, centered: true };
-        pet.setSize(380, 600);
-        pet.setPosition(
-          Math.round(area.x + (area.width - 380) / 2),
-          Math.round(
-            Math.max(
-              area.y,
-              Math.min(
-                area.y + area.height - 600,
-                area.y + area.height / 2 - 210,
-              ),
-            ),
-          ),
-        );
+        const placement = workflowPlacement(area);
+        petLayout = placement.layout;
+        pet.setSize(380, placement.window.height);
+        pet.setPosition(placement.window.x, placement.window.y);
         pet.webContents.send("pet-layout", petLayout);
         pet.focus();
         ignoreMouse(false);

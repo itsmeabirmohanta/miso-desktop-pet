@@ -758,11 +758,11 @@ body.settings-view {
 }
 
 .pet-stage.workflow-centered {
-  height: 600px;
+  height: var(--workflow-height, 600px);
 }
 .workflow-centered .bubble {
-  top: 210px;
-  max-height: 400px;
+  top: var(--popup-center, 210px);
+  max-height: var(--popup-max-height, 400px);
 }
 .workflow-centered .popup-agenda {
   max-height: 220px;

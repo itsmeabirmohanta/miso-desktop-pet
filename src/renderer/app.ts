@@ -107,6 +107,18 @@ function setupPet() {
     const stage = root.querySelector<HTMLElement>(".pet-stage")!;
     stage.style.setProperty("--cat-x", value.x + "px");
     stage.style.setProperty("--cat-y", value.y + "px");
+    stage.style.setProperty(
+      "--popup-center",
+      (value.popupCenter ?? 210) + "px",
+    );
+    stage.style.setProperty(
+      "--popup-max-height",
+      (value.popupMaxHeight ?? 400) + "px",
+    );
+    stage.style.setProperty(
+      "--workflow-height",
+      (value.workflowHeight ?? 600) + "px",
+    );
     stage.classList.toggle("popup-below", !value.above);
     stage.classList.toggle("workflow-centered", !!value.centered);
     regions();

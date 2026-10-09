@@ -187,6 +187,9 @@ export async function smoke(
   const work = screen.getPrimaryDisplay().workArea;
   await evaluate(pet, `window.butler.move(${work.x},${work.y})`);
   await delay(150);
+  // Keep the real desktop cursor from making the hover-only name assertion flaky.
+  pet.webContents.sendInputEvent({ type: "mouseMove", x: 379, y: 439 });
+  await delay(80);
   let geometry = await evaluate(
     pet,
     "(()=>{const r=document.querySelector('#pet').getBoundingClientRect();return {x:window.screenX+r.x,y:window.screenY+r.y,width:r.width,below:document.querySelector('.pet-stage').classList.contains('popup-below'),name:getComputedStyle(document.querySelector('#pet-label')).visibility};})()",

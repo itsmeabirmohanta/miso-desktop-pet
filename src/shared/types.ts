@@ -87,6 +87,9 @@ export interface PetLayout {
   y: number;
   above: boolean;
   centered?: boolean;
+  popupCenter?: number;
+  popupMaxHeight?: number;
+  workflowHeight?: number;
 }
 export interface Snapshot {
   panelOpen?: boolean;

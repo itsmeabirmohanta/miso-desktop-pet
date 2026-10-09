@@ -1,5 +1,30 @@
 import { describe, it, expect } from "vitest";
-import { petPlacement } from "../src/shared/pet-layout";
+import { petPlacement, workflowPlacement } from "../src/shared/pet-layout";
+describe("centered workflow on different screens", () => {
+  it.each([480, 600, 728, 768, 780, 1040])(
+    "centers the popup and keeps the window and cat visible at height %i",
+    (height) => {
+      const area = { x: -1024, y: -200, width: 1024, height };
+      const placement = workflowPlacement(area);
+      expect(placement.window.y + placement.layout.popupCenter).toBe(
+        area.y + height / 2,
+      );
+      expect(placement.window.y).toBeGreaterThanOrEqual(area.y);
+      expect(placement.window.y + placement.window.height).toBeLessThanOrEqual(
+        area.y + height,
+      );
+      expect(
+        placement.layout.popupCenter + placement.layout.popupMaxHeight / 2,
+      ).toBeLessThanOrEqual(placement.layout.y - 20);
+      expect(
+        placement.layout.popupCenter - placement.layout.popupMaxHeight / 2,
+      ).toBeGreaterThanOrEqual(8);
+      expect(placement.layout.y + 105).toBeLessThanOrEqual(
+        placement.window.height,
+      );
+    },
+  );
+});
 describe("free cat positioning", () => {
   const area = { x: 0, y: 0, width: 1920, height: 1040 };
   it("allows the cat at the top and opens its popup below", () => {
