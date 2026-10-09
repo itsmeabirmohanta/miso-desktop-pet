@@ -6,7 +6,12 @@ const release = process.argv.includes("--release");
 const target = resolve("dist");
 if (target !== resolve(process.cwd(), "dist"))
   throw new Error("Invalid build directory");
-await rm(target, { recursive: true, force: true });
+await rm(target, {
+  recursive: true,
+  force: true,
+  maxRetries: 5,
+  retryDelay: 200,
+});
 await import("./make-icon.mjs");
 await prepareAssets();
 await mkdir("dist/main", { recursive: true });

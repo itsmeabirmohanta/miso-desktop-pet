@@ -1,6 +1,6 @@
 {
   "name": "miso-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "MISO - Your Little Butler",
   "author": "MISO",
@@ -82,7 +82,9 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": false,
+      "include": "scripts/installer.nsh"
     },
     "electronFuses": {
       "runAsNode": false,

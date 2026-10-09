@@ -3,8 +3,9 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, join, dirname } from "node:path";
 import assert from "node:assert/strict";
-const profile = await mkdtemp(join(tmpdir(), "butler-release-check-"));
-assert.equal(dirname(resolve(profile)), resolve(tmpdir()));
+const profileRoot = await mkdtemp(join(tmpdir(), "butler-release-check-"));
+const profile = join(profileRoot, "first-run-profile");
+assert.equal(dirname(resolve(profileRoot)), resolve(tmpdir()));
 const env = {
   ...process.env,
   NODE_OPTIONS: "--require=butler-nonexistent-injection.js",
@@ -13,8 +14,15 @@ delete env.ELECTRON_RUN_AS_NODE;
 delete env.BUTLER_GOOGLE_CLIENT_ID;
 delete env.BUTLER_GOOGLE_CLIENT_SECRET;
 const child = spawn(
-  resolve("release/win-unpacked/MISO.exe"),
-  [`--user-data-dir=${profile}`],
+  resolve(
+    process.argv.includes("--executable")
+      ? process.argv[process.argv.indexOf("--executable") + 1]
+      : "release/win-unpacked/MISO.exe",
+  ),
+  [
+    `--user-data-dir=${profile}`,
+    ...(process.argv.includes("--safe-mode") ? ["--safe-mode"] : []),
+  ],
   { env, windowsHide: true, stdio: "ignore" },
 );
 let exited = false;
@@ -60,8 +68,8 @@ try {
 } finally {
   if (!exited) child.kill();
   for (let i = 0; !exited && i < 20; i++) await delay(100);
-  if (exited && dirname(resolve(profile)) === resolve(tmpdir()))
-    await rm(profile, {
+  if (exited && dirname(resolve(profileRoot)) === resolve(tmpdir()))
+    await rm(profileRoot, {
       recursive: true,
       force: true,
       maxRetries: 3,

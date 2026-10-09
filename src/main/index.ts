@@ -10,7 +10,9 @@ import {
   screen,
   shell,
   globalShortcut,
+  dialog,
 } from "electron";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, resolve } from "node:path";
 import assets from "../assets/manifest.json";
@@ -43,13 +45,50 @@ declare const __BUTLER_RELEASE__: boolean;
 const isSmoke = !__BUTLER_RELEASE__ && process.argv.includes("--smoke-test");
 // A standard explicit profile override also permits isolated release verification.
 const profileDirectory = app.commandLine.getSwitchValue("user-data-dir");
+const profilePath = profileDirectory
+  ? resolve(profileDirectory)
+  : join(app.getPath("appData"), "butler-desktop");
+let startupPhase = "profile initialization";
+let reportingStartupFailure = false;
+function startupFailure(error: unknown) {
+  if (reportingStartupFailure) return;
+  reportingStartupFailure = true;
+  const rawCode = (error as { code?: unknown })?.code;
+  const code =
+    typeof rawCode === "string" && /^[A-Z0-9_-]{1,40}$/.test(rawCode)
+      ? rawCode
+      : "STARTUP_FAILED";
+  try {
+    writeFileSync(
+      join(profilePath, "startup-status.json"),
+      JSON.stringify(
+        {
+          version: app.getVersion(),
+          platform: process.platform,
+          architecture: process.arch,
+          phase: startupPhase,
+          code,
+        },
+        null,
+        2,
+      ),
+    );
+  } catch {}
+  dialog.showErrorBox(
+    "MISO could not start",
+    `MISO stopped during ${startupPhase}. Support code: ${code}.\n\nTry the MISO (Safe Mode) shortcut if the window is blank or closes. Check Windows security notifications for a blocked application. If the problem continues, share startup-status.json from %APPDATA%\\butler-desktop. It contains only startup diagnostics, not your keys or calendar data.\n\nYour saved data has not been reset. Encrypted data copied from another Windows account or laptop cannot be unlocked here; reconnect using a fresh profile instead.`,
+  );
+  app.exit(1);
+}
+process.on("uncaughtException", startupFailure);
+if (process.argv.includes("--safe-mode")) app.disableHardwareAcceleration();
+try {
+  mkdirSync(profilePath, { recursive: true });
+} catch (error) {
+  startupFailure(error);
+}
 // Keep the original profile and encryption context across the branding change.
-app.setPath(
-  "userData",
-  profileDirectory
-    ? resolve(profileDirectory)
-    : join(app.getPath("appData"), "butler-desktop"),
-);
+app.setPath("userData", profilePath);
 app.setName(APP_NAME);
 if (!__BUTLER_RELEASE__ && isSmoke)
   app.setPath(
@@ -538,6 +577,21 @@ function showPet() {
   trayMenu();
 }
 function secureWindow(window: BrowserWindow) {
+  window.webContents.on("render-process-gone", () => {
+    if (!quitting) {
+      startupPhase = "window rendering";
+      startupFailure({ code: "RENDERER_FAILED" });
+    }
+  });
+  window.webContents.on(
+    "did-fail-load",
+    (_event, _code, _description, _url, mainFrame) => {
+      if (mainFrame && !quitting) {
+        startupPhase = "window loading";
+        startupFailure({ code: "WINDOW_LOAD_FAILED" });
+      }
+    },
+  );
   window.setIcon(join(__dirname, "../assets/branding/icon.png"));
   window.on("page-title-updated", (event) => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler(
@@ -642,6 +696,7 @@ else {
   app
     .whenReady()
     .then(async () => {
+      startupPhase = "secure local storage";
       store = new SettingsStore();
       if (!isSmoke) loadOAuthConfig(store);
       if (
@@ -673,6 +728,7 @@ else {
         }));
         store.setSecret("googleRefreshToken", "");
       }
+      startupPhase = "desktop initialization";
       provider = new AccountCalendarProvider(
         () => store.settings.defaultAccountId,
       );
@@ -1356,6 +1412,7 @@ else {
       });
       if (!setupReady()) openSetup();
       else if (!isSmoke) showPet();
+      startupPhase = "calendar connection";
       try {
         if (store.settings.accounts.length && !isSmoke)
           await initializeGoogle();
@@ -1365,6 +1422,7 @@ else {
         publish();
       }
       polling();
+      startupPhase = "running";
       if (isSmoke) {
         openSettings();
         openSetup();
@@ -1383,13 +1441,7 @@ else {
         }
       }
     })
-    .catch((error) => {
-      console.error(
-        "MISO startup failed:",
-        error instanceof Error ? error.message : "Unknown error",
-      );
-      app.exit(1);
-    });
+    .catch(startupFailure);
 }
 app.on("window-all-closed", () => {});
 app.on("before-quit", () => {

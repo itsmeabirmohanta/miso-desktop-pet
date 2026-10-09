@@ -1,6 +1,6 @@
-# MISO 1.0.0 distribution
+# MISO 1.0.1 distribution
 
-Share only `release/MISO Setup 1.0.0.exe`, its SHA-256 checksum, and end-user instructions. Do not share this workspace, `artifacts`, logs, screenshots, your app-data folder, or a folder copied from an existing installation's user profile.
+Share only `release/MISO Setup 1.0.1.exe`, its SHA-256 checksum, and end-user instructions. Do not share this workspace, `artifacts`, logs, screenshots, your app-data folder, or a folder copied from an existing installation's user profile.
 
 ## Implemented protections
 

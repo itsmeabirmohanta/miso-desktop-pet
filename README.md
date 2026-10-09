@@ -64,7 +64,7 @@ npm run dist             # Clean release build and installer
 npm run smoke:packaged   # Windows archive/runtime checks and fresh-profile launch
 ```
 
-On Windows, the installer is `release/MISO Setup 1.0.0.exe`, with a generated SHA-256 checksum. Share the installer rather than this workspace or a user's app-data folder. Node.js is not needed on the recipient's machine.
+On Windows, the installer is `release/MISO Setup 1.0.1.exe`, with a generated SHA-256 checksum. Share the installer rather than this workspace or a user's app-data folder. Node.js is not needed on the recipient's machine.
 
 Windows packaging and fresh-profile startup are verified. macOS/Linux packaging targets exist but require testing on those systems; the packaged verification script targets Windows. Publisher code signing is not configured by default, so Windows can show reputation warnings. No installer is automatically published by CI; Windows build artifacts can be downloaded from a successful Actions run.
 
