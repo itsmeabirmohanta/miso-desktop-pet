@@ -23,7 +23,7 @@ const child = spawn(
     `--user-data-dir=${profile}`,
     ...(process.argv.includes("--safe-mode") ? ["--safe-mode"] : []),
   ],
-  { env, windowsHide: true, stdio: "ignore" },
+  { env, cwd: profileRoot, windowsHide: true, stdio: "ignore" },
 );
 let exited = false;
 child.once("exit", () => {

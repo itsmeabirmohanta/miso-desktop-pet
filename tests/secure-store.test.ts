@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const fixture = vi.hoisted(() => ({
   disk: {} as Record<string, any>,
   available: true,
+  encryptFails: false,
 }));
 vi.mock("electron-store", () => ({
   default: class {
@@ -17,7 +18,10 @@ vi.mock("electron", () => ({
   safeStorage: {
     isEncryptionAvailable: () => fixture.available,
     getSelectedStorageBackend: () => "gnome_libsecret",
-    encryptString: (value: string) => Buffer.from("protected:" + value),
+    encryptString: (value: string) => {
+      if (fixture.encryptFails) throw new Error("private OS details");
+      return Buffer.from("protected:" + value);
+    },
     decryptString: (value: Buffer) => {
       if (!value.toString().startsWith("protected:"))
         throw new Error("Cannot decrypt");
@@ -29,8 +33,18 @@ import { SettingsStore } from "../src/main/settings/store";
 beforeEach(() => {
   fixture.disk = {};
   fixture.available = true;
+  fixture.encryptFails = false;
 });
 describe("protected local store", () => {
+  it("reports encryption failure without changing the existing file or leaking OS details", () => {
+    fixture.disk = { settings: { sound: true } };
+    const original = structuredClone(fixture.disk);
+    fixture.encryptFails = true;
+    expect(() => new SettingsStore()).toThrow(
+      expect.objectContaining({ code: "ENCRYPTION_FAILED" }),
+    );
+    expect(fixture.disk).toEqual(original);
+  });
   it("migrates legacy personal fields into a single protected vault", () => {
     fixture.disk = {
       settings: {
@@ -69,7 +83,10 @@ describe("protected local store", () => {
   it("does not overwrite a vault that belongs to another OS account or is damaged", () => {
     fixture.disk = { vault: Buffer.from("unreadable").toString("base64") };
     const original = structuredClone(fixture.disk);
-    expect(() => new SettingsStore()).toThrow("Cannot decrypt");
+    expect(() => new SettingsStore()).toThrow("cannot be unlocked");
+    expect(() => new SettingsStore()).toThrow(
+      expect.objectContaining({ code: "VAULT_UNREADABLE" }),
+    );
     expect(fixture.disk).toEqual(original);
   });
 });

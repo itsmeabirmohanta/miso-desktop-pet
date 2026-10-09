@@ -30,33 +30,59 @@ interface Data {
   fired: Record<string, number>;
 }
 export class SettingsStore {
-  private store = new Store<Data & { vault?: string }>({
-    name: "butler",
-  });
+  private store: Store<Data & { vault?: string }>;
   private data: Data;
   constructor() {
     this.assertSecure();
+    try {
+      this.store = new Store<Data & { vault?: string }>({ name: "butler" });
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      throw Object.assign(new Error("The settings file could not be opened."), {
+        code:
+          code === "EACCES" || code === "EPERM"
+            ? "STORAGE_ACCESS_DENIED"
+            : "STORAGE_OPEN_FAILED",
+      });
+    }
     const existing = this.store.store;
     // Decryption failure must never silently replace a user's data.
-    this.data = existing.vault
-      ? JSON.parse(
-          safeStorage.decryptString(Buffer.from(existing.vault, "base64")),
-        )
-      : {
-          settings: { ...defaults, ...existing.settings },
-          secrets: existing.secrets ?? {},
-          cache: existing.cache ?? [],
-          fired: existing.fired ?? {},
-        };
+    try {
+      this.data = existing.vault
+        ? JSON.parse(
+            safeStorage.decryptString(Buffer.from(existing.vault, "base64")),
+          )
+        : {
+            settings: { ...defaults, ...existing.settings },
+            secrets: existing.secrets ?? {},
+            cache: existing.cache ?? [],
+            fired: existing.fired ?? {},
+          };
+    } catch {
+      throw Object.assign(new Error("The saved vault cannot be unlocked."), {
+        code: "VAULT_UNREADABLE",
+      });
+    }
     this.persist();
   }
   private persist() {
     this.assertSecure();
     // Replace the entire file so migration leaves no plaintext personal fields.
-    this.store.store = {
-      vault: safeStorage
+    let vault: string;
+    try {
+      vault = safeStorage
         .encryptString(JSON.stringify(this.data))
-        .toString("base64"),
+        .toString("base64");
+    } catch {
+      throw Object.assign(
+        new Error("Windows could not protect local storage."),
+        {
+          code: "ENCRYPTION_FAILED",
+        },
+      );
+    }
+    this.store.store = {
+      vault,
     } as Data & { vault: string };
   }
   get settings(): Settings {
@@ -126,8 +152,11 @@ export class SettingsStore {
       (process.platform === "linux" &&
         safeStorage.getSelectedStorageBackend() === "basic_text")
     )
-      throw new Error(
-        "No secure OS credential storage is available. Enable your system keyring and restart MISO.",
+      throw Object.assign(
+        new Error(
+          "No secure OS credential storage is available. Enable your system keyring and restart MISO.",
+        ),
+        { code: "SECURE_STORAGE_UNAVAILABLE" },
       );
   }
   secret(name: string): string | undefined {

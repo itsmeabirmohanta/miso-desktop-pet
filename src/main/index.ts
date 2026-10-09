@@ -12,7 +12,7 @@ import {
   globalShortcut,
   dialog,
 } from "electron";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, resolve } from "node:path";
 import assets from "../assets/manifest.json";
@@ -45,9 +45,15 @@ declare const __BUTLER_RELEASE__: boolean;
 const isSmoke = !__BUTLER_RELEASE__ && process.argv.includes("--smoke-test");
 // A standard explicit profile override also permits isolated release verification.
 const profileDirectory = app.commandLine.getSwitchValue("user-data-dir");
+const recoveryMarker = join(app.getPath("appData"), "miso-recovery-selected");
+const recoverySelected =
+  process.argv.includes("--recovery-profile") || existsSync(recoveryMarker);
 const profilePath = profileDirectory
   ? resolve(profileDirectory)
-  : join(app.getPath("appData"), "butler-desktop");
+  : join(
+      app.getPath("appData"),
+      recoverySelected ? "miso-recovery" : "butler-desktop",
+    );
 let startupPhase = "profile initialization";
 let reportingStartupFailure = false;
 function startupFailure(error: unknown) {
@@ -74,9 +80,30 @@ function startupFailure(error: unknown) {
       ),
     );
   } catch {}
+  if (
+    code === "VAULT_UNREADABLE" &&
+    !process.argv.includes("--recovery-profile")
+  ) {
+    const choice = dialog.showMessageBoxSync({
+      type: "warning",
+      title: "MISO storage recovery",
+      message:
+        "Your saved MISO data cannot be unlocked on this Windows account.",
+      detail:
+        "Start with a separate, empty profile and reconnect your calendars? Your original encrypted data will be kept untouched. Existing events in Google Calendar will remain available when you reconnect.",
+      buttons: ["Keep data and close", "Start separate profile"],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    if (choice === 1) {
+      app.relaunch({ args: [...process.argv.slice(1), "--recovery-profile"] });
+      app.exit(0);
+      return;
+    }
+  }
   dialog.showErrorBox(
     "MISO could not start",
-    `MISO stopped during ${startupPhase}. Support code: ${code}.\n\nTry the MISO (Safe Mode) shortcut if the window is blank or closes. Check Windows security notifications for a blocked application. If the problem continues, share startup-status.json from %APPDATA%\\butler-desktop. It contains only startup diagnostics, not your keys or calendar data.\n\nYour saved data has not been reset. Encrypted data copied from another Windows account or laptop cannot be unlocked here; reconnect using a fresh profile instead.`,
+    `MISO stopped during ${startupPhase}. Support code: ${code}.\n\nFor a blank window or graphics crash, use MISO (Safe Mode) from the Start menu or run MISO.exe --safe-mode. Safe Mode does not repair storage errors. Check Windows security notifications for a blocked application. If the problem continues, share startup-status.json from ${profilePath}. It contains only startup diagnostics, not your keys or calendar data.\n\nYour saved data has not been reset.`,
   );
   app.exit(1);
 }
@@ -698,6 +725,8 @@ else {
     .then(async () => {
       startupPhase = "secure local storage";
       store = new SettingsStore();
+      if (recoverySelected && !profileDirectory)
+        writeFileSync(recoveryMarker, "1");
       if (!isSmoke) loadOAuthConfig(store);
       if (
         !store.settings.accounts.length &&
