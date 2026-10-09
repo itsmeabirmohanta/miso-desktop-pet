@@ -1,0 +1,44 @@
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { IdlePoseCycle, IDLE_POSE_INTERVAL } from "../src/renderer/idle-poses";
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => vi.useRealTimers());
+it("changes decorative poses at the interval without rapid success-pose resets", () => {
+  const changed = vi.fn();
+  const cycle = new IdlePoseCycle(changed);
+  cycle.setEnabled(true);
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL - 1);
+  expect(changed).not.toHaveBeenCalled();
+  vi.advanceTimersByTime(1);
+  expect(changed).toHaveBeenLastCalledWith("happy");
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL);
+  expect(changed).toHaveBeenLastCalledWith("sleep");
+  cycle.dispose();
+});
+it("returns to resting immediately when blocked and waits a full interval on resume", () => {
+  const changed = vi.fn();
+  const cycle = new IdlePoseCycle(changed);
+  cycle.setEnabled(true);
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL);
+  cycle.setEnabled(false);
+  expect(changed).toHaveBeenLastCalledWith("idle");
+  const count = changed.mock.calls.length;
+  vi.advanceTimersByTime(10 * IDLE_POSE_INTERVAL);
+  expect(changed).toHaveBeenCalledTimes(count);
+  cycle.setEnabled(true);
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL - 1);
+  expect(changed).toHaveBeenCalledTimes(count);
+  vi.advanceTimersByTime(1);
+  expect(changed).toHaveBeenLastCalledWith("happy");
+  cycle.dispose();
+});
+it("does not restart the interval on unrelated snapshot refreshes", () => {
+  const changed = vi.fn();
+  const cycle = new IdlePoseCycle(changed);
+  cycle.setEnabled(true);
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL / 2);
+  cycle.setEnabled(true);
+  vi.advanceTimersByTime(IDLE_POSE_INTERVAL / 2);
+  expect(changed).toHaveBeenCalledWith("happy");
+  cycle.dispose();
+  expect(vi.getTimerCount()).toBe(0);
+});

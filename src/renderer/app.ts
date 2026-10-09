@@ -4,6 +4,7 @@ import { APP_NAME } from "../shared/brand";
 import { setupDashboard } from "./dashboard";
 import { quickAdd } from "./quick-add";
 import { setupWizard } from "./setup";
+import { IdlePoseCycle } from "./idle-poses";
 const root = document.querySelector<HTMLElement>("#app")!;
 const api = window.butler;
 const settingsView =
@@ -33,15 +34,34 @@ function setupPet() {
   root.innerHTML = `<section class="pet-stage"><div id="bubble" class="bubble hidden"><div class="bubble-top"><span id="bubble-title">A LITTLE HELP FROM MISO</span><button id="close" class="icon-button" aria-label="Close bubble">×</button></div><div id="message" class="bubble-message">Hi, I’m Miso. What should I remember?</div><div id="quick-add" hidden></div><div id="choices" class="choices"></div><div id="reminder-buttons" class="reminder-buttons"></div><form id="command-form" class="command-form"><input id="command" aria-label="Tell MISO what to remember" placeholder="Remind me to…" maxlength="2000" autocomplete="off"><button id="submit" class="primary" aria-label="Send command">↑</button></form><div class="pet-tools"><button id="open-settings">Settings</button><span id="connection" class="muted"></span></div></div><button id="pet" class="pet-button" data-state="idle" aria-label="Open MISO; drag to move"><img id="pet-image" src="../assets/cat.svg" alt="Your animated cat companion" draggable="false"></button><span id="pet-label" class="pet-label">MISO · YOUR LITTLE BUTLER</span></section>`;
   let quickActive = false;
   let activeState: PetState = "idle";
+  let idlePose: PetState = "idle";
+  let hovered = false;
+  let focused = false;
+  let petVisible = true;
+  let drag:
+    { x: number; y: number; windowX: number; windowY: number } | undefined;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const idlePoses = new IdlePoseCycle((pose) => {
+    idlePose = pose;
+    updateMascot();
+  });
+  function visiblePose(): PetState {
+    if (drag) return "walk";
+    if (hovered || focused) return "idle";
+    return activeState === "idle" ? idlePose : activeState;
+  }
   function updateMascot() {
+    const pose = visiblePose();
+    el("pet").dataset.state = pose;
+    el("pet").dataset.idlePose = String(idlePoses.enabled);
     const picture = el<HTMLImageElement>("pet-image");
-    const path = `../assets/${assets.mascot[activeState]}`;
+    const path = `../assets/${assets.mascot[pose]}`;
     if (picture.getAttribute("src") !== path) picture.src = path;
   }
   el<HTMLImageElement>("pet-image").onerror = () => {
     const picture = el<HTMLImageElement>("pet-image");
     const fallback =
-      activeState === "wink" ? "../assets/cat-wink.svg" : "../assets/cat.svg";
+      visiblePose() === "wink" ? "../assets/cat-wink.svg" : "../assets/cat.svg";
     if (picture.getAttribute("src") !== fallback) picture.src = fallback;
   };
   updateMascot();
@@ -89,6 +109,29 @@ function setupPet() {
   let reminderKey: string | undefined;
   let restore: ReturnType<typeof setTimeout> | undefined;
   const queue: Reply[] = [];
+  function refreshIdlePoses() {
+    idlePoses.setEnabled(
+      !!current &&
+        petVisible &&
+        !document.hidden &&
+        !reducedMotion.matches &&
+        !current.panelOpen &&
+        !current.settings.paused &&
+        !hovered &&
+        !focused &&
+        !drag &&
+        !busy &&
+        !quickActive &&
+        !quick.saving &&
+        !reminderKey &&
+        activeState === "idle" &&
+        el("bubble").classList.contains("hidden"),
+    );
+    updateMascot();
+  }
+  reducedMotion.addEventListener("change", refreshIdlePoses);
+  document.addEventListener("visibilitychange", refreshIdlePoses);
+  window.addEventListener("pagehide", () => idlePoses.dispose());
   function regions() {
     const nodes = [
       el("pet"),
@@ -127,14 +170,14 @@ function setupPet() {
   regions();
   function state(value: PetState) {
     activeState = value;
-    el("pet").dataset.state = value;
-    updateMascot();
+    refreshIdlePoses();
     if (restore) clearTimeout(restore);
     if (value === "happy" || value === "wink")
       restore = setTimeout(() => state("idle"), 2500);
   }
   function show() {
     el("bubble").classList.remove("hidden");
+    refreshIdlePoses();
     api.interactive(true);
     regions();
   }
@@ -221,13 +264,16 @@ function setupPet() {
     input.value = "";
     void run(() => api.command(value));
   });
-  api.onPetVisible((visible) =>
-    document.body.classList.toggle("pet-hidden", !visible),
-  );
+  api.onPetVisible((visible) => {
+    petVisible = visible;
+    document.body.classList.toggle("pet-hidden", !visible);
+    refreshIdlePoses();
+  });
   api.onClosePopup(() => {
     quickActive = false;
     quick.hide();
     el("bubble").classList.add("hidden");
+    refreshIdlePoses();
     api.interactive(false);
     regions();
   });
@@ -235,12 +281,27 @@ function setupPet() {
   el("close").addEventListener("click", hide);
   el("open-settings").addEventListener("click", () => void api.settings());
   const pet = el("pet");
-  let drag:
-    { x: number; y: number; windowX: number; windowY: number } | undefined;
+  pet.addEventListener("pointerenter", () => {
+    hovered = true;
+    refreshIdlePoses();
+  });
+  pet.addEventListener("pointerleave", () => {
+    hovered = false;
+    refreshIdlePoses();
+  });
+  pet.addEventListener("focus", () => {
+    focused = pet.matches(":focus-visible");
+    refreshIdlePoses();
+  });
+  pet.addEventListener("blur", () => {
+    focused = false;
+    refreshIdlePoses();
+  });
   let moved = false;
   pet.addEventListener("pointerdown", (event) => {
     const e = event as PointerEvent;
     if (e.button !== 0 || quickActive) return;
+    focused = false;
     drag = {
       x: e.screenX,
       y: e.screenY,
@@ -248,6 +309,7 @@ function setupPet() {
       windowY: window.screenY + pet.getBoundingClientRect().y,
     };
     moved = false;
+    refreshIdlePoses();
     pet.setPointerCapture(e.pointerId);
     api.dragging(true);
     api.interactive(true);
@@ -268,6 +330,7 @@ function setupPet() {
     }
   });
   function endDrag() {
+    if (!drag) return;
     drag = undefined;
     api.dragging(false);
     state("idle");
@@ -294,6 +357,7 @@ function setupPet() {
   });
   function update(value: Snapshot) {
     const wasOpen = current?.panelOpen;
+    const wasPaused = current?.settings.paused;
     current = value;
     if (value.panelOpen) {
       quickActive = false;
@@ -319,6 +383,8 @@ function setupPet() {
         ? "Connected"
         : "Setup needed";
     if (value.settings.paused) state("sleep");
+    else if (wasPaused && activeState === "sleep") state("idle");
+    refreshIdlePoses();
   }
   api.onSnapshot(update);
   api.onReply(display);

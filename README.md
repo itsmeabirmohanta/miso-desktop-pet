@@ -7,6 +7,7 @@ The interface follows the [MISO brand styling guide](docs/UI-BRANDING.md): cream
 ## Features
 
 - A draggable desktop mascot with separate idle, walking, sleeping, thinking, alert, happy, and wink artwork.
+- Idle pose changes every 15 seconds; hovering returns to the resting pose. Automatic rotation pauses during interactions and respects reduced-motion preferences.
 - Compact, centered, step-by-step reminder entry, opened by clicking the mascot or a configurable hotkey.
 - Multiple Google accounts and calendar selection.
 - A seven-day agenda with event details, reviewed edits and deletions, and links to Google Calendar.

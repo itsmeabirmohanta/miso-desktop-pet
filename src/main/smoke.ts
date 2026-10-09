@@ -1,4 +1,5 @@
 import { capturePerformance } from "./performance";
+import { IDLE_POSE_INTERVAL } from "../renderer/idle-poses";
 import { app, screen, type BrowserWindow } from "electron";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -207,6 +208,36 @@ export async function smoke(
   assert.equal(geometry.width, 110);
   assert.equal(geometry.below, true);
   assert.equal(geometry.name, "hidden");
+  assert.equal(
+    await evaluate(pet, "document.querySelector('#pet').dataset.idlePose"),
+    "true",
+  );
+  await delay(IDLE_POSE_INTERVAL + 100);
+  assert.equal(
+    await evaluate(pet, "document.querySelector('#pet').dataset.state"),
+    "happy",
+  );
+  const beforePoseHover = pet.getPosition();
+  pet.webContents.sendInputEvent({ type: "mouseMove", x: 50, y: 50 });
+  await delay(80);
+  assert.equal(
+    await evaluate(pet, "document.querySelector('#pet').dataset.state"),
+    "idle",
+  );
+  assert.equal(
+    await evaluate(pet, "document.querySelector('#pet').dataset.idlePose"),
+    "false",
+  );
+  assert.equal(
+    await evaluate(
+      pet,
+      "document.querySelector('#bubble').classList.contains('hidden')",
+    ),
+    true,
+  );
+  assert.deepEqual(pet.getPosition(), beforePoseHover);
+  pet.webContents.sendInputEvent({ type: "mouseMove", x: 379, y: 439 });
+  await delay(80);
   pet.webContents.send("quick-add");
   await delay(120);
   const topBubble = await evaluate(

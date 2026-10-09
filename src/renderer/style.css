@@ -165,6 +165,9 @@ body.pet-view {
 .pet-button[data-state="happy"] img {
   animation: hop 0.55s ease-in-out 3;
 }
+.pet-button[data-idle-pose="true"][data-state="happy"] img {
+  animation: breathe 3s ease-in-out infinite;
+}
 .pet-button[data-state="alert"] img {
   animation: wiggle 0.8s ease-in-out 3;
 }
