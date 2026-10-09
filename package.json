@@ -1,6 +1,6 @@
 {
   "name": "miso-desktop",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "MISO - Your Little Butler",
   "author": "MISO",
@@ -18,7 +18,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/renderer/*.css\" \"tests/**/*.ts\" \"scripts/*.mjs\" package.json tsconfig.json",
     "format:check": "prettier --check \"src/**/*.ts\" \"src/renderer/*.css\" \"tests/**/*.ts\" \"scripts/*.mjs\" package.json tsconfig.json",
     "build:release": "node scripts/build.mjs --release",
-    "verify:release": "node scripts/audit-release.mjs --packaged"
+    "verify:release": "node scripts/audit-release.mjs --packaged",
+    "dist:configured": "node scripts/build-configured-release.mjs"
   },
   "dependencies": {
     "@googleapis/calendar": "^20.1.0",

@@ -1,13 +1,13 @@
 # Installing MISO
 
-1. Install `MISO Setup 1.0.2.exe` on Windows x64.
+1. Install `MISO Setup 1.0.3.exe` on Windows x64.
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.
 
-**Current build:** built-in Google OAuth configuration is intentionally absent to protect the original developer configuration. Before connecting, open **Setup / credentials → Advanced developer configuration** and enter your own Google Desktop OAuth client ID and its client secret if required. Google's Calendar API must be enabled for that project. Follow Google's instructions: https://developers.google.com/identity/protocols/oauth2/native-app
+The publisher-configured installer includes MISO's Desktop OAuth app configuration. Click **Connect Google account** and sign in using your own account. The app configuration is hidden from the settings UI; each user's tokens and calendar data stay in their own protected local profile. Google may restrict authorization while the publisher's consent screen is in Testing mode.
 
-When a build includes a separate public MISO OAuth configuration, users can sign in directly. Advanced configuration can override it. Remove connected accounts before switching clients; **Restore default** restores the build's default. The current build has no default to restore.
+Advanced developer configuration lets users supply their own Desktop OAuth client instead. Remove connected accounts before switching clients; **Restore default** restores MISO's bundled configuration. Builds made without publisher configuration require this advanced setup. See https://developers.google.com/identity/protocols/oauth2/native-app.
 
 ## Your data and sharing
 

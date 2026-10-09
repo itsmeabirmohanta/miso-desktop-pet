@@ -31,6 +31,8 @@ For local development, set `BUTLER_GOOGLE_CLIENT_ID` and optionally `BUTLER_GOOG
 
 A publisher can provide a **separate public Desktop OAuth client** through `BUTLER_PUBLIC_GOOGLE_CLIENT_ID` and `BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET` when building a release. Development variables are not automatically embedded in production builds. Google authorization uses the system browser, PKCE, random state, and a loopback callback.
 
+To explicitly reuse the app OAuth configuration saved in the publisher's local MISO profile, run `npm run dist:configured`. This reads only the app client ID and client secret into the build environment; it never copies account tokens, AI keys or calendar data. The bundled configuration is hidden from the UI but remains extractable from the installer, as expected for Desktop OAuth. Use only a Desktop client for this command.
+
 Desktop OAuth client IDs and bundled native client secrets cannot be kept confidential in a distributed app. Never embed personal access/refresh tokens, service-account private keys, AI keys, or confidential web-client credentials. Default configuration is hidden in the settings UI; custom configuration and Restore default are supported when a build includes a default. Connected accounts must be removed before switching clients.
 
 General-public sign-in requires the publisher's Google production configuration and any required verification. See [Google's Desktop OAuth documentation](https://developers.google.com/identity/protocols/oauth2/native-app).
