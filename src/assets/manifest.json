@@ -1,0 +1,15 @@
+{
+  "branding": {
+    "logo": "branding/logo.svg",
+    "tray": "branding/tray.png"
+  },
+  "mascot": {
+    "idle": "mascot/idle/mascot.png",
+    "walk": "mascot/walk/mascot.png",
+    "sleep": "mascot/sleep/mascot.png",
+    "alert": "mascot/alert/mascot.png",
+    "happy": "mascot/happy/mascot.png",
+    "thinking": "mascot/thinking/mascot.png",
+    "wink": "mascot/wink/mascot.png"
+  }
+}

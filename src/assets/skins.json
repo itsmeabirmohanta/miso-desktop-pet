@@ -1,0 +1,12 @@
+{
+  "ginger": {
+    "name": "MISO",
+    "image": "cat.svg",
+    "filter": "none"
+  },
+  "midnight": {
+    "name": "MISO",
+    "image": "cat.svg",
+    "filter": "hue-rotate(170deg) saturate(0.6) brightness(0.7)"
+  }
+}
