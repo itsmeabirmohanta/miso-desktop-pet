@@ -46,6 +46,8 @@ await cp("src/assets", "dist/assets", {
     const name = relative("src/assets", path).replaceAll("\\", "/");
     return (
       name === "" ||
+      name === "fonts" ||
+      /^fonts\/(?:Inter|Baloo2)(?:\.ttf|-OFL\.txt)$/.test(name) ||
       /^(?:branding|mascot|mascot\/(?:idle|walk|sleep|alert|happy|thinking|wink))$/.test(
         name,
       ) ||

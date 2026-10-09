@@ -1,6 +1,6 @@
 # Installing MISO
 
-1. Install `MISO Setup 1.0.4.exe` on Windows x64.
+1. Install `MISO Setup 1.0.5.exe` on Windows x64.
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.

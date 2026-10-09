@@ -98,6 +98,12 @@ export function calendarView(
       item.dataset.search =
         `${e.summary ?? ""} ${cal?.accountEmail ?? ""} ${cal?.title ?? ""}`.toLowerCase();
       const category = e.extendedProperties?.private?.petCategory;
+      item.dataset.category =
+        category === "task" || category === "date" || category === "reminder"
+          ? category
+          : e.attendees?.length
+            ? "meeting"
+            : "event";
       item.append(
         node(
           "span",

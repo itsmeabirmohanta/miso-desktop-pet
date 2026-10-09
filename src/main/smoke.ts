@@ -19,8 +19,16 @@ export async function smoke(
   assert.equal(setup.getTitle(), "Set up MISO");
   const output = join(process.cwd(), "artifacts", "review");
   await mkdir(output, { recursive: true });
-  const evaluate = (w: BrowserWindow, code: string) =>
-    w.webContents.executeJavaScript(code);
+  const evaluate = async (w: BrowserWindow, code: string) => {
+    try {
+      return await w.webContents.executeJavaScript(code);
+    } catch (error) {
+      // Expressions are fixed synthetic test steps, never personal data.
+      throw new Error(`Smoke step failed in ${w.getTitle()}: ${code}`, {
+        cause: error,
+      });
+    }
+  };
   assert.equal(
     await evaluate(settings, "document.querySelector('h1').textContent"),
     "MISO",
@@ -397,10 +405,13 @@ export async function smoke(
     true,
   );
   assert.equal(events.size, 0);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  // Its previous-day 9 AM reminder must also remain in the future.
+  const futureDate = new Date(Date.now() + 3 * 86400000)
+    .toISOString()
+    .slice(0, 10);
   const added = await evaluate(
     settings,
-    `window.butler.createManual(${JSON.stringify({ accountId: "two", category: "date", title: "Annual date", start: tomorrow, allDay: true, yearly: true, reminders: [900] })})`,
+    `window.butler.createManual(${JSON.stringify({ accountId: "two", category: "date", title: "Annual date", start: futureDate, allDay: true, yearly: true, reminders: [900] })})`,
   );
   assert.equal(added.success, true);
   assert.equal(
@@ -459,6 +470,9 @@ export async function smoke(
   await evaluate(settings, "document.querySelector('#ai-enabled').click()");
   await delay(200);
   await evaluate(settings, "document.querySelector('dialog button').click()");
+  // Close the settings pane before exercising the separate pet workflow.
+  settings.hide();
+  await delay(150);
   pet.webContents.send("quick-add");
   await delay(120);
   assert.equal(

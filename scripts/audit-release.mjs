@@ -29,9 +29,15 @@ const allowed =
   /^dist\/(?:main\/(?:index|preload)\.cjs|renderer\/(?:app\.js|index\.html|style\.css|setup\.css)|assets\/(?:[^/]+\.(?:svg|png|ico)|skins\.json|manifest\.json|oauth-client\.json))$/;
 for (const name of firstParty) {
   // ASAR lists directories as well as files.
-  if (["dist/main", "dist/renderer", "dist/assets"].includes(name)) continue;
+  if (
+    ["dist/main", "dist/renderer", "dist/assets", "dist/assets/fonts"].includes(
+      name,
+    )
+  )
+    continue;
   if (
     !allowed.test(name) &&
+    !/^dist\/assets\/fonts\/(?:Inter|Baloo2)(?:\.ttf|-OFL\.txt)$/.test(name) &&
     !/^dist\/assets\/(?:branding|mascot\/(?:idle|walk|sleep|alert|happy|thinking|wink))\/[^/]+\.(?:svg|png|ico|webp|gif)$/.test(
       name,
     ) &&

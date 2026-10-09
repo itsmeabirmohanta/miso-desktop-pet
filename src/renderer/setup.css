@@ -26,8 +26,8 @@
   font-size: 12px;
 }
 .setup-steps .selected {
-  background: #e9dbca;
-  color: #93492f;
+  background: var(--butter-soft);
+  color: var(--charcoal);
 }
 .wizard .card {
   margin-bottom: 6px;
@@ -45,7 +45,7 @@
 .ai-hint {
   font-size: 11px;
   line-height: 1.6;
-  color: #8a877a;
+  color: var(--text-muted);
   margin-top: 13px;
 }
 .wizard-footer {
@@ -56,13 +56,13 @@
   align-items: center;
   gap: 14px;
   padding: 14px 0;
-  background: #f8f6f1;
-  border-top: 1px solid #e5e1d7;
+  background: var(--cream);
+  border-top: 1px solid var(--border);
   margin-top: 12px;
 }
 .wizard-footer span {
   font-size: 11px;
-  color: #827f71;
+  color: var(--text-muted);
 }
 .wizard .feedback {
   min-height: 18px;

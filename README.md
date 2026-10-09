@@ -2,6 +2,8 @@
 
 **MISO - Your Little Butler** is an Electron desktop companion for Google Calendar tasks, reminders, meetings, and important dates. AI is optional and off by default.
 
+The interface follows the [MISO brand styling guide](docs/UI-BRANDING.md): cream surfaces, charcoal text, butter-yellow actions, and locally bundled Baloo 2 and Inter fonts. Existing layouts, icons and mascot artwork are preserved.
+
 ## Features
 
 - A draggable desktop mascot with separate idle, walking, sleeping, thinking, alert, happy, and wink artwork.

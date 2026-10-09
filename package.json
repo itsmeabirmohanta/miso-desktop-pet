@@ -1,6 +1,6 @@
 {
   "name": "miso-desktop",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "description": "MISO - Your Little Butler",
   "author": "MISO",
@@ -56,7 +56,9 @@
       "package.json",
       "dist/assets/branding/**/*",
       "dist/assets/mascot/**/*",
-      "dist/assets/manifest.json"
+      "dist/assets/manifest.json",
+      "dist/assets/fonts/*.ttf",
+      "dist/assets/fonts/*-OFL.txt"
     ],
     "directories": {
       "output": "release"
