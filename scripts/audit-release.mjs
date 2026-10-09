@@ -6,6 +6,26 @@ const require = createRequire(import.meta.url);
 const packaged = process.argv.includes("--packaged");
 const asar = packaged ? require("@electron/asar") : undefined;
 const archive = "release/win-unpacked/resources/app.asar";
+const packageConfig = JSON.parse(await readFile("package.json", "utf8"));
+if (packageConfig.build?.nsis?.runAfterFinish !== false)
+  throw new Error(
+    "Installer auto-launch must remain disabled to avoid blocking Finish.",
+  );
+const installerScript = await readFile(
+  packageConfig.build.nsis.include,
+  "utf8",
+);
+for (const mode of ["safe-mode", "recovery-profile"]) {
+  if (
+    !installerScript
+      .split(/\r?\n/)
+      .some(
+        (line) =>
+          /^\s*CreateShortCut\s/.test(line) && line.includes(`"--${mode}"`),
+      )
+  )
+    throw new Error(`Installer is missing its ${mode} shortcut.`);
+}
 async function walk(path) {
   const entries = await readdir(path, { withFileTypes: true });
   return (
@@ -88,6 +108,13 @@ const oauth = JSON.parse(
   (await get("dist/assets/oauth-client.json")).toString(),
 );
 if (
+  process.argv.includes("--require-oauth") &&
+  (!oauth.clientId || !oauth.clientSecret)
+)
+  throw new Error(
+    "Publisher release is missing its default Desktop OAuth configuration. Configure both GitHub release secrets before shipping.",
+  );
+if (
   oauth.clientId &&
   !/^\d+-[a-zA-Z0-9_-]+\.apps\.googleusercontent\.com$/.test(oauth.clientId)
 )
@@ -113,7 +140,7 @@ if (packaged) {
     if (wire[option] !== FuseState.ENABLE)
       throw new Error("A required protection fuse is disabled.");
   const releaseFiles = await readdir("release");
-  const version = JSON.parse(await readFile("package.json", "utf8")).version;
+  const version = packageConfig.version;
   const installer = `MISO Setup ${version}.exe`;
   if (releaseFiles.includes(installer)) {
     const sha256 = createHash("sha256")

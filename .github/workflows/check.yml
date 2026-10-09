@@ -35,9 +35,13 @@ jobs:
           BUTLER_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_ID }}
           BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET }}
       - run: npm run smoke:packaged
+      - run: node scripts/verify-packaged.mjs --safe-mode
+      - name: Require default Google sign-in in publisher builds
+        if: github.event_name != 'pull_request'
+        run: node scripts/audit-release.mjs --packaged --require-oauth
       - uses: actions/upload-artifact@v4
         with:
-          name: MISO-Windows-x64
+          name: MISO-Windows-x64${{ github.event_name == 'pull_request' && '-test-build' || '' }}
           path: |
             release/MISO Setup *.exe
             release/MISO Setup *.exe.sha256

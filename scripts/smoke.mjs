@@ -16,7 +16,7 @@ const child = spawn(
 const timer = setTimeout(() => {
   child.kill();
   process.exitCode = 1;
-}, 45000);
+}, 60000);
 child.on("exit", (code) => {
   clearTimeout(timer);
   process.exitCode = code ?? 1;

@@ -208,14 +208,46 @@ export async function smoke(
   assert.equal(geometry.width, 110);
   assert.equal(geometry.below, true);
   assert.equal(geometry.name, "hidden");
+  // Server runners often disable animations. Exercise both preferences explicitly
+  // without changing the user's OS setting or the shipped renderer behaviour.
+  pet.webContents.debugger.attach("1.3");
+  const backgroundThrottling = pet.webContents.getBackgroundThrottling();
+  pet.webContents.setBackgroundThrottling(false);
+  await pet.webContents.debugger.sendCommand("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+  });
+  await delay(100);
+  assert.equal(
+    await evaluate(pet, "document.querySelector('#pet').dataset.idlePose"),
+    "false",
+  );
+  await pet.webContents.debugger.sendCommand("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "no-preference" }],
+  });
+  pet.showInactive();
+  await delay(150);
   assert.equal(
     await evaluate(pet, "document.querySelector('#pet').dataset.idlePose"),
     "true",
   );
   await delay(IDLE_POSE_INTERVAL + 100);
+  for (let attempt = 0; attempt < 15; attempt++) {
+    if (
+      (await evaluate(pet, "document.querySelector('#pet').dataset.state")) ===
+      "happy"
+    )
+      break;
+    await delay(200);
+  }
   assert.equal(
     await evaluate(pet, "document.querySelector('#pet').dataset.state"),
     "happy",
+    JSON.stringify(
+      await evaluate(
+        pet,
+        "(()=>{const p=document.querySelector('#pet'); return {state:p.dataset.state,enabled:p.dataset.idlePose,hidden:document.hidden,hovered:p.matches(':hover'),focused:p.matches(':focus-visible'),reduced:matchMedia('(prefers-reduced-motion: reduce)').matches};})()",
+      ),
+    ),
   );
   const beforePoseHover = pet.getPosition();
   pet.webContents.sendInputEvent({ type: "mouseMove", x: 50, y: 50 });
@@ -238,6 +270,8 @@ export async function smoke(
   assert.deepEqual(pet.getPosition(), beforePoseHover);
   pet.webContents.sendInputEvent({ type: "mouseMove", x: 379, y: 439 });
   await delay(80);
+  pet.webContents.debugger.detach();
+  pet.webContents.setBackgroundThrottling(backgroundThrottling);
   pet.webContents.send("quick-add");
   await delay(120);
   const topBubble = await evaluate(
