@@ -34,9 +34,9 @@ export function loadOAuthConfig(store: SettingsStore) {
   )
     store.save({ googleClientId: clientId });
   if (
-    secret &&
+    clientId &&
     store.settings.googleClientId === clientId &&
-    !store.secret("googleClientSecret")
+    store.secret("googleClientSecret") !== (secret || undefined)
   )
     store.setSecret("googleClientSecret", secret);
 }

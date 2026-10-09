@@ -1,6 +1,6 @@
 # Installing MISO
 
-1. Install `MISO Setup 1.0.3.exe` on Windows x64.
+1. Install `MISO Setup 1.0.4.exe` on Windows x64.
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.
@@ -8,6 +8,8 @@
 The publisher-configured installer includes MISO's Desktop OAuth app configuration. Click **Connect Google account** and sign in using your own account. The app configuration is hidden from the settings UI; each user's tokens and calendar data stay in their own protected local profile. Google may restrict authorization while the publisher's consent screen is in Testing mode.
 
 Advanced developer configuration lets users supply their own Desktop OAuth client instead. Remove connected accounts before switching clients; **Restore default** restores MISO's bundled configuration. Builds made without publisher configuration require this advanced setup. See https://developers.google.com/identity/protocols/oauth2/native-app.
+
+If sign-in fails after returning from Google, share the displayed stage and `GOOGLE_...` support code. Version 1.0.4 distinguishes rejected client configuration, rejected sign-in codes, permission denial, connection/TLS errors, and missing offline access or account identity. These messages do not include tokens or raw server responses.
 
 ## Your data and sharing
 

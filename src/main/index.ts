@@ -20,6 +20,7 @@ import { APP_NAME, APP_FULL_NAME } from "../shared/brand";
 import { z } from "zod";
 import { SettingsStore } from "./settings/store";
 import { makeAuth, connectGoogle } from "./calendar/auth";
+import { GoogleSignInError } from "./calendar/auth-errors";
 import { GoogleCalendarProvider } from "./calendar/google";
 import { InputService, AICredentialError } from "./nlu/input";
 import { aiConfig, aiSecretName, normalizeBaseUrl } from "../shared/ai";
@@ -673,6 +674,7 @@ function placePet(x: number, y: number) {
   return placed.window;
 }
 function errorMessage(error: unknown): string {
+  if (error instanceof GoogleSignInError) return error.message;
   if (statusCode(error) === 412)
     return "The event changed on Google. Please enter the command again.";
   if (statusCode(error) === 401 || String(error).includes("invalid_grant"))

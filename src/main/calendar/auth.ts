@@ -3,6 +3,11 @@ import { createServer } from "node:http";
 import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
 import { shell } from "electron";
 import type { SettingsStore } from "../settings/store";
+import {
+  GoogleSignInError,
+  signInError,
+  type SignInStage,
+} from "./auth-errors";
 export function makeAuth(
   store: SettingsStore,
   accountId?: string,
@@ -52,11 +57,11 @@ export async function connectGoogle(store: SettingsStore): Promise<{
     clientSecret: store.secret("googleClientSecret"),
     redirectUri,
   });
+  let stage: SignInStage = "browser sign-in";
   try {
     const code = await new Promise<string>((resolve, reject) => {
       const timer = setTimeout(
-        () =>
-          reject(new Error("Google sign-in timed out. Try connecting again.")),
+        () => reject(new GoogleSignInError("timeout", stage)),
         180000,
       );
       server.on("request", (req, res) => {
@@ -85,7 +90,15 @@ export async function connectGoogle(store: SettingsStore): Promise<{
             : "Sign-in cancelled. Return to MISO.",
         );
         if (authCode) resolve(authCode);
-        else reject(new Error("Google sign-in was cancelled."));
+        else
+          reject(
+            new GoogleSignInError(
+              url.searchParams.get("error") === "access_denied"
+                ? "access_denied"
+                : "cancelled",
+              stage,
+            ),
+          );
       });
       const url = client.generateAuthUrl({
         access_type: "offline",
@@ -106,26 +119,24 @@ export async function connectGoogle(store: SettingsStore): Promise<{
         reject(error);
       });
     });
+    stage = "token exchange";
     const { tokens } = await client.getToken({
       code,
       codeVerifier: verifier,
       redirect_uri: redirectUri,
     });
     if (!tokens.refresh_token)
-      throw new Error(
-        "Google did not issue a refresh token. Revoke MISO access in your Google account and reconnect.",
-      );
+      throw new GoogleSignInError("missing_refresh_token", stage);
     if (!tokens.id_token)
-      throw new Error(
-        "Google did not return an account identity. Try signing in again.",
-      );
+      throw new GoogleSignInError("missing_identity", stage);
+    stage = "account verification";
     const ticket = await client.verifyIdToken({
       idToken: tokens.id_token,
       audience: store.settings.googleClientId,
     });
     const identity = ticket.getPayload();
     if (!identity?.sub || !identity.email || !identity.email_verified)
-      throw new Error("Google account identity could not be verified.");
+      throw new GoogleSignInError("missing_identity", stage);
     client.setCredentials(tokens);
     return {
       client,
@@ -133,6 +144,8 @@ export async function connectGoogle(store: SettingsStore): Promise<{
       email: identity.email,
       refreshToken: tokens.refresh_token,
     };
+  } catch (error) {
+    throw signInError(error, stage);
   } finally {
     server.close();
     server.closeAllConnections();
