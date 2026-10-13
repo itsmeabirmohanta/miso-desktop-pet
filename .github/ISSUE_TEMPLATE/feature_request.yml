@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest an improvement to the desktop pet, calendars, or reminder workflow.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like MISO to help with?
+      description: Describe the problem or use case without including private calendar data.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: Explain how you would expect the feature to work.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or examples
+      description: Include any workarounds or examples that help explain the request.

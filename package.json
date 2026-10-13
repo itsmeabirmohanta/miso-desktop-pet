@@ -2,7 +2,7 @@
   "name": "miso-desktop",
   "version": "1.0.6",
   "private": true,
-  "description": "MISO - Your Little Butler",
+  "description": "MISO - Your Little Butler: a desktop pet for Google Calendar reminders, tasks, meetings and important dates, with multiple accounts and optional AI.",
   "author": "MISO",
   "main": "dist/main/index.cjs",
   "scripts": {
@@ -103,13 +103,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/itsmeabirmohanta/miso.git"
+    "url": "https://github.com/itsmeabirmohanta/miso-desktop-pet.git"
   },
-  "homepage": "https://github.com/itsmeabirmohanta/miso#readme",
+  "homepage": "https://github.com/itsmeabirmohanta/miso-desktop-pet#readme",
   "bugs": {
-    "url": "https://github.com/itsmeabirmohanta/miso/issues"
+    "url": "https://github.com/itsmeabirmohanta/miso-desktop-pet/issues"
   },
   "engines": {
     "node": ">=22.12.0"
-  }
+  },
+  "keywords": [
+    "miso",
+    "desktop-pet",
+    "desktop-companion",
+    "google-calendar",
+    "reminders",
+    "task-manager",
+    "productivity",
+    "electron",
+    "typescript",
+    "windows"
+  ]
 }

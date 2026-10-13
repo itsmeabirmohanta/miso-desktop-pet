@@ -1,16 +1,17 @@
 <div align="center">
+  <h1>MISO — Your Little Butler</h1>
   <img src="src/assets/Miso-github-banner.jpg" alt="MISO — Your Little Butler, a desktop pet reminder companion" width="960">
   <p><strong>A little company on your desktop. A little help remembering what matters.</strong></p>
   <p>
-    <a href="https://github.com/itsmeabirmohanta/miso/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.6-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.6"></a>
-    <a href="https://github.com/itsmeabirmohanta/miso/actions/workflows/check.yml"><img src="https://github.com/itsmeabirmohanta/miso/actions/workflows/check.yml/badge.svg" alt="Build and verification status"></a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.6-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.6"></a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml"><img src="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml/badge.svg" alt="Build and verification status"></a>
     <img src="https://img.shields.io/badge/platform-Windows_x64-7ED389?style=flat-square&amp;labelColor=1E1E2E" alt="Windows x64">
     <img src="https://img.shields.io/badge/AI-optional-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="AI is optional">
   </p>
   <p>
-    <a href="https://github.com/itsmeabirmohanta/miso/releases/latest/download/MISO-Setup.exe"><strong>Download for Windows</strong></a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe"><strong>Download for Windows</strong></a>
     &nbsp; · &nbsp;
-    <a href="https://github.com/itsmeabirmohanta/miso/releases/latest">Release notes</a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest">Release notes</a>
     &nbsp; · &nbsp;
     <a href="docs/USER-GUIDE.md">User guide</a>
   </p>
@@ -44,7 +45,7 @@ While idle, MISO changes pose every 15 seconds. Rotation pauses during interacti
 
 ## Start in three steps
 
-1. **Install:** download [MISO-Setup.exe](https://github.com/itsmeabirmohanta/miso/releases/latest/download/MISO-Setup.exe), run it, and open **MISO** from Start after clicking Finish. Node.js is not needed.
+1. **Install:** download [MISO-Setup.exe](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe), run it, and open **MISO** from Start after clicking Finish. Node.js is not needed.
 2. **Connect:** sign in to your own Google account in your browser. Add more accounts and select your calendars in Settings.
 3. **Ask:** click the cat or press **Ctrl+Alt+B** to add a reminder, task, important date, or view your calendar. Change the shortcut in Settings.
 
@@ -58,7 +59,7 @@ While idle, MISO changes pose every 15 seconds. Rotation pauses during interacti
 
 **Distribution status:** Windows x64 is the verified installer target. The current installer is unsigned and may show a Windows reputation warning. The publisher-configured release includes default Google sign-in configuration; Google's consent warning remains until the OAuth project completes the required verification. Download availability and Google approval are separate. See the [installation and troubleshooting guide](docs/USER-GUIDE.md).
 
-For a checksum, download [MISO-Setup.exe.sha256](https://github.com/itsmeabirmohanta/miso/releases/latest/download/MISO-Setup.exe.sha256) from the release. Share the original installer; each user connects their own accounts. GitHub download links are publicly accessible once this repository is public.
+For a checksum, download [MISO-Setup.exe.sha256](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe.sha256) from the release. Share the original installer; each user connects their own accounts. The public GitHub release includes the installer, checksum, and installation guide.
 
 ## Your data
 
@@ -78,8 +79,8 @@ OS encryption does not protect an unlocked device from malware running as its us
 Use Node.js **22.12 or newer**, npm, and a desktop session.
 
 ```sh
-git clone https://github.com/itsmeabirmohanta/miso.git
-cd miso
+git clone https://github.com/itsmeabirmohanta/miso-desktop-pet.git
+cd miso-desktop-pet
 npm ci
 npm start
 ```
@@ -136,11 +137,17 @@ Each pose uses the same `mascot` base name. Build-time priority is WebP, PNG, GI
 
 ## Explore further
 
-| For users                                                                  | For contributors                           |
-| -------------------------------------------------------------------------- | ------------------------------------------ |
-| [Installation and troubleshooting](docs/USER-GUIDE.md)                     | [Contributing](CONTRIBUTING.md)            |
-| [Latest release](https://github.com/itsmeabirmohanta/miso/releases/latest) | [Artwork guide](src/assets/README.md)      |
-| [Privacy and security](docs/SECURITY-AND-SHIPPING.md)                      | [Optimization notes](docs/OPTIMIZATION.md) |
-| [Security reporting](SECURITY.md)                                          | [Brand styling](docs/UI-BRANDING.md)       |
+| For users                                                                              | For contributors                           |
+| -------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [Installation and troubleshooting](docs/USER-GUIDE.md)                                 | [Contributing](CONTRIBUTING.md)            |
+| [Latest release](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest) | [Artwork guide](src/assets/README.md)      |
+| [Privacy and security](docs/SECURITY-AND-SHIPPING.md)                                  | [Optimization notes](docs/OPTIMIZATION.md) |
+| [Security reporting](SECURITY.md)                                                      | [Brand styling](docs/UI-BRANDING.md)       |
 
 No project-wide license has been selected. Bundled fonts retain their respective [Baloo 2](src/assets/fonts/Baloo2-OFL.txt) and [Inter](src/assets/fonts/Inter-OFL.txt) licenses.
+
+## Help MISO reach more desktops
+
+Save the repository with a star, watch releases for updates, or share the [Windows download](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe) with someone who would enjoy a desktop companion. Have a question or an idea? Join [Discussions](https://github.com/itsmeabirmohanta/miso-desktop-pet/discussions). Report reproducible bugs and request features through the [issue forms](https://github.com/itsmeabirmohanta/miso-desktop-pet/issues/new/choose).
+
+See [shareable links and a short product introduction](docs/SHARING.md).

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/itsmeabirmohanta/miso-desktop-pet/discussions
+    about: Ask questions, share ideas, or discuss using MISO.
+  - name: Installation and troubleshooting
+    url: https://github.com/itsmeabirmohanta/miso-desktop-pet/blob/main/docs/USER-GUIDE.md
+    about: Read setup instructions and common startup or sign-in troubleshooting steps.
+  - name: Report a security vulnerability privately
+    url: https://github.com/itsmeabirmohanta/miso-desktop-pet/security/advisories/new
+    about: Use private vulnerability reporting for exploitable problems or exposed credentials.

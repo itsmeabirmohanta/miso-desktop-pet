@@ -1,6 +1,6 @@
 # MISO distribution
 
-Share the published `MISO-Setup.exe`, its SHA-256 checksum, and end-user instructions from [GitHub Releases](https://github.com/itsmeabirmohanta/miso/releases/latest). Locally generated installers use `release/MISO Setup <version>.exe`. The development repository can be public; private `.env` files, ignored `artifacts`, logs, screenshots, app-data folders, and existing user profiles must stay outside distribution. See the [publication review](PUBLICATION-REVIEW.md).
+Share the published `MISO-Setup.exe`, its SHA-256 checksum, and end-user instructions from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest). Locally generated installers use `release/MISO Setup <version>.exe`. The development repository can be public; private `.env` files, ignored `artifacts`, logs, screenshots, app-data folders, and existing user profiles must stay outside distribution. See the [publication review](PUBLICATION-REVIEW.md).
 
 ## Implemented protections
 

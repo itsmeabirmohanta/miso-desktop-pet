@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a startup, calendar, reminder, or interface problem.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve MISO. Use sample event names and remove account emails, calendar details, tokens, API keys, and OAuth credentials from anything you share. Report security vulnerabilities privately using the link on the issue chooser.
+  - type: input
+    id: version
+    attributes:
+      label: MISO version
+      description: Include the release version or source commit.
+      placeholder: "1.0.6"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and version
+      placeholder: "Windows 11, x64"
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: How did you install MISO?
+      options:
+        - GitHub release installer
+        - Built from source
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Describe the steps using synthetic examples instead of personal calendar data.
+      placeholder: |
+        1. Open MISO.
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: What should happen, and what happens instead?
+    validations:
+      required: true
+  - type: input
+    id: support-code
+    attributes:
+      label: Support code, if shown
+      description: Copy only the support code displayed by MISO. Do not upload your app-data folder or full logs.
