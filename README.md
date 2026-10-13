@@ -3,13 +3,15 @@
   <img src="src/assets/Miso-github-banner.jpg" alt="MISO — Your Little Butler, a desktop pet reminder companion" width="960">
   <p><strong>A little company on your desktop. A little help remembering what matters.</strong></p>
   <p>
-    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.6-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.6"></a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.7-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.7"></a>
     <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml"><img src="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml/badge.svg" alt="Build and verification status"></a>
     <img src="https://img.shields.io/badge/platform-Windows_x64-7ED389?style=flat-square&amp;labelColor=1E1E2E" alt="Windows x64">
     <img src="https://img.shields.io/badge/AI-optional-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="AI is optional">
   </p>
   <p>
     <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe"><strong>Download for Windows</strong></a>
+    &nbsp; · &nbsp;
+    <a href="https://miso.abirmahanta.in/">Official website</a>
     &nbsp; · &nbsp;
     <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest">Release notes</a>
     &nbsp; · &nbsp;
@@ -20,6 +22,8 @@
 ---
 
 MISO is a small, draggable desktop cat that helps you keep up with Google Calendar meetings, tasks, reminders, and important dates. Click your companion, answer a few short prompts, and get back to your day. Calendar features work with **AI switched off** and require no AI key.
+
+Visit **[miso.abirmahanta.in](https://miso.abirmahanta.in/)** for the product overview, [privacy policy](https://miso.abirmahanta.in/privacy-policy), and [terms of service](https://miso.abirmahanta.in/terms-of-service). The same links are available from MISO's setup, settings, and tray menu and open in your browser.
 
 ## Meet your butler
 

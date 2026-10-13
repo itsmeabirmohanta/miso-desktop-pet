@@ -1,10 +1,12 @@
 import assets from "../assets/manifest.json";
+import { addSiteLinks } from "./site-links";
 import type { Snapshot } from "../shared/types";
 import { confirmDialog, resultDialog } from "./dialogs";
 export function setupWizard(root: HTMLElement) {
   document.body.className = "settings-view";
   root.innerHTML = `<main class="settings-shell"><header class="header"><img src="../assets/${assets.branding.logo}" alt="MISO"><div><h1>First, connect Google.</h1><p>MISO - Your Little Butler</p><p>Sign in or create a Google account to connect your calendars.</p></div></header><section class="card"><h2>Your Google accounts</h2><p>Google opens in your browser to ask for calendar permissions. You can connect several accounts. AI is optional and can be enabled later in Settings.</p><div id="setup-accounts"></div><div class="button-row"><button id="enable-calendar-api" hidden>Enable Calendar API</button><button id="retry-sync">Retry sync</button></div><button id="google-connect" class="primary">Continue with Google</button><details id="developer-config" class="setup-details"><summary>Advanced developer configuration</summary><p id="oauth-mode"></p><p>Use your own Google Desktop OAuth configuration, or restore the default configuration included with this build. Remove connected accounts before switching.</p><form id="developer-form"><label class="field"><span>Desktop OAuth client ID</span><input id="google-client" required></label><label class="field"><span>Client secret</span><input id="google-secret" type="password" autocomplete="off"></label><div class="button-row"><button type="submit">Save configuration</button><button type="button" id="google-help">Google setup help</button><button type="button" id="restore-oauth">Restore default</button></div></form></details></section><p id="feedback" class="feedback" role="status"></p><div class="button-row"><button id="start-butler" class="primary" disabled>Start MISO</button><button id="start-scratch" class="danger">Start from scratch</button></div></main>`;
   const api = window.butler;
+  addSiteLinks(root);
   const get = <T extends HTMLElement>(id: string) =>
     document.getElementById(id) as T;
   let current: Snapshot;

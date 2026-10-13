@@ -30,6 +30,8 @@ To build with a separate public Desktop client, supply `BUTLER_PUBLIC_GOOGLE_CLI
 
 Before general distribution, the publisher must enable Calendar API and complete Google's production publishing/verification requirements for the requested scopes. Testing-mode consent configuration is not a general-public release. Workspace administrators can impose additional restrictions.
 
+MISO's official homepage is `https://miso.abirmahanta.in/`, with privacy policy at `https://miso.abirmahanta.in/privacy-policy` and terms at `https://miso.abirmahanta.in/terms-of-service`. These links are available inside the app and in the repository documentation. Google Auth Platform branding and domain ownership must be configured separately in the publisher's Cloud project; adding links to the app does not submit Google verification.
+
 Google reference: https://developers.google.com/identity/protocols/oauth2/native-app
 Production verification: https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification
 Electron integrity: https://www.electronjs.org/docs/latest/tutorial/asar-integrity

@@ -2,6 +2,8 @@
 
 MISO's public repository is [miso-desktop-pet](https://github.com/itsmeabirmohanta/miso-desktop-pet). The app itself remains **MISO — Your Little Butler**.
 
+The official product website is **[miso.abirmahanta.in](https://miso.abirmahanta.in/)**. GitHub's About homepage points to it; releases remain available directly from GitHub.
+
 ## Links to share
 
 - [Download the latest Windows installer](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe)
@@ -23,7 +25,7 @@ GitHub's social-preview image is configured separately from the README banner. I
 
 ## Maintaining discovery information
 
-- Keep the About description and relevant topics aligned with the application's actual features. The release-page homepage gives visitors a clear route to install.
+- Keep the About description and relevant topics aligned with the application's actual features. Keep the official website and the latest release's download links current.
 - Add concise release notes when publishing new versions, with the supported platform and known setup requirements.
 - Use Discussions for questions and ideas, issue forms for reproducible bugs and feature requests, and private reporting for security problems.
 - Watch releases for updates, save the repository with a star, or share it with people who would find a desktop calendar companion useful.
@@ -31,3 +33,6 @@ GitHub's social-preview image is configured separately from the README banner. I
 Repository metadata helps people find and understand the project. Adoption also depends on reliable setup, a useful demo, and continued maintenance; these changes do not guarantee GitHub Trending placement or download growth.
 
 [GitHub topics](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics) · [Repository redirects](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) · [Social previews](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview)
+
+- [Official website](https://miso.abirmahanta.in/)
+- [Privacy policy](https://miso.abirmahanta.in/privacy-policy) and [terms of service](https://miso.abirmahanta.in/terms-of-service)

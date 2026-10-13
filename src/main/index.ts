@@ -16,7 +16,12 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, resolve } from "node:path";
 import assets from "../assets/manifest.json";
-import { APP_NAME, APP_FULL_NAME } from "../shared/brand";
+import {
+  APP_NAME,
+  APP_FULL_NAME,
+  APP_LINKS,
+  type AppLink,
+} from "../shared/brand";
 import { z } from "zod";
 import { SettingsStore } from "./settings/store";
 import { makeAuth, connectGoogle } from "./calendar/auth";
@@ -632,6 +637,17 @@ function secureWindow(window: BrowserWindow) {
     event.preventDefault(),
   );
 }
+function openAppLink(topic: AppLink) {
+  return shell.openExternal(APP_LINKS[topic]);
+}
+function openTrayLink(topic: AppLink) {
+  void openAppLink(topic).catch(() =>
+    dialog.showErrorBox(
+      "Could not open MISO's website",
+      `Open ${APP_LINKS[topic]} in your browser.`,
+    ),
+  );
+}
 function trayMenu() {
   tray.setContextMenu(
     Menu.buildFromTemplate([
@@ -654,6 +670,10 @@ function trayMenu() {
           publish();
         },
       },
+      { type: "separator" },
+      { label: "MISO website", click: () => openTrayLink("website") },
+      { label: "Privacy policy", click: () => openTrayLink("privacy") },
+      { label: "Terms of service", click: () => openTrayLink("terms") },
       { type: "separator" },
       { label: "Quit MISO", click: () => app.quit() },
     ]),
@@ -947,7 +967,24 @@ else {
         return snapshot();
       });
       handle("help", async (topic: unknown, p: unknown) => {
-        const choice = z.enum(["google", "google-calendar", "ai"]).parse(topic);
+        const choice = z
+          .enum([
+            "google",
+            "google-calendar",
+            "ai",
+            "website",
+            "privacy",
+            "terms",
+          ])
+          .parse(topic);
+        if (
+          choice === "website" ||
+          choice === "privacy" ||
+          choice === "terms"
+        ) {
+          await openAppLink(choice);
+          return;
+        }
         const which = z
           .enum(["anthropic", "openai", "gemini", "compatible", "ollama"])
           .parse(p ?? store.settings.aiProvider);

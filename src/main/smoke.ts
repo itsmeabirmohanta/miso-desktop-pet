@@ -1,6 +1,7 @@
 import { capturePerformance } from "./performance";
 import { IDLE_POSE_INTERVAL } from "../renderer/idle-poses";
-import { app, screen, type BrowserWindow } from "electron";
+import { app, screen, shell, type BrowserWindow } from "electron";
+import { APP_LINKS, type AppLink } from "../shared/brand";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { strict as assert } from "node:assert";
@@ -35,6 +36,41 @@ export async function smoke(
     "MISO",
   );
   assert.equal(await evaluate(settings, "typeof require"), "undefined");
+  const openedPages: string[] = [];
+  const originalOpenExternal = shell.openExternal;
+  shell.openExternal = async (url) => {
+    openedPages.push(url);
+  };
+  try {
+    for (const view of [setup, settings]) {
+      assert.equal(
+        await evaluate(
+          view,
+          "document.querySelectorAll('[data-app-link]').length",
+        ),
+        3,
+      );
+      for (const topic of Object.keys(APP_LINKS) as AppLink[]) {
+        await evaluate(
+          view,
+          `document.querySelector('[data-app-link="${topic}"]').click()`,
+        );
+        await delay(50);
+        assert.equal(openedPages.at(-1), APP_LINKS[topic]);
+      }
+    }
+    const openedCount = openedPages.length;
+    for (const forbidden of ["https://example.test/", "javascript:alert(1)"]) {
+      await evaluate(
+        settings,
+        `window.butler.help(${JSON.stringify(forbidden)}).then(()=>{throw new Error('Arbitrary help URL accepted')},()=>true)`,
+      );
+    }
+    assert.equal(openedPages.length, openedCount);
+    assert.equal(openedCount, 6);
+  } finally {
+    shell.openExternal = originalOpenExternal;
+  }
   assert.equal(
     await evaluate(setup, "document.querySelector('h1').textContent"),
     "First, connect Google.",

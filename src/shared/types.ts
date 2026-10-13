@@ -147,7 +147,8 @@ export interface ButlerAPI {
   testAI(): Promise<Snapshot>;
   finishSetup(): Promise<Snapshot>;
   help(
-    topic: "google" | "google-calendar" | "ai",
+    topic:
+      "google" | "google-calendar" | "ai" | "website" | "privacy" | "terms",
     provider?: AIProvider,
   ): Promise<void>;
   snooze(key: string, minutes: number): Promise<void>;

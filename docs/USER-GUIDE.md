@@ -1,9 +1,11 @@
 # Installing MISO
 
-1. Install `MISO Setup 1.0.6.exe` on Windows x64.
+1. Install `MISO Setup 1.0.7.exe` on Windows x64, or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest).
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.
+
+The official website is [miso.abirmahanta.in](https://miso.abirmahanta.in/). Setup, Settings, and the tray menu include links to the website, [privacy policy](https://miso.abirmahanta.in/privacy-policy), and [terms of service](https://miso.abirmahanta.in/terms-of-service). These links open your browser; MISO does not attach account identities, credentials, or calendar details to them.
 
 While idle, MISO changes between resting, happy and sleeping poses every 15 seconds. Hovering returns it to resting immediately; leaving restarts the interval. This changes only its appearance and does not open a popup or move the pet. Rotation pauses while a dialog is open, reminders are paused, the pet is hidden, or an action is in progress. Reduced-motion preferences disable automatic pose rotation.
 
