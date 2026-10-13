@@ -1,6 +1,6 @@
-# MISO 1.0.1 distribution
+# MISO distribution
 
-Share only `release/MISO Setup 1.0.1.exe`, its SHA-256 checksum, and end-user instructions. Do not share this workspace, `artifacts`, logs, screenshots, your app-data folder, or a folder copied from an existing installation's user profile.
+Share the published `MISO-Setup.exe`, its SHA-256 checksum, and end-user instructions from [GitHub Releases](https://github.com/itsmeabirmohanta/miso/releases/latest). Locally generated installers use `release/MISO Setup <version>.exe`. The development repository can be public; private `.env` files, ignored `artifacts`, logs, screenshots, app-data folders, and existing user profiles must stay outside distribution. See the [publication review](PUBLICATION-REVIEW.md).
 
 ## Implemented protections
 
@@ -14,13 +14,13 @@ Share only `release/MISO Setup 1.0.1.exe`, its SHA-256 checksum, and end-user in
 - No analytics/crash-upload service is configured. Google sync sends calendar requests to Google. AI is off by default; when enabled, typed AI commands go to the selected provider or local server. Provider policies govern data they receive.
 - Reset clears local personal data and AI keys, while retaining the selected OAuth configuration for reconnecting. Account removal attempts Google token revocation; local reset does not revoke remote Google permissions. Google calendars/events remain in Google.
 
-## Google configuration and the remaining release decision
+## Google configuration and verification
 
-The current installer intentionally contains **no original developer OAuth configuration**. Users can enter their own Desktop OAuth configuration under **Setup / credentials → Advanced developer configuration**.
+The publisher-configured release includes the Desktop OAuth app configuration selected by the publisher. It is stored in GitHub Actions secrets for publisher builds and is not committed as credential values in this repository. The installer deliberately embeds this app configuration so users can connect their own Google accounts without creating a Cloud project. Personal account tokens, AI keys, and calendar data are excluded. Unconfigured source or test builds require a user's Desktop OAuth configuration under **Setup / credentials → Advanced developer configuration**.
 
 Google Desktop OAuth clients are public clients. A client ID is present in the browser's authorization request, and a desktop client secret cannot be made confidential inside a distributed executable. UI masking, minification, ASAR packaging, and encryption with a shipped decryption key do not solve this. An OAuth client ID alone does not grant access to an owner's Google account.
 
-For built-in login, create a separate Google Cloud OAuth client for MISO's public distribution. Keep the owner's original client out of the release. The separate public client still cannot be hidden from someone inspecting the application or Google authorization URL.
+A dedicated Google Cloud project/client for public distribution separates the app's public identity from unrelated development or server credentials. Regardless of which Desktop client is selected, its bundled values cannot be hidden from someone inspecting the installer or Google authorization URL. They are not personal account tokens and do not grant access to a user's account without authorization.
 
 An alternative is a hosted login/token service. This requires a separate deployment, HTTPS domain, server-side credential storage, token lifecycle and access controls, and a data-handling policy. A server can keep its secret confidential, but the client ID used for Google authorization is still visible in the browser; use a separate public application registration if the original ID must stay private.
 

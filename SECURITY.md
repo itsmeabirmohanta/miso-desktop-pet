@@ -6,4 +6,4 @@ Use GitHub's private vulnerability reporting for this repository if the maintain
 
 For protection boundaries and shipping requirements, read [security and shipping details](docs/SECURITY-AND-SHIPPING.md).
 
-The currently maintained source version is 1.0.1. No security certification, response-time commitment, or guarantee against malware running as the logged-in OS user is implied.
+The latest source and published release are the maintained versions; see [GitHub Releases](https://github.com/itsmeabirmohanta/miso/releases/latest). No security certification, response-time commitment, or guarantee against malware running as the logged-in OS user is implied. The [publication review](docs/PUBLICATION-REVIEW.md) describes what becomes visible when the repository is public.
