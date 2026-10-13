@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>MISO — Your Little Butler</h1>
+  <h1>MISO : Your Little Butler</h1>
   <img src="src/assets/Miso-github-banner.jpg" alt="MISO — Your Little Butler, a desktop pet reminder companion" width="960">
   <p><strong>A little company on your desktop. A little help remembering what matters.</strong></p>
   <p>
