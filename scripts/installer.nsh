@@ -26,8 +26,21 @@
 !macroend
 
 !macro customFinishPage
+  Function MisoLaunchAfterSetup
+    ; Match the stock assisted finish callback. Expanding StartApp here would
+    ; redeclare its global variable when installSection also expands it.
+    ${if} ${isUpdated}
+      StrCpy $1 "--updated"
+    ${else}
+      StrCpy $1 ""
+    ${endif}
+    ${StdUtils.ExecShellAsUser} $0 "$launchLink" "open" "$1"
+  FunctionEnd
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_TEXT "Launch MISO"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "MisoLaunchAfterSetup"
   !define MUI_FINISHPAGE_TITLE "MISO is ready to meet you"
-  !define MUI_FINISHPAGE_TEXT "Open MISO from the Start menu or your desktop shortcut.$\r$\n$\r$\nConnect Google Calendar, choose your calendars, and let your little butler keep an eye on what is next.$\r$\n$\r$\nClick the cat or press Ctrl+Alt+B when you need a hand.$\r$\n$\r$\nClick Finish to close setup."
+  !define MUI_FINISHPAGE_TEXT "Your little butler is installed.$\r$\n$\r$\nLeave Launch MISO checked to meet your companion. First-time setup walks you through Google sign-in, optional AI, and calendar sync.$\r$\n$\r$\nYou can also open MISO later from the Start menu or your desktop shortcut.$\r$\n$\r$\nClick Finish to close setup."
   !insertmacro MUI_PAGE_FINISH
 !macroend
 

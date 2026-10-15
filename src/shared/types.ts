@@ -52,6 +52,8 @@ export interface Settings {
   aiKeyRequired: boolean;
   aiValidationFingerprint: string;
   aiEnabled: boolean;
+  assistantMode: "ai" | "manual";
+  onboardingCompleted: boolean;
   accounts: GoogleAccount[];
   defaultAccountId: string;
   hotkey: string;
@@ -81,6 +83,18 @@ export interface Reply {
   state?: PetState;
   choices?: Choice[];
   reminder?: Reminder;
+  scheduledEvent?: CalendarEvent;
+}
+export interface AIModel {
+  id: string;
+  label: string;
+}
+export interface AISetupInput {
+  provider: AIProvider;
+  baseUrl: string;
+  keyRequired: boolean;
+  apiKey?: string;
+  model?: string;
 }
 export interface PetLayout {
   x: number;
@@ -128,7 +142,7 @@ export interface ButlerAPI {
   previewEdit(
     calendarId: string,
     eventId: string,
-    input: { title: string; start: string; end: string },
+    input: { title: string; start: string; end: string; reminders?: number[] },
   ): Promise<{ ticket: string; summary: string }>;
   confirmEdit(ticket: string): Promise<OperationResult>;
   cancelEdit(ticket: string): Promise<void>;
@@ -145,6 +159,10 @@ export interface ButlerAPI {
   confirmDelete(ticket: string): Promise<OperationResult>;
   cancelDelete(ticket: string): Promise<void>;
   testAI(): Promise<Snapshot>;
+  discoverAI(
+    input: AISetupInput,
+  ): Promise<{ models: AIModel[]; recommended: string }>;
+  configureAI(input: AISetupInput): Promise<Snapshot>;
   finishSetup(): Promise<Snapshot>;
   help(
     topic:

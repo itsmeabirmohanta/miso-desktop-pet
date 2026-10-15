@@ -1,17 +1,27 @@
 import { calendarView } from "./calendar-view";
-import type { Category, ManualEventInput, Snapshot } from "../shared/types";
+import type {
+  CalendarEvent,
+  Category,
+  ManualEventInput,
+  Snapshot,
+} from "../shared/types";
 export function quickAdd(
   root: HTMLElement,
   options: {
     snapshot: () => Snapshot;
     close: () => void;
     saved: (message: string) => void;
+    busy?: () => void;
   },
 ) {
   let step = 0,
     saving = false;
   let data: ManualEventInput;
   let reminder = "10";
+  function setSaving(value: boolean) {
+    saving = value;
+    options.busy?.();
+  }
   const today = () =>
     new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
       .toISOString()
@@ -192,7 +202,7 @@ export function quickAdd(
         calendarView(root, {
           ...options,
           back: render,
-          busy: (value) => (saving = value),
+          busy: setSaving,
         });
         return;
       }
@@ -221,7 +231,7 @@ export function quickAdd(
       }
       if (step === 6) data.accountId = field.value;
       if (step === 7) {
-        saving = true;
+        setSaving(true);
         form
           .querySelectorAll<HTMLButtonElement>("button")
           .forEach((b) => (b.disabled = true));
@@ -236,7 +246,7 @@ export function quickAdd(
             error.textContent = e.message;
           })
           .finally(() => {
-            saving = false;
+            setSaving(false);
             form
               .querySelectorAll<HTMLButtonElement>("button")
               .forEach((b) => (b.disabled = false));
@@ -262,6 +272,30 @@ export function quickAdd(
     return s - 1;
   }
   return {
+    calendar() {
+      root.hidden = false;
+      calendarView(root, {
+        ...options,
+        back: () => {
+          root.hidden = true;
+          options.close();
+        },
+        busy: setSaving,
+      });
+    },
+    reviewScheduled(event: CalendarEvent) {
+      root.hidden = false;
+      calendarView(root, {
+        ...options,
+        initialEvent: event,
+        notice: "Saved to Google Calendar. Choose Edit to adjust the details.",
+        back: () => {
+          root.hidden = true;
+          options.close();
+        },
+        busy: setSaving,
+      });
+    },
     open() {
       if (saving) return;
       reset();

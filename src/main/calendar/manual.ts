@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { createPayload } from "./mapping";
+import { createPayload, explicitReminders } from "./mapping";
 import type { CalendarProvider } from "./provider";
 import type { SettingsStore } from "../settings/store";
 import type { CalendarEvent, CalendarInfo } from "../../shared/types";
@@ -25,6 +25,7 @@ export class ManualCalendarService {
         summary: string;
         start: CalendarEvent["start"];
         end: CalendarEvent["end"];
+        reminders?: CalendarEvent["reminders"];
       };
       expires: number;
     }
@@ -124,6 +125,10 @@ export class ManualCalendarService {
         title: z.string().trim().min(1).max(300),
         start: z.string().max(100),
         end: z.string().max(100),
+        reminders: z
+          .array(z.number().int().min(0).max(40320))
+          .max(5)
+          .optional(),
       })
       .strict()
       .parse(input);
@@ -157,6 +162,9 @@ export class ManualCalendarService {
         ? { date: start.toISODate()! }
         : { dateTime: start.toISO()! },
       end: allDay ? { date: end.toISODate()! } : { dateTime: end.toISO()! },
+      ...(value.reminders !== undefined
+        ? { reminders: explicitReminders(value.reminders) }
+        : {}),
     };
     for (const [id, p] of this.edits)
       if (p.expires < Date.now()) this.edits.delete(id);
@@ -165,7 +173,7 @@ export class ManualCalendarService {
     this.edits.set(ticket, { event, patch, expires: Date.now() + 300000 });
     return {
       ticket,
-      summary: `${value.title}\n${start.toFormat(allDay ? "dd LLL yyyy" : "dd LLL yyyy, HH:mm")} → ${end.toFormat(allDay ? "dd LLL yyyy" : "dd LLL yyyy, HH:mm")}\n${calendar.title} · ${calendar.accountEmail ?? ""}${event.recurringEventId ? "\nOnly this occurrence will change." : ""}`,
+      summary: `${value.title}\n${start.toFormat(allDay ? "dd LLL yyyy" : "dd LLL yyyy, HH:mm")} → ${end.toFormat(allDay ? "dd LLL yyyy" : "dd LLL yyyy, HH:mm")}\n${calendar.title} · ${calendar.accountEmail ?? ""}${value.reminders !== undefined ? `\nReminders: ${value.reminders.length ? value.reminders.join(", ") + " minutes before" : "None"}` : ""}${event.recurringEventId ? "\nOnly this occurrence will change." : ""}`,
     };
   }
   cancelEdit(ticket: string) {

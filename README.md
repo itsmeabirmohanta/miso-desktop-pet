@@ -47,6 +47,8 @@ Visit **[miso.abirmahanta.in](https://miso.abirmahanta.in/)** for the product ov
 
 While idle, MISO changes pose every 15 seconds. Rotation pauses during interactions and respects reduced-motion preferences. The interface uses warm cream, charcoal, and butter-yellow accents with locally bundled Baloo 2 and Inter fonts. See the [brand guide](docs/UI-BRANDING.md).
 
+Optional AI setup accepts your provider key and can discover and verify a model automatically. You can also load the available text models or enter a custom model ID. With AI enabled, switch between **AI-assisted** natural-language scheduling and **User-assisted** manual steps in the pet popup or Settings. A clear AI create command saves to Google Calendar, then shows an editable result; ambiguous commands ask for clarification. See [AI setup and scheduling modes](docs/USER-GUIDE.md#ai-setup-and-scheduling-modes) for providers, key requirements and quota troubleshooting.
+
 ## Start in three steps
 
 1. **Install:** download [MISO-Setup.exe](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe), run it, and open **MISO** from Start after clicking Finish. Node.js is not needed.

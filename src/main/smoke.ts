@@ -4,6 +4,11 @@ import { app, screen, shell, type BrowserWindow } from "electron";
 import { APP_NAME, APP_LINKS, type AppLink } from "../shared/brand";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import { strict as assert } from "node:assert";
 import type { SettingsStore } from "./settings/store";
 import { AccountCalendarProvider, scopedCalendar } from "./calendar/accounts";
@@ -32,6 +37,21 @@ export async function smoke(
         cause: error,
       });
     }
+  };
+  const captureSetup = async (name: string) => {
+    // Let the slide transition and Chromium compositor finish before visual QA.
+    await delay(250);
+    await writeFile(
+      join(output, name),
+      (await setup.webContents.capturePage()).toPNG(),
+    );
+  };
+  const waitForView = async (view: BrowserWindow, expression: string) => {
+    for (let i = 0; i < 120; i++) {
+      if (await evaluate(view, expression)) return;
+      await delay(25);
+    }
+    throw new Error(`View did not reach: ${expression}`);
   };
   assert.equal(
     await evaluate(settings, "document.querySelector('h1').textContent"),
@@ -75,7 +95,7 @@ export async function smoke(
   }
   assert.equal(
     await evaluate(setup, "document.querySelector('h1').textContent"),
-    "First, connect Google.",
+    "Welcome to MISO.",
   );
   assert.equal(
     await evaluate(setup, "document.querySelector('#start-butler').disabled"),
@@ -103,10 +123,20 @@ export async function smoke(
   );
   setup.showInactive();
   await delay(250);
-  await writeFile(
-    join(output, "setup.png"),
-    (await setup.webContents.capturePage()).toPNG(),
+  await captureSetup("setup.png");
+  await evaluate(setup, "document.querySelector('#start-onboarding').click()");
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('[data-slide=google]').hidden",
+    ),
+    false,
   );
+  assert.equal(
+    await evaluate(setup, "document.querySelector('#setup-enable-ai').checked"),
+    false,
+  );
+  await captureSetup("onboarding-google.png");
   store.setSecret("smoke-test", "secure-roundtrip");
   assert.equal(store.secret("smoke-test"), "secure-roundtrip");
   assert.equal(
@@ -117,6 +147,10 @@ export async function smoke(
   );
   store.setSecret("smoke-test", "");
   let readCount = 0;
+  let failReads = false;
+  let syncGate: Promise<void> | undefined;
+  let syncSawBusy = false;
+  let syncCheckedBlockedStart = false;
   const events = new Map<string, CalendarEvent>();
   const accounts = ["one", "two"].map((id) => ({
     id,
@@ -144,6 +178,26 @@ export async function smoke(
       },
       async listEvents(id) {
         readCount++;
+        if (
+          store.settings.aiEnabled &&
+          !store.settings.onboardingCompleted &&
+          !syncCheckedBlockedStart
+        ) {
+          syncCheckedBlockedStart = true;
+          syncSawBusy = await evaluate(
+            setup,
+            "!document.querySelector('[data-slide=sync]').hidden && document.querySelector('#onboarding-controls').disabled && document.querySelector('#start-butler').disabled",
+          );
+          assert.match(
+            await evaluate(
+              setup,
+              "window.butler.finishSetup().catch(e=>e.message)",
+            ),
+            /Sync your Google calendars/,
+          );
+        }
+        if (syncGate) await syncGate;
+        if (failReads) throw new Error("Synthetic offline calendar");
         return {
           items: Array.from(events.values()).filter(
             (e) => e.calendarId === id && e.organizer?.email === account.email,
@@ -183,11 +237,42 @@ export async function smoke(
     defaultAccountId: "one",
     petCalendars: accounts[0].petCalendars,
   });
+  assert.equal(store.settings.onboardingCompleted, false);
+  assert.match(
+    await evaluate(setup, "window.butler.finishSetup().catch(e=>e.message)"),
+    /Sync your Google calendars/,
+  );
   const synced = await evaluate(settings, "window.butler.sync()");
   assert.equal(synced.accounts.length, 2);
   assert.equal(synced.calendars.length, 6);
   assert.equal(synced.setupReady, true);
   assert.equal(synced.hasApiKey, false);
+  assert.match(
+    await evaluate(
+      setup,
+      "window.butler.save({onboardingCompleted:true}).catch(e=>e.message)",
+    ),
+    /Unrecognized|onboardingCompleted/i,
+  );
+  // Reload an unfinished setup with saved Google credentials: resume onboarding.
+  setup.webContents.reload();
+  await delay(400);
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('[data-slide=welcome]').hidden",
+    ),
+    false,
+  );
+  await evaluate(setup, "document.querySelector('#start-onboarding').click()");
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('[data-slide=assistant]').hidden",
+    ),
+    false,
+  );
+  await evaluate(setup, "document.querySelector('#back-google').click()");
   assert.equal(
     await evaluate(
       settings,
@@ -223,13 +308,363 @@ export async function smoke(
   );
   await delay(150);
   assert.equal(store.settings.accounts.length, 2);
-  await evaluate(settings, "window.butler.finishSetup()");
+  // Exercise both optional-AI branches through the real renderer and IPC.
+  const waitForSetup = async (expression: string) => {
+    for (let i = 0; i < 100; i++) {
+      if (await evaluate(setup, expression)) return;
+      await delay(25);
+    }
+    throw new Error(`Onboarding did not reach: ${expression}`);
+  };
+  await evaluate(
+    setup,
+    "document.querySelector('#setup-enable-ai').click(); document.querySelector('#connected-continue').click()",
+  );
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('#ai-choice-yes').getAttribute('aria-pressed')",
+    ),
+    "true",
+  );
+  await captureSetup("onboarding-ai-choice.png");
+  await evaluate(
+    setup,
+    "document.querySelector('#assistant-continue').click()",
+  );
+  await waitForSetup(
+    "!document.querySelector('[data-slide=ai]').hidden && !document.querySelector('#onboarding-controls').disabled",
+  );
+  await evaluate(
+    setup,
+    "document.querySelector('#setup-ai-provider').value='gemini'; document.querySelector('#setup-ai-provider').dispatchEvent(new Event('change'))",
+  );
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('#setup-ai-key-field').hidden",
+    ),
+    false,
+  );
+  assert.equal(
+    await evaluate(
+      setup,
+      "document.querySelector('#setup-ai-needs-key').checked",
+    ),
+    true,
+  );
+  let aiRequests = 0;
+  let rejectAI = true;
+  const aiStub = (req: IncomingMessage, res: ServerResponse) => {
+    aiRequests++;
+    res.setHeader("Content-Type", "application/json");
+    if (rejectAI) {
+      res.writeHead(401);
+      res.end("{}");
+      return;
+    }
+    if (req.method === "GET") {
+      assert.match(req.url ?? "", /^\/v1beta\/models\?pageSize=1000/);
+      assert.equal(req.headers["x-goog-api-key"], "AIzaSyntheticOnly");
+      res.end(
+        JSON.stringify({
+          models: [
+            {
+              name: "models/gemini-synthetic-flash",
+              displayName: "Synthetic Flash",
+              supportedGenerationMethods: ["generateContent"],
+            },
+            {
+              name: "models/gemini-synthetic-pro",
+              supportedGenerationMethods: ["generateContent"],
+            },
+            {
+              name: "models/embedding-synthetic",
+              supportedGenerationMethods: ["embedContent"],
+            },
+          ],
+        }),
+      );
+      return;
+    }
+    assert.match(
+      req.url ?? "",
+      /^\/v1beta\/models\/(?:synthetic-model|gemini-synthetic-flash):generateContent$/,
+    );
+    assert.equal(req.headers["x-goog-api-key"], "AIzaSyntheticOnly");
+    const parsed = {
+      action: "create",
+      category: "reminder",
+      title: "Drink water",
+      start: "2030-01-01T09:00:00+05:30",
+      duration_minutes: 60,
+      all_day: false,
+      recurrence: null,
+      reminders_minutes_before: [0],
+      target_query: "",
+      changes: {},
+      confidence: 1,
+      clarification_needed: null,
+    };
+    res.end(
+      JSON.stringify({
+        candidates: [
+          {
+            content: { parts: [{ text: JSON.stringify(parsed) }] },
+            finishReason: "STOP",
+          },
+        ],
+      }),
+    );
+  };
+  const aiServer = createServer(aiStub);
+  await new Promise<void>((resolve) =>
+    aiServer.listen(0, "127.0.0.1", resolve),
+  );
+  const aiAddress = aiServer.address();
+  assert.ok(aiAddress && typeof aiAddress !== "string");
+  try {
+    await evaluate(
+      setup,
+      `document.querySelector('#setup-ai-key').value='AIzaSyntheticOnly'; document.querySelector('#setup-ai-key').dispatchEvent(new Event('input')); document.querySelector('#setup-ai-url').value='http://127.0.0.1:${aiAddress.port}/v1beta'; document.querySelector('#setup-ai-url').dispatchEvent(new Event('input')); document.querySelector('#setup-ai-model').value='synthetic-model'; document.querySelector('#setup-ai-model').dispatchEvent(new Event('input'))`,
+    );
+    await captureSetup("onboarding-ai-details.png");
+    await evaluate(setup, "document.querySelector('#verify-ai').click()");
+    await waitForSetup(
+      "document.querySelector('#feedback').textContent.includes('rejected access') && !document.querySelector('#onboarding-controls').disabled",
+    );
+    assert.equal(store.settings.aiEnabled, false);
+    assert.equal(
+      await evaluate(setup, "document.querySelector('[data-slide=ai]').hidden"),
+      false,
+    );
+    rejectAI = false;
+    await evaluate(setup, "document.querySelector('#verify-ai').click()");
+    await waitForSetup(
+      "!document.querySelector('[data-slide=ready]').hidden && !document.querySelector('#onboarding-controls').disabled",
+    );
+    assert.equal(aiRequests, 2);
+    assert.equal(
+      syncSawBusy,
+      true,
+      "AI Yes must show mandatory sync before ready",
+    );
+    assert.equal(store.settings.aiEnabled, true);
+    assert.equal(
+      (await evaluate(setup, "window.butler.snapshot()")).aiVerified,
+      true,
+    );
+    assert.equal(store.settings.onboardingCompleted, false);
+    assert.equal(pet.isVisible(), false);
+    await captureSetup("onboarding-ai-ready.png");
+  } finally {
+    await new Promise<void>((resolve) => aiServer.close(() => resolve()));
+  }
+  await evaluate(
+    setup,
+    "document.querySelector('#ready-back').click(); document.querySelector('#ai-choice-no').click()",
+  );
+  failReads = true;
+  await evaluate(
+    setup,
+    "document.querySelector('#assistant-continue').click()",
+  );
+  await waitForSetup(
+    "!document.querySelector('#retry-sync').hidden && !document.querySelector('#onboarding-controls').disabled",
+  );
+  assert.equal(
+    await evaluate(setup, "document.querySelector('[data-slide=sync]').hidden"),
+    false,
+  );
+  assert.equal(
+    await evaluate(setup, "document.querySelector('#start-butler').disabled"),
+    true,
+  );
+  assert.equal(store.settings.aiEnabled, false);
+  assert.match(
+    await evaluate(setup, "window.butler.finishSetup().catch(e=>e.message)"),
+    /Sync your Google calendars/,
+  );
+  failReads = false;
+  let releaseSync!: () => void;
+  syncGate = new Promise<void>((resolve) => {
+    releaseSync = resolve;
+  });
+  await evaluate(setup, "document.querySelector('#retry-sync').click()");
+  await waitForSetup("document.querySelector('#onboarding-controls').disabled");
+  assert.match(
+    await evaluate(setup, "window.butler.finishSetup().catch(e=>e.message)"),
+    /Sync your Google calendars/,
+  );
+  assert.equal(pet.isVisible(), false);
+  await captureSetup("onboarding-sync.png");
+  releaseSync();
+  syncGate = undefined;
+  await waitForSetup(
+    "!document.querySelector('[data-slide=ready]').hidden && !document.querySelector('#onboarding-controls').disabled",
+  );
+  await captureSetup("onboarding-ready.png");
+  assert.equal(store.settings.onboardingCompleted, false);
+  await evaluate(setup, "document.querySelector('#start-butler').click()");
   await delay(100);
+  assert.equal(store.settings.onboardingCompleted, true);
+  assert.equal(
+    new (store.constructor as typeof SettingsStore)().settings
+      .onboardingCompleted,
+    true,
+  );
+  assert.equal(settings.isVisible(), false);
+  assert.equal(setup.isDestroyed(), true);
   assert.equal(pet.isVisible(), true);
   assert.equal(
     await evaluate(pet, "document.querySelector('#command-form').hidden"),
     true,
   );
+  // Configure Gemini from its live-shaped model catalog, then exercise both modes.
+  const workflowServer = createServer(aiStub);
+  await new Promise<void>((resolve) =>
+    workflowServer.listen(0, "127.0.0.1", resolve),
+  );
+  const workflowAddress = workflowServer.address();
+  assert.ok(workflowAddress && typeof workflowAddress !== "string");
+  try {
+    await evaluate(pet, "window.butler.settings()");
+    await evaluate(settings, "document.querySelector('#ai-enabled').click()");
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    await evaluate(settings, "document.querySelector('dialog button').click()");
+    await evaluate(
+      settings,
+      `document.querySelector('#settings-ai-provider').value='gemini'; document.querySelector('#settings-ai-provider').dispatchEvent(new Event('change')); document.querySelector('#settings-ai-key').value='AIzaSyntheticOnly'; document.querySelector('#settings-ai-key').dispatchEvent(new Event('input')); document.querySelector('#settings-ai-url').value='http://127.0.0.1:${workflowAddress.port}/v1beta'; document.querySelector('#settings-ai-url').dispatchEvent(new Event('input')); document.querySelector('#settings-ai-load-models').click()`,
+    );
+    await waitForView(
+      settings,
+      "document.querySelector('#settings-ai-models-status').textContent.includes('2 text models')",
+    );
+    assert.equal(
+      await evaluate(
+        settings,
+        "document.querySelector('#settings-ai-selection').value",
+      ),
+      "auto",
+    );
+    assert.equal(
+      await evaluate(
+        settings,
+        "document.querySelector('#settings-ai-model').required",
+      ),
+      false,
+    );
+    await evaluate(
+      settings,
+      "document.querySelector('#ai-form').requestSubmit()",
+    );
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    assert.match(
+      await evaluate(settings, "document.querySelector('dialog').textContent"),
+      /AI assistant ready/,
+    );
+    await evaluate(settings, "document.querySelector('dialog button').click()");
+    assert.equal(store.settings.model, "gemini-synthetic-flash");
+    assert.equal(store.settings.assistantMode, "ai");
+    assert.equal(
+      (await evaluate(settings, "window.butler.snapshot()")).aiVerified,
+      true,
+    );
+    assert.equal(
+      (
+        await readFile(join(app.getPath("userData"), "butler.json"), "utf8")
+      ).includes("AIzaSyntheticOnly"),
+      false,
+    );
+    settings.hide();
+    pet.webContents.send("quick-add");
+    await waitForView(
+      pet,
+      "!document.querySelector('#command-form').hidden && document.querySelector('#quick-add').hidden",
+    );
+    assert.equal(
+      await evaluate(
+        pet,
+        "document.querySelector('#ai-assisted-mode').getAttribute('aria-pressed')",
+      ),
+      "true",
+    );
+    await evaluate(
+      pet,
+      "document.querySelector('#command').value='Remind me to drink water on January 1 2030 at 9am for one hour'; document.querySelector('#command-form').requestSubmit()",
+    );
+    await waitForView(pet, "!!document.querySelector('.event-saved-notice')");
+    assert.equal(events.size, 1);
+    const scheduled = [...events.values()][0];
+    assert.equal(
+      Date.parse(scheduled.end!.dateTime!) -
+        Date.parse(scheduled.start!.dateTime!),
+      3600000,
+    );
+    await delay(200);
+    await writeFile(
+      join(output, "ai-scheduled-review.png"),
+      (await pet.webContents.capturePage()).toPNG(),
+    );
+    await evaluate(
+      pet,
+      "Array.from(document.querySelectorAll('#quick-add button')).find(b=>b.textContent==='Edit').click()",
+    );
+    await evaluate(
+      pet,
+      "document.querySelector('#edit-title').value='Drink water (adjusted)'; document.querySelector('#edit-reminders').value='15'; document.querySelector('#popup-edit-form').requestSubmit()",
+    );
+    await waitForView(
+      pet,
+      "Array.from(document.querySelectorAll('#quick-add button')).some(b=>b.textContent==='Save changes')",
+    );
+    await evaluate(
+      pet,
+      "Array.from(document.querySelectorAll('#quick-add button')).find(b=>b.textContent==='Save changes').click()",
+    );
+    await waitForView(
+      pet,
+      "document.querySelector('#quick-add').hidden && !document.querySelector('#user-assisted-mode').disabled",
+    );
+    assert.equal([...events.values()][0].summary, "Drink water (adjusted)");
+    assert.deepEqual([...events.values()][0].reminders?.overrides, [
+      { method: "popup", minutes: 15 },
+    ]);
+    const requestsBeforeManual = aiRequests;
+    await evaluate(
+      pet,
+      "document.querySelector('#user-assisted-mode').click()",
+    );
+    await waitForView(
+      pet,
+      "!!document.querySelector('#quick-field') && !document.querySelector('#quick-add').hidden",
+    );
+    assert.equal(store.settings.assistantMode, "manual");
+    assert.equal(
+      await evaluate(pet, "document.querySelector('#command-form').hidden"),
+      true,
+    );
+    assert.match(
+      await evaluate(
+        pet,
+        "window.butler.command('Water tomorrow').catch(e=>e.message)",
+      ),
+      /Switch to AI-assisted/,
+    );
+    assert.equal(aiRequests, requestsBeforeManual);
+    await evaluate(pet, "document.querySelector('#ai-assisted-mode').click()");
+    await waitForView(
+      pet,
+      "!document.querySelector('#command-form').hidden && document.querySelector('#quick-add').hidden",
+    );
+    assert.equal(store.settings.assistantMode, "ai");
+    await evaluate(pet, "window.butler.save({aiEnabled:false})");
+    await evaluate(pet, "document.querySelector('#close').click()");
+    events.clear();
+    await evaluate(settings, "window.butler.sync()");
+  } finally {
+    await new Promise<void>((resolve) => workflowServer.close(() => resolve()));
+  }
   await capturePerformance(pet, output);
   const work = screen.getPrimaryDisplay().workArea;
   await evaluate(pet, `window.butler.move(${work.x},${work.y})`);
@@ -249,6 +684,11 @@ export async function smoke(
   // Server runners often disable animations. Exercise both preferences explicitly
   // without changing the user's OS setting or the shipped renderer behaviour.
   pet.webContents.debugger.attach("1.3");
+  // A person using the shared desktop can otherwise reset the idle timer by
+  // moving the real cursor over MISO while this check waits for its next pose.
+  await pet.webContents.debugger.sendCommand("Input.setIgnoreInputEvents", {
+    ignore: true,
+  });
   const backgroundThrottling = pet.webContents.getBackgroundThrottling();
   pet.webContents.setBackgroundThrottling(false);
   await pet.webContents.debugger.sendCommand("Emulation.setEmulatedMedia", {
@@ -288,6 +728,9 @@ export async function smoke(
     ),
   );
   const beforePoseHover = pet.getPosition();
+  await pet.webContents.debugger.sendCommand("Input.setIgnoreInputEvents", {
+    ignore: false,
+  });
   pet.webContents.sendInputEvent({ type: "mouseMove", x: 50, y: 50 });
   await delay(80);
   assert.equal(
@@ -776,6 +1219,6 @@ export async function smoke(
     else process.env.BUTLER_GOOGLE_CLIENT_SECRET = previousSecret;
   }
   console.log(
-    "Electron smoke passed: Google-first setup, two accounts, optional AI, manual writes, confirmation tickets, isolated sync and screenshots.",
+    "Electron smoke passed: onboarding, Gemini model discovery/automatic selection, AI scheduling and editable receipt, mode switching, sync retry, two accounts, manual writes and screenshots.",
   );
 }

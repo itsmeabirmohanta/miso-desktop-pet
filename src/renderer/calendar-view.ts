@@ -8,6 +8,8 @@ export function calendarView(
     close: () => void;
     saved: (message: string) => void;
     busy: (value: boolean) => void;
+    initialEvent?: CalendarEvent;
+    notice?: string;
   },
 ) {
   const api = window.butler;
@@ -173,11 +175,46 @@ export function calendarView(
   function details(e: CalendarEvent) {
     const cal = options.snapshot().calendars.find((c) => c.id === e.calendarId);
     heading(e.summary ?? "Untitled event", when(e));
+    if (
+      options.notice &&
+      options.initialEvent &&
+      e.id === options.initialEvent?.id &&
+      e.calendarId === options.initialEvent.calendarId
+    )
+      root.append(node("p", options.notice, "event-saved-notice"));
     const metadata = node("div", "", "event-detail");
     metadata.append(
       node("p", cal?.title ?? "Calendar"),
       node("small", cal?.accountEmail ?? ""),
     );
+    if (e.end?.dateTime)
+      metadata.append(
+        node(
+          "p",
+          `Ends ${DateTime.fromISO(e.end.dateTime).toLocal().toFormat("ccc, dd LLL · h:mm a")}`,
+        ),
+      );
+    const offsets =
+      e.reminders?.overrides
+        ?.filter((r) => r.method === "popup")
+        .map((r) => r.minutes ?? 0) ?? [];
+    metadata.append(
+      node(
+        "small",
+        e.reminders?.useDefault !== false
+          ? "Reminders: Google Calendar defaults"
+          : offsets.length
+            ? `Reminders: ${offsets.map((n) => (n === 0 ? "at event time" : `${n} minutes before`)).join(", ")}`
+            : "No reminders",
+      ),
+    );
+    if (e.recurrence?.length)
+      metadata.append(
+        node(
+          "small",
+          "Repeating series · open Google Calendar to edit the whole series.",
+        ),
+      );
     if (e.location) metadata.append(node("p", e.location));
     if (e.description) metadata.append(node("p", e.description.slice(0, 1500)));
     if (e.recurringEventId)
@@ -186,7 +223,7 @@ export function calendarView(
       );
     root.append(metadata);
     const actions = node("div", "", "quick-actions");
-    actions.append(button("Back", agenda));
+    actions.append(button("Calendar", agenda), button("Done", options.close));
     if (
       cal &&
       ["owner", "writer"].includes(cal.role) &&
@@ -203,7 +240,7 @@ export function calendarView(
   }
   function edit(
     e: CalendarEvent,
-    value?: { title: string; start: string; end: string },
+    value?: { title: string; start: string; end: string; reminders?: number[] },
   ) {
     heading(
       "Edit event, boss",
@@ -256,6 +293,41 @@ export function calendarView(
           "dialog-subtitle",
         ),
       );
+    const keepDefaults = document.createElement("input");
+    keepDefaults.id = "edit-default-reminders";
+    keepDefaults.type = "checkbox";
+    keepDefaults.checked =
+      value?.reminders === undefined && e.reminders?.useDefault !== false;
+    const reminderDefaults = node("label", "", "check-field");
+    reminderDefaults.append(
+      keepDefaults,
+      document.createTextNode("Keep Google Calendar default reminders"),
+    );
+    const offsets = document.createElement("input");
+    offsets.id = "edit-reminders";
+    offsets.type = "text";
+    offsets.maxLength = 50;
+    offsets.value = (
+      value?.reminders ??
+      e.reminders?.overrides
+        ?.filter((r) => r.method === "popup")
+        .map((r) => r.minutes ?? 0) ??
+      []
+    ).join(", ");
+    offsets.disabled = keepDefaults.checked;
+    keepDefaults.onchange = () => {
+      offsets.disabled = keepDefaults.checked;
+    };
+    const reminderField = node("label", "", "field");
+    reminderField.append(
+      node("span", "Reminder minutes before"),
+      offsets,
+      node(
+        "small",
+        "Separate up to five values with commas. 0 means at event time; blank means no reminders. Maximum 40320 (four weeks).",
+      ),
+    );
+    form.append(reminderDefaults, reminderField);
     const actions = node("div", "", "quick-actions");
     const review = button("Review changes", () => {}, true);
     review.type = "submit";
@@ -270,6 +342,15 @@ export function calendarView(
         title: inputs[0].value,
         start: inputs[1].value,
         end: inputs[2].value,
+        ...(!keepDefaults.checked
+          ? {
+              reminders: offsets.value.trim()
+                ? offsets.value
+                    .split(",")
+                    .map((v) => (v.trim() ? Number(v.trim()) : Number.NaN))
+                : [],
+            }
+          : {}),
       };
       void run(async () => {
         const preview = await api.previewEdit(e.calendarId, e.id!, changed);
@@ -304,5 +385,6 @@ export function calendarView(
     root.append(form);
     inputs[0].focus();
   }
-  agenda();
+  if (options.initialEvent) details(options.initialEvent);
+  else agenda();
 }

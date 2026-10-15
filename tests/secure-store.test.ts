@@ -36,6 +36,54 @@ beforeEach(() => {
   fixture.encryptFails = false;
 });
 describe("protected local store", () => {
+  it("commits verified AI settings and key together, preserving them if protection fails", () => {
+    const store = new SettingsStore();
+    store.saveAI(
+      { model: "working", aiEnabled: true },
+      "ai-key",
+      "working-key",
+    );
+    const before = structuredClone(fixture.disk);
+    fixture.encryptFails = true;
+    expect(() =>
+      store.saveAI({ model: "replacement" }, "ai-key", "replacement-key"),
+    ).toThrow();
+    fixture.encryptFails = false;
+    expect(fixture.disk).toEqual(before);
+    expect(store.settings.model).toBe("working");
+    expect(store.secret("ai-key")).toBe("working-key");
+    expect(new SettingsStore().settings.model).toBe("working");
+  });
+  it("keeps fresh and interrupted onboarding incomplete across restarts", () => {
+    const store = new SettingsStore();
+    expect(store.settings.onboardingCompleted).toBe(false);
+    store.save({
+      accounts: [{ id: "new", email: "new@example.test", petCalendars: {} }],
+    });
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(false);
+    store.save({ onboardingCompleted: true });
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(true);
+    store.resetPersonalData();
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(false);
+  });
+  it("preserves the completed experience for accounts from older encrypted profiles", () => {
+    fixture.disk = {
+      vault: Buffer.from(
+        "protected:" +
+          JSON.stringify({
+            settings: {
+              accounts: [
+                { id: "old", email: "old@example.test", petCalendars: {} },
+              ],
+            },
+            cache: [],
+            secrets: {},
+            fired: {},
+          }),
+      ).toString("base64"),
+    };
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(true);
+  });
   it("reports encryption failure without changing the existing file or leaking OS details", () => {
     fixture.disk = { settings: { sound: true } };
     const original = structuredClone(fixture.disk);
@@ -58,6 +106,7 @@ describe("protected local store", () => {
     };
     const store = new SettingsStore();
     expect(Object.keys(fixture.disk)).toEqual(["vault"]);
+    expect(store.settings.onboardingCompleted).toBe(true);
     expect(store.settings.accounts[0].email).toBe("private@example.com");
     const reloaded = new SettingsStore();
     expect(reloaded.cache[0].summary).toBe("Private appointment");

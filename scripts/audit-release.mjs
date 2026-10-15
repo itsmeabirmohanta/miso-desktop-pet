@@ -27,13 +27,24 @@ for (const [file, width, height] of [
   assert.equal(bmp.readInt32LE(22), height, "Wrong installer bitmap height");
   assert.equal(bmp.readUInt16LE(28), 24, "NSIS artwork must be a 24-bit BMP");
 }
-if (packageConfig.build?.nsis?.runAfterFinish !== false)
-  throw new Error(
-    "Installer auto-launch must remain disabled to avoid blocking Finish.",
-  );
+assert.equal(nsis.runAfterFinish, true, "Installer must offer Launch MISO");
 const installerScript = await readFile(
   packageConfig.build.nsis.include,
   "utf8",
+);
+assert.ok(
+  installerScript.includes('!define MUI_FINISHPAGE_RUN_TEXT "Launch MISO"'),
+);
+assert.ok(
+  installerScript.includes(
+    '!define MUI_FINISHPAGE_RUN_FUNCTION "MisoLaunchAfterSetup"',
+  ),
+);
+assert.ok(
+  installerScript.includes(
+    '${StdUtils.ExecShellAsUser} $0 "$launchLink" "open" "$1"',
+  ),
+  "Use the asynchronous, unelevated app launcher",
 );
 assert.ok(
   installerScript.includes('!include "${__FILEDIR__}\\installer-upgrade.nsh"'),

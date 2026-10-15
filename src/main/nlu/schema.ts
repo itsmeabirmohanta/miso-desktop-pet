@@ -39,6 +39,7 @@ export const intentSchema = z
     category: z.enum(["task", "date", "reminder"]),
     title: z.string().max(300),
     start: start.nullable(),
+    duration_minutes: z.number().int().min(1).max(10080).optional(),
     all_day: z.boolean(),
     recurrence: recurrence.nullable(),
     reminders_minutes_before: offsets,
@@ -71,6 +72,15 @@ export const intentSchema = z
       });
   });
 export type Intent = z.infer<typeof intentSchema>;
+// Keep Google's structured output aligned with the same local validation schema.
+// String length/pattern checks stay local: Gemini accepts a subset of JSON Schema.
+export const intentJSONSchema = JSON.parse(
+  JSON.stringify(z.toJSONSchema(intentSchema), (key, value) =>
+    ["$schema", "minLength", "maxLength", "pattern"].includes(key)
+      ? undefined
+      : value,
+  ),
+);
 export function parseIntent(text: string): Intent {
   const clean = text
     .trim()

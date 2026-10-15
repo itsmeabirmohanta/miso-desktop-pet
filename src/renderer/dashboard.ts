@@ -7,6 +7,12 @@ import { choiceDialog, confirmDialog, resultDialog } from "./dialogs";
 export function setupDashboard(root: HTMLElement) {
   root.innerHTML = `<main class="settings-shell"><header class="header"><img src="../assets/${assets.branding.logo}" alt="MISO"><div><h1>MISO</h1><p>MISO - Your Little Butler</p><p>Tasks, important dates and reminders. AI is optional.</p></div></header><p id="feedback" class="status-bar" role="status"></p><section class="card"><h2>Google accounts</h2><div id="accounts"></div><div class="button-row"><button id="add-account" class="primary">Add Google account</button><button id="refresh">Sync now</button><button id="enable-calendar-api" hidden>Enable Calendar API</button></div><label class="field"><span>Default account</span><select id="default-account"></select></label><h2>Calendars to remind you about</h2><div id="calendar-list" class="calendar-list"></div><div class="button-row"><button id="save-calendars">Save calendar selection</button></div></section><div class="settings-grid"><section class="card"><h2>Add a task or important date</h2><p>No AI or API key needed. MISO saves events to your Google Calendar.</p><form id="manual-form"><label class="field"><span>Account</span><select id="event-account" required></select></label><label class="field"><span>Type</span><select id="event-category"><option value="task">Task</option><option value="date">Important date</option><option value="reminder">Reminder</option></select></label><label class="field"><span>Title</span><input id="event-title" required maxlength="300"></label><div class="row"><label class="field"><span>Date</span><input id="event-date" type="date" required></label><label class="field" id="time-field"><span>Time</span><input id="event-time" type="time" value="09:00" required></label></div><label class="check-field"><input id="event-all-day" type="checkbox">All day</label><label class="check-field"><input id="event-yearly" type="checkbox">Repeat every year</label><label class="field"><span>Reminder</span><select id="event-reminder"></select></label><div class="button-row"><button class="primary">Review & add</button></div></form></section><section class="card"><h2>Next 7 days</h2><p>Deletion also removes the event from Google Calendar and other synced devices.</p><div id="upcoming" class="agenda-list"></div></section></div><section class="card"><h2>Optional AI assistant</h2><p>AI is off by default. When enabled, your typed commands are sent to the provider or local server you choose. Manual calendar features do not send commands to an AI provider.</p><label class="check-field"><input id="ai-enabled" type="checkbox">Enable AI</label><form id="ai-form" hidden>${aiFields("settings-ai")}<div class="button-row"><button>Save & test model</button></div></form></section><section class="card"><h2>Reminder preferences</h2><form id="preferences"><label class="check-field"><input id="hotkey-enabled" type="checkbox">Enable global quick-entry hotkey</label><label class="field"><span>Hotkey combination</span><input id="hotkey" readonly aria-label="Press your hotkey combination" placeholder="Click here, then press your combination"><small>Click the field and press Ctrl, Alt or Shift with a letter, number or function key. Save preferences to apply. The shortcut opens the same popup as clicking the cat.</small></label><div class="row"><label class="field"><span>Meeting reminder (minutes before)</span><input id="lead" type="number" min="0" max="10080" required></label><label class="field"><span>Sync interval (minutes)</span><input id="poll" type="number" min="2" max="5" required></label></div><div class="row"><label class="field"><span>Quiet hours start</span><input id="quiet-start" type="time"></label><label class="field"><span>Quiet hours end</span><input id="quiet-end" type="time"></label></div><label class="check-field"><input id="sound" type="checkbox">Play reminder sound</label><label class="check-field"><input id="login" type="checkbox">Start at login</label><label class="check-field"><input id="paused" type="checkbox">Pause reminders</label><label class="field"><span>Pet appearance</span><select id="skin"><option value="ginger">Ginger</option><option value="midnight">Midnight</option></select></label><div class="button-row"><button>Save preferences</button></div></form></section></main>`;
   const api = window.butler;
+  root
+    .querySelector("#ai-enabled")!
+    .parentElement!.insertAdjacentHTML(
+      "afterend",
+      `<label class="field" id="assistant-mode-field" hidden><span>Scheduling workflow</span><select id="assistant-mode"><option value="ai">AI-assisted · describe what to schedule</option><option value="manual">User-assisted · enter each detail</option></select></label>`,
+    );
   addSiteLinks(root);
   const get = <T extends HTMLElement>(id: string) =>
     document.getElementById(id) as T;
@@ -100,6 +106,8 @@ export function setupDashboard(root: HTMLElement) {
     }
     input("ai-enabled").checked = s.settings.aiEnabled;
     get("ai-form").hidden = !s.settings.aiEnabled;
+    get("assistant-mode-field").hidden = !s.settings.aiEnabled;
+    get<HTMLSelectElement>("assistant-mode").value = s.settings.assistantMode;
     ai.update(s, !aiDirty);
     if (!preferencesDirty) {
       input("hotkey-enabled").checked = !!s.settings.hotkey;
@@ -311,16 +319,27 @@ export function setupDashboard(root: HTMLElement) {
           : "Your calendars and reminders keep working without AI.",
       );
     });
+  get("assistant-mode").onchange = () =>
+    void run(async () => {
+      update(
+        await api.save({
+          assistantMode: get<HTMLSelectElement>("assistant-mode").value as
+            "ai" | "manual",
+        }),
+      );
+    });
   get("ai-form").onsubmit = (e) => {
     e.preventDefault();
     void run(async () => {
       const value = ai.read();
-      await api.save(value.settings, value.secrets);
-      const s = await api.testAI();
+      const s = await api.configureAI(value);
       aiDirty = false;
       ai.clearKey();
       update(s);
-      await resultDialog("Model verified", "AI commands are ready.");
+      await resultDialog(
+        "AI assistant ready",
+        `Using ${s.settings.model}. Click MISO to schedule in natural language, or switch to User-assisted mode for the manual steps.`,
+      );
     });
   };
   input("hotkey").onkeydown = (e) => {

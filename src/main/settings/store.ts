@@ -12,6 +12,8 @@ export const defaults: Settings = {
   aiKeyRequired: true,
   aiValidationFingerprint: "",
   aiEnabled: false,
+  assistantMode: "ai",
+  onboardingCompleted: false,
   accounts: [],
   defaultAccountId: "",
   hotkey: "Ctrl+Alt+B",
@@ -63,6 +65,11 @@ export class SettingsStore {
         code: "VAULT_UNREADABLE",
       });
     }
+    // Existing users already completed the previous Google-first setup.
+    // An explicit false is an interrupted new onboarding and must survive restarts.
+    const previous = existing.vault ? this.data.settings : existing.settings;
+    if (previous?.onboardingCompleted === undefined)
+      this.data.settings.onboardingCompleted = !!previous?.accounts?.length;
     this.persist();
   }
   private persist() {
@@ -106,6 +113,24 @@ export class SettingsStore {
       fired: {},
     };
     this.persist();
+  }
+  saveAI(patch: Partial<Settings>, keyName: string, key: string | undefined) {
+    this.assertSecure();
+    const previous = this.data;
+    const secrets = { ...previous.secrets };
+    if (key)
+      secrets[keyName] = safeStorage.encryptString(key).toString("base64");
+    this.data = {
+      ...previous,
+      settings: { ...this.settings, ...patch },
+      secrets,
+    };
+    try {
+      this.persist();
+    } catch (error) {
+      this.data = previous;
+      throw error;
+    }
   }
   get cache(): CalendarEvent[] {
     return this.data.cache;

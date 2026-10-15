@@ -134,11 +134,26 @@ describe("safe command lifecycle", () => {
       title: "Report",
       start: "2026-10-09T17:00:00+05:30",
     });
-    await controller.command("Report Friday 5pm");
+    const reply = await controller.command("Report Friday 5pm");
+    expect(reply.scheduledEvent).toEqual(event);
+    expect(provider.createEvent).toHaveBeenCalledTimes(1);
     const payload = provider.createEvent.mock.calls[0][1];
     expect(payload.extendedProperties?.private?.petApp).toBe("1");
     expect(payload.reminders?.useDefault).toBe(false);
     expect(payload.id).toMatch(/^[0-9a-f]{32}$/);
+  });
+  it("preserves an explicitly requested duration in an automatically scheduled event", async () => {
+    const { controller, provider } = fixture([], {
+      action: "create",
+      title: "Planning",
+      start: "2030-01-01T09:00:00Z",
+      duration_minutes: 60,
+    });
+    await controller.command("Planning tomorrow at 9 for an hour");
+    const value = provider.createEvent.mock.calls[0][1];
+    expect(
+      Date.parse(value.end!.dateTime!) - Date.parse(value.start!.dateTime!),
+    ).toBe(3600000);
   });
   it("overlong lead never writes", async () => {
     const { controller, provider } = fixture([], {

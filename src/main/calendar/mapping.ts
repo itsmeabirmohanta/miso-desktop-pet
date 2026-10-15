@@ -64,7 +64,12 @@ export function createPayload(
     throw new Error("What should I call it, and when is it due?");
   return {
     summary: intent.title.trim(),
-    ...eventTimes(intent.start, intent.all_day, zone),
+    ...eventTimes(
+      intent.start,
+      intent.all_day,
+      zone,
+      intent.duration_minutes ?? 15,
+    ),
     recurrence: intent.recurrence ? [intent.recurrence] : undefined,
     reminders: explicitReminders(intent.reminders_minutes_before),
     extendedProperties: {

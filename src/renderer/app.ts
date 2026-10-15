@@ -32,6 +32,14 @@ else if (settingsView) setupDashboard(root);
 else setupPet();
 function setupPet() {
   root.innerHTML = `<section class="pet-stage"><div id="bubble" class="bubble hidden"><div class="bubble-top"><span id="bubble-title">A LITTLE HELP FROM MISO</span><button id="close" class="icon-button" aria-label="Close bubble">×</button></div><div id="message" class="bubble-message">Hi, I’m Miso. What should I remember?</div><div id="quick-add" hidden></div><div id="choices" class="choices"></div><div id="reminder-buttons" class="reminder-buttons"></div><form id="command-form" class="command-form"><input id="command" aria-label="Tell MISO what to remember" placeholder="Remind me to…" maxlength="2000" autocomplete="off"><button id="submit" class="primary" aria-label="Send command">↑</button></form><div class="pet-tools"><button id="open-settings">Settings</button><span id="connection" class="muted"></span></div></div><button id="pet" class="pet-button" data-state="idle" aria-label="Open MISO; drag to move"><img id="pet-image" src="../assets/cat.svg" alt="Your animated cat companion" draggable="false"></button><span id="pet-label" class="pet-label">MISO · YOUR LITTLE BUTLER</span></section>`;
+  const modeBar = document.createElement("div");
+  modeBar.id = "workflow-mode";
+  modeBar.className = "workflow-mode";
+  modeBar.setAttribute("role", "group");
+  modeBar.setAttribute("aria-label", "Scheduling mode");
+  modeBar.innerHTML = `<button id="ai-assisted-mode" type="button" aria-pressed="false">AI-assisted</button><button id="user-assisted-mode" type="button" aria-pressed="true">User-assisted</button>`;
+  modeBar.hidden = true;
+  el("quick-add").before(modeBar);
   let quickActive = false;
   let activeState: PetState = "idle";
   let idlePose: PetState = "idle";
@@ -74,11 +82,83 @@ function setupPet() {
   const quick = quickAdd(el("quick-add"), {
     snapshot: () => current,
     close: hide,
+    busy: refreshMode,
     saved: (message) => {
       restoreHome();
       display({ text: "aye aye boss\n" + message, state: "wink" });
     },
   });
+  function aiMode() {
+    return (
+      !!current?.settings.aiEnabled &&
+      current.aiVerified &&
+      current.settings.assistantMode === "ai"
+    );
+  }
+  function refreshMode() {
+    modeBar.hidden = !current?.settings.aiEnabled || !!reminderKey;
+    const ai = el<HTMLButtonElement>("ai-assisted-mode");
+    const manual = el<HTMLButtonElement>("user-assisted-mode");
+    ai.setAttribute("aria-pressed", String(aiMode()));
+    manual.setAttribute("aria-pressed", String(!aiMode()));
+    ai.disabled = busy || quick.saving || !current?.aiVerified;
+    ai.title = current?.aiVerified
+      ? "Describe an event in natural language"
+      : "Configure and test your AI model in Settings first";
+    manual.disabled = busy || quick.saving;
+  }
+  function renderEntry() {
+    el("choices").replaceChildren();
+    el("command-form").hidden = !aiMode();
+    if (aiMode()) {
+      quick.hide();
+      el("message").textContent =
+        "What should I schedule, boss? Tell me what and when. I’ll save it to Google Calendar, then show the details so you can make changes.";
+      el<HTMLInputElement>("command").placeholder =
+        "Remind me to call Mum tomorrow at 6pm…";
+      el("choices").append(
+        button("View calendar", () => {
+          el("message").textContent = "";
+          el("command-form").hidden = true;
+          el("choices").replaceChildren();
+          quick.calendar();
+        }),
+      );
+      el("command").focus();
+    } else {
+      el("message").textContent =
+        current.settings.aiEnabled && !current.aiVerified
+          ? "Verify an AI model in Settings to use AI-assisted mode. You can keep using the manual steps below."
+          : "";
+      quick.open();
+    }
+    refreshMode();
+  }
+  async function switchMode(mode: "ai" | "manual") {
+    if (
+      busy ||
+      quick.saving ||
+      reminderKey ||
+      !current ||
+      (mode === "ai" && !current.aiVerified)
+    )
+      return;
+    busy = true;
+    refreshMode();
+    try {
+      update(await api.save({ assistantMode: mode }));
+      busy = false;
+      if (quickActive) renderEntry();
+      else await openQuick();
+    } catch (error) {
+      display({ text: (error as Error).message });
+    } finally {
+      busy = false;
+      refreshMode();
+    }
+  }
+  el("ai-assisted-mode").onclick = () => void switchMode("ai");
+  el("user-assisted-mode").onclick = () => void switchMode("manual");
   async function openQuick() {
     if (
       !current ||
@@ -101,10 +181,7 @@ function setupPet() {
       return;
     }
     show();
-    el("message").textContent = "";
-    el("choices").replaceChildren();
-    el("command-form").hidden = true;
-    quick.open();
+    renderEntry();
   }
   let reminderKey: string | undefined;
   let restore: ReturnType<typeof setTimeout> | undefined;
@@ -203,7 +280,7 @@ function setupPet() {
     }
     quick.hide();
     show();
-    el("command-form").hidden = !current?.settings.aiEnabled;
+    el("command-form").hidden = !aiMode();
     el("message").textContent = value.text;
     el("choices").replaceChildren();
     state(value.state ?? "idle");
@@ -211,6 +288,11 @@ function setupPet() {
       el("choices").append(
         button(choice.label, () => void run(() => api.choose(choice.id))),
       );
+    if (value.scheduledEvent) {
+      el("message").textContent = "aye aye boss — scheduled.";
+      el("command-form").hidden = true;
+      quick.reviewScheduled(value.scheduledEvent);
+    }
     if (value.reminder) {
       reminderKey = value.reminder.key;
       el("reminder-buttons").replaceChildren();
@@ -222,6 +304,7 @@ function setupPet() {
         button("Done", () => void finishReminder(), "primary"),
       );
     }
+    refreshMode();
   }
   async function finishReminder(minutes?: number) {
     try {
@@ -245,6 +328,7 @@ function setupPet() {
   async function run(fn: () => Promise<Reply>) {
     if (busy) return;
     busy = true;
+    refreshMode();
     state("thinking");
     el<HTMLButtonElement>("submit").disabled = true;
     try {
@@ -253,6 +337,7 @@ function setupPet() {
       display({ text: (error as Error).message });
     } finally {
       busy = false;
+      refreshMode();
       el<HTMLButtonElement>("submit").disabled = false;
     }
   }
@@ -372,8 +457,8 @@ function setupPet() {
       }
     }
     if (value.petLayout) layout(value.petLayout);
-    if (el("quick-add").hidden)
-      el("command-form").hidden = !value.settings.aiEnabled;
+    if (el("quick-add").hidden) el("command-form").hidden = !aiMode();
+    refreshMode();
     updateMascot();
     el("pet").classList.toggle("midnight", value.settings.skin === "midnight");
     el("pet-label").textContent = APP_NAME;

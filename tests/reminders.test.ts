@@ -21,6 +21,8 @@ const settings: Settings = {
   aiValidationFingerprint: "",
   hotkey: "Ctrl+Alt+B",
   aiEnabled: false,
+  assistantMode: "manual",
+  onboardingCompleted: true,
   accounts: [],
   defaultAccountId: "",
   selectedCalendars: [],

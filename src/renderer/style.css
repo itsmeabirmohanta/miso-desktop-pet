@@ -46,6 +46,38 @@
   --radius-card: 16px;
   --radius-popover: 20px;
 }
+.workflow-mode {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  margin: 4px 0 12px;
+  background: var(--surface-muted);
+  border-radius: 12px;
+}
+.workflow-mode button {
+  flex: 1;
+  font-size: 11px;
+  padding: 9px 7px;
+}
+.workflow-mode button[aria-pressed="true"] {
+  background: var(--charcoal);
+  color: var(--cream);
+}
+.event-saved-notice {
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--mint-soft);
+  color: var(--mint-ink);
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+#quick-add:has(.event-saved-notice) .quick-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  padding: 10px 0;
+}
 * {
   box-sizing: border-box;
 }

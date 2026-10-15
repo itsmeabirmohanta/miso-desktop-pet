@@ -1,6 +1,6 @@
 # Multiple-account and calendar-only acceptance
 
-- Fresh configured build: Google login comes first with no API-key requirement. Cancel consent: no account saved.
+- Fresh configured build: welcome slide and Start onboarding button, then mandatory Google login with optional Enable AI Assistant checkbox. Cancel consent: no account saved; stay on the Google slide.
 - Start with AI off. Create a task and yearly date; verify Google times, reminders and local notifications.
 - Add account B. Verify distinct labels and calendar choices. Reconnect B: update instead of duplicate.
 - Create in each account and verify the destination. Confirm optional AI uses the selected default account.
@@ -17,8 +17,15 @@ Real Google consent requires live accounts. Automated smoke tests use mock provi
 
 Use a dedicated Google test account and a calendar containing no important data. Automated tests never require real keys.
 
-- [ ] First launch opens setup with the pet hidden. Start stays disabled until Google is connected and its calendars are configured. AI is optional and off by default.
+- [ ] Installer finish page: Launch MISO checked opens onboarding and closes the installer without waiting for the app to exit. Unchecked does not launch; opening the shortcut later shows the same welcome slide.
+- [ ] First launch opens welcome with the pet hidden. Start onboarding shows Google sign-in and the optional AI checkbox; Google is mandatory. After consent, show sign-in completed and the Yes/No AI choice. Checkbox preference carries into that choice.
+- [ ] AI Yes opens configuration. Switch providers, verify required key behavior, fail a model test, then correct it. AI remains off until verified. Continue without AI and AI No both proceed to sync without requiring a key.
+- [ ] Sync shows progress; failure stays on the sync slide with retry and reconnect options. Only success reveals Sync completed and Start MISO. Start closes setup/settings and reveals the pet; Review my choices returns to the AI choice.
+- [ ] Close and reopen after Google sign-in but before Start MISO: onboarding still appears, reuses the saved account, and completes without a second sign-in. After finishing, relaunch directly into the pet. Existing pre-onboarding profiles retain their completed experience. Start from scratch restores welcome.
 - [ ] Test Anthropic, OpenAI, Gemini, a compatible gateway and an unauthenticated local Ollama model with your own credentials. Confirm custom model IDs and endpoints work.
+- [ ] Gemini: paste an AI Studio API key and use Automatic without typing a model ID or endpoint. Load available models; verify all pages and text-model filtering. Select a discovered model, then a custom ID. Test invalid keys, restricted keys, missing model access and exhausted quota; preserve a previously working configuration when the draft fails. Never paste real keys into logs or screenshots.
+- [ ] AI-assisted: click the pet, type a clear event/reminder with an explicit duration, and verify exactly one Google write. Check the saved-event dialog's title, date, end time, account and reminders. Edit title/time/reminders, cancel the preview, then confirm a fresh preview. An event changed remotely must reject stale changes.
+- [ ] Switch AI-assisted/User-assisted from the popup and Settings. User-assisted opens manual steps and makes no AI request. Switching after an AI-created event or manual edit must remain available; switching modes and restarting preserves the choice. Turning AI off retains calendar/manual features.
 - [ ] Change provider/endpoint: the previous service’s key is not reused. Invalid keys reopen setup; corrected keys can pass the test.
 - [ ] Close setup before completing it: exit without starting the pet. Restart a fully configured app: saved settings start the pet without re-entering keys.
 

@@ -80,7 +80,11 @@ export class CommandController {
           id: randomUUID().replace(/-/g, ""),
         });
         await this.refreshAfterWrite();
-        return { text: `Added: ${this.label(event)}`, state: "happy" };
+        return {
+          text: `Scheduled in Google Calendar: ${this.label(event)}. You can edit the details below.`,
+          state: "happy",
+          scheduledEvent: event,
+        };
       }
       if (intent.action !== "query" && !intent.target_query.trim())
         return {

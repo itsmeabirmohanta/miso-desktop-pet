@@ -29,7 +29,16 @@ import { makeAuth, connectGoogle } from "./calendar/auth";
 import { GoogleSignInError } from "./calendar/auth-errors";
 import { GoogleCalendarProvider } from "./calendar/google";
 import { InputService, AICredentialError } from "./nlu/input";
-import { aiConfig, aiSecretName, normalizeBaseUrl } from "../shared/ai";
+import {
+  aiConfig,
+  aiSecretName,
+  normalizeBaseUrl,
+  cleanAPIKey,
+  type AIConfig,
+} from "../shared/ai";
+import { setupConfig, verifyAISetup } from "./nlu/configure";
+import { discoverModels } from "./nlu/models";
+import { AIServiceError } from "./nlu/errors";
 import { CommandController } from "./controller";
 import { mapLimited } from "./sync/concurrency";
 import { SyncService } from "./sync/sync";
@@ -167,6 +176,7 @@ let poll: ReturnType<typeof setInterval> | undefined;
 let cursorPoll: ReturnType<typeof setInterval> | undefined;
 let connecting = false;
 let quitting = false;
+let onboardingSyncGeneration = -1;
 const patchSchema = z
   .object({
     hotkey: z
@@ -177,7 +187,7 @@ const patchSchema = z
         "Use modifier keys plus a letter, number, Space or function key.",
       ),
     googleClientId: z.string().max(500),
-    model: z.string().trim().min(1).max(100),
+    model: z.string().trim().min(1).max(200),
     selectedCalendars: z.array(z.string().max(500)).max(100),
     aiProvider: z.enum([
       "anthropic",
@@ -189,6 +199,7 @@ const patchSchema = z
     aiBaseUrl: z.string().max(1000),
     aiKeyRequired: z.boolean(),
     aiEnabled: z.boolean(),
+    assistantMode: z.enum(["ai", "manual"]),
     defaultAccountId: z.string().max(300),
     meetingLead: z.number().int().min(0).max(40320),
     pollMinutes: z.number().int().min(2).max(5),
@@ -207,6 +218,15 @@ const secretSchema = z
     clientSecret: z.string().max(1000).optional(),
   })
   .strict();
+const aiSetupSchema = z
+  .object({
+    provider: z.enum(["anthropic", "openai", "gemini", "compatible", "ollama"]),
+    baseUrl: z.string().max(1000),
+    keyRequired: z.boolean(),
+    apiKey: z.string().max(1000).optional(),
+    model: z.string().max(200).optional(),
+  })
+  .strict();
 function aiKey(): string | undefined {
   const config = aiConfig(store.settings);
   if (!config.baseUrl) return undefined;
@@ -219,15 +239,19 @@ function aiKey(): string | undefined {
   );
 }
 function fingerprint(): string {
+  return configFingerprint(aiConfig(store.settings), aiKey());
+}
+function configFingerprint(config: AIConfig, key: string | undefined): string {
   try {
-    const config = aiConfig(store.settings);
-    if (!config.model || (config.keyRequired && !aiKey())) return "";
+    if (!config.model || (config.keyRequired && !key)) return "";
     return createHash("sha256")
       .update(
         JSON.stringify({
-          ...config,
+          provider: config.provider,
+          model: config.model,
           baseUrl: normalizeBaseUrl(config.baseUrl),
-          key: aiKey() ?? "",
+          keyRequired: config.keyRequired,
+          key: key ?? "",
         }),
       )
       .digest("hex");
@@ -247,6 +271,9 @@ function setupReady() {
         (c) => !!a.petCalendars[c as "task" | "date" | "reminder"],
       ),
   );
+}
+function onboardingComplete() {
+  return setupReady() && store.settings.onboardingCompleted;
 }
 function agendaEvents() {
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -472,9 +499,13 @@ function deliver(reminder: Reminder) {
     }).show();
 }
 function openSettings() {
+  if (!isSmoke && !onboardingComplete()) {
+    openSetup();
+    return;
+  }
   closePetPopup();
   if (setupWindow && !setupWindow.isDestroyed() && setupWindow.isVisible()) {
-    if (!setupReady()) {
+    if (!onboardingComplete()) {
       setupWindow.focus();
       publish();
       return;
@@ -539,10 +570,10 @@ function openSetup() {
     return;
   }
   setupWindow = new BrowserWindow({
-    width: 670,
-    height: Math.min(900, screen.getPrimaryDisplay().workArea.height - 40),
-    minWidth: 580,
-    minHeight: 600,
+    width: Math.min(980, screen.getPrimaryDisplay().workArea.width - 40),
+    height: Math.min(810, screen.getPrimaryDisplay().workArea.height - 40),
+    minWidth: Math.min(720, screen.getPrimaryDisplay().workArea.width - 40),
+    minHeight: Math.min(600, screen.getPrimaryDisplay().workArea.height - 40),
     resizable: true,
     title: "Set up MISO",
     icon: appIcon,
@@ -570,7 +601,8 @@ function openSetup() {
   setupWindow.on("closed", () => {
     setupWindow = undefined;
     publish();
-    if (!setupReady() && !quitting) app.quit();
+    if (!onboardingComplete() && !quitting) app.quit();
+    else if (!quitting) showPet();
   });
 }
 function setHotkey(value: string) {
@@ -599,7 +631,7 @@ function openQuickAdd() {
     panel?.focus();
     return;
   }
-  if (!setupReady()) {
+  if (!onboardingComplete()) {
     openSetup();
     return;
   }
@@ -609,8 +641,13 @@ function openQuickAdd() {
   pet.webContents.send("quick-add");
 }
 function showPet() {
-  if (!setupReady()) {
+  if (!onboardingComplete()) {
     openSetup();
+    return;
+  }
+  if (setupWindow && !setupWindow.isDestroyed()) {
+    setupWindow.show();
+    setupWindow.focus();
     return;
   }
   pet.showInactive();
@@ -710,6 +747,7 @@ function placePet(x: number, y: number) {
   return placed.window;
 }
 function errorMessage(error: unknown): string {
+  if (error instanceof AIServiceError) return error.message;
   if (error instanceof GoogleSignInError) return error.message;
   if (statusCode(error) === 412)
     return "The event changed on Google. Please enter the command again.";
@@ -744,7 +782,10 @@ function handle(channel: string, fn: (...args: any[]) => any) {
         return { ok: false, error: "Untrusted caller." };
       return { ok: true, value: await fn(...args) };
     } catch (error) {
-      if (error instanceof AICredentialError) {
+      if (
+        error instanceof AICredentialError &&
+        ["command", "choose"].includes(channel)
+      ) {
         store.save({ aiValidationFingerprint: "" });
         openSettings();
         publish();
@@ -1028,6 +1069,57 @@ else {
             : urls[which],
         );
       });
+      handle("discover-ai", async (value: unknown) => {
+        const draft = aiSetupSchema.parse(value);
+        const config = setupConfig(draft);
+        const key = draft.apiKey
+          ? cleanAPIKey(draft.apiKey)
+          : (store.secret(aiSecretName(config)) ??
+            (aiSecretName(config) === aiSecretName(aiConfig(store.settings))
+              ? aiKey()
+              : undefined));
+        const models = await discoverModels(config, key);
+        return { models, recommended: models[0].id };
+      });
+      handle("configure-ai", async (value: unknown) => {
+        if (testingAI || controller.isBusy || connecting || calendarWriting)
+          throw new Error(
+            "Finish the current operation before configuring AI.",
+          );
+        const draft = aiSetupSchema.parse(value);
+        testingAI = true;
+        try {
+          const config = setupConfig(draft);
+          const savedKey =
+            store.secret(aiSecretName(config)) ??
+            (aiSecretName(config) === aiSecretName(aiConfig(store.settings))
+              ? aiKey()
+              : undefined);
+          const verified = await verifyAISetup(draft, savedKey);
+          store.saveAI(
+            {
+              aiProvider: verified.config.provider,
+              aiBaseUrl: verified.config.baseUrl,
+              aiKeyRequired: verified.config.keyRequired,
+              model: verified.config.model,
+              aiEnabled: true,
+              assistantMode: "ai",
+              aiValidationFingerprint: configFingerprint(
+                verified.config,
+                verified.key,
+              ),
+            },
+            aiSecretName(verified.config),
+            verified.key,
+          );
+          controller.clear();
+          onboardingSyncGeneration = -1;
+          publish();
+          return snapshot();
+        } finally {
+          testingAI = false;
+        }
+      });
       handle("test-ai", async () => {
         if (testingAI || controller.isBusy)
           throw new Error("Wait for your current AI request to finish.");
@@ -1053,7 +1145,15 @@ else {
       handle("finish-setup", () => {
         if (!setupReady())
           throw new Error("Connect Google Calendar first. AI is optional.");
+        if (connecting || testingAI || controller.isBusy || calendarWriting)
+          throw new Error("Finish the current operation before starting MISO.");
+        if (onboardingSyncGeneration !== accountGeneration)
+          throw new Error("Sync your Google calendars before starting MISO.");
+        if (store.settings.aiEnabled && !aiVerified())
+          throw new Error("Test your AI model or continue without AI first.");
+        store.save({ onboardingCompleted: true });
         setTimeout(() => {
+          settingsWindow?.hide();
           setupWindow?.close();
           setupWindow = undefined;
           showPet();
@@ -1067,6 +1167,10 @@ else {
         if (!store.settings.aiEnabled)
           throw new Error(
             "AI is optional and currently off. Use Add task / date in the calendar dashboard, or enable AI in Settings.",
+          );
+        if (store.settings.assistantMode !== "ai")
+          throw new Error(
+            "Switch to AI-assisted mode to use natural-language commands. User-assisted mode works without AI.",
           );
         if (!aiVerified())
           throw new Error(
@@ -1090,8 +1194,17 @@ else {
         return controller.choose(z.string().max(30).parse(id));
       });
       handle("sync", async () => {
+        // Only an explicitly completed sync unlocks Start MISO. Background
+        // refreshes and the preliminary Google sign-in sync cannot skip it.
+        onboardingSyncGeneration = -1;
+        const generation = accountGeneration;
         if (isSmoke) await sync(true);
         else await initializeGoogle();
+        if (generation !== accountGeneration || !setupReady())
+          throw new Error(
+            "Reconnect Google, then complete calendar sync before starting MISO.",
+          );
+        onboardingSyncGeneration = generation;
         return snapshot();
       });
       handle("save", async (patch: unknown, secrets: unknown) => {
@@ -1125,7 +1238,10 @@ else {
         )
           normalizeBaseUrl(nextConfig.baseUrl);
         if (sensitive.apiKey !== undefined)
-          store.setSecret(aiSecretName(nextConfig), sensitive.apiKey.trim());
+          store.setSecret(
+            aiSecretName(nextConfig),
+            cleanAPIKey(sensitive.apiKey),
+          );
         if (sensitive.clientSecret !== undefined)
           store.setSecret("googleClientSecret", sensitive.clientSecret.trim());
         else if (
@@ -1140,7 +1256,12 @@ else {
           await setStartAtLogin(parsed.startAtLogin);
         if (parsed.hotkey !== undefined) setHotkey(parsed.hotkey);
         store.save(parsed);
-        if (parsed.aiEnabled === false || parsed.defaultAccountId)
+        if (parsed.aiEnabled !== undefined) onboardingSyncGeneration = -1;
+        if (
+          parsed.aiEnabled === false ||
+          parsed.defaultAccountId ||
+          parsed.assistantMode
+        )
           controller.clear();
         polling();
         trayMenu();
@@ -1258,7 +1379,7 @@ else {
           return snapshot();
         } finally {
           connecting = false;
-          if (setupReady() && !setupWindow && !isSmoke) showPet();
+          if (onboardingComplete() && !setupWindow && !isSmoke) showPet();
           publish();
         }
       });
@@ -1486,7 +1607,7 @@ else {
       app.on("activate", () => {
         if (engine) showPet();
       });
-      if (!setupReady()) openSetup();
+      if (!onboardingComplete()) openSetup();
       else if (!isSmoke) showPet();
       startupPhase = "calendar connection";
       try {
@@ -1502,7 +1623,7 @@ else {
       if (isSmoke) {
         openSettings();
         openSetup();
-      } else if (setupReady()) {
+      } else if (onboardingComplete()) {
         showPet();
         if (process.argv.includes("--settings")) openSettings();
       } else openSetup();

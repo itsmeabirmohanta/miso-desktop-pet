@@ -70,6 +70,40 @@ export function normalizeBaseUrl(value: string): string {
     );
   return url.toString().replace(/\/+$/, "");
 }
+export function providerBaseUrl(provider: AIProvider, value: string): string {
+  let base = normalizeBaseUrl(value.trim() || providers[provider].baseUrl);
+  base = base.replace(
+    /\/(?:chat\/completions|messages|models\/[^/]+:generateContent|models)$/,
+    "",
+  );
+  const official = new URL(providers[provider].baseUrl || base);
+  if (
+    new URL(base).origin === official.origin &&
+    new URL(base).pathname === "/"
+  )
+    base = providers[provider].baseUrl || base;
+  return base;
+}
+export function cleanAPIKey(value: string): string {
+  let key = value.trim();
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  )
+    key = key.slice(1, -1).trim();
+  key = key.replace(/^Bearer\s+/i, "").trim();
+  if (/\s/.test(key))
+    throw new Error(
+      "The API key contains spaces or line breaks. Paste only the key, without a command or URL.",
+    );
+  return key;
+}
+export function detectKeyProvider(key: string): AIProvider | undefined {
+  if (key.startsWith("AIza")) return "gemini";
+  if (key.startsWith("sk-ant-")) return "anthropic";
+  if (/^sk-(?:proj|svcacct)-/.test(key)) return "openai";
+  return undefined;
+}
 export function aiSecretName(config: AIConfig): string {
   return `ai:${config.provider}:${normalizeBaseUrl(config.baseUrl)}`;
 }
