@@ -17,7 +17,10 @@ const child = spawn(
   resolve(
     process.argv.includes("--executable")
       ? process.argv[process.argv.indexOf("--executable") + 1]
-      : "release/win-unpacked/MISO.exe",
+      : join(
+          process.env.MISO_RELEASE_DIR || "release",
+          "win-unpacked/MISO.exe",
+        ),
   ),
   [
     `--user-data-dir=${profile}`,

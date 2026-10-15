@@ -1,4 +1,6 @@
 export const APP_NAME = "MISO";
+// Keep this aligned with electron-builder and installed Windows shortcuts.
+export const APP_ID = "dev.butler.desktop";
 export const APP_FULL_NAME = "MISO - Your Little Butler";
 export const APP_WEBSITE = "https://miso.abirmahanta.in/";
 export const APP_LINKS = {

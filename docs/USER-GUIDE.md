@@ -1,6 +1,6 @@
 # Installing MISO
 
-1. Install `MISO Setup 1.0.7.exe` on Windows x64, or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest).
+1. Install the Windows x64 installer (`MISO Setup 1.0.8.exe` for the local branded build), or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest).
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.
@@ -24,6 +24,10 @@ Forward the original installer file, not your app-data folder, screenshots, logs
 Remove an account to disconnect it locally; MISO also attempts token revocation. **Start from scratch** clears local personal data and saved AI keys but retains the selected Google OAuth configuration. Google calendars and events remain in Google. To revoke remaining permissions, manage third-party access in your Google account.
 
 ## Startup troubleshooting
+
+The installed app runs as `MISO.exe` with MISO product metadata and a custom Windows icon. Setup and Settings use the same Windows app identity as the installed shortcuts. The installer has MISO welcome/finish pages, mascot artwork, and matching install/uninstall icons.
+
+Running `npm start` uses the development `electron.exe`, so Task Manager can still call that process Electron. Use MISO from the Start menu or `release/win-unpacked/MISO.exe` to check the shipping process name. If an old pinned taskbar shortcut still shows Electron, close the app, unpin that shortcut, open the installed MISO, and pin its new taskbar entry.
 
 Installation finishes without automatically launching the app. Open MISO from Start after clicking Finish. If it is blank or closes, try **MISO (Safe Mode)** in Start or on the desktop; it uses software rendering. You can also run `MISO.exe --safe-mode`. Safe Mode does not repair storage errors.
 

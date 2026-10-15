@@ -18,6 +18,7 @@ import { join, resolve } from "node:path";
 import assets from "../assets/manifest.json";
 import {
   APP_NAME,
+  APP_ID,
   APP_FULL_NAME,
   APP_LINKS,
   type AppLink,
@@ -123,6 +124,12 @@ try {
 // Keep the original profile and encryption context across the branding change.
 app.setPath("userData", profilePath);
 app.setName(APP_NAME);
+if (process.platform === "win32") app.setAppUserModelId(APP_ID);
+const appIcon = join(
+  __dirname,
+  "../assets/branding",
+  process.platform === "win32" ? "icon.ico" : "icon.png",
+);
 if (!__BUTLER_RELEASE__ && isSmoke)
   app.setPath(
     "userData",
@@ -486,6 +493,7 @@ function openSettings() {
     minWidth: 660,
     minHeight: 600,
     title: `${APP_FULL_NAME} · Settings`,
+    icon: appIcon,
     backgroundColor: "#f8f6f1",
     autoHideMenuBar: true,
     show: false,
@@ -537,6 +545,7 @@ function openSetup() {
     minHeight: 600,
     resizable: true,
     title: "Set up MISO",
+    icon: appIcon,
     backgroundColor: "#f8f6f1",
     autoHideMenuBar: true,
     show: !isSmoke,
@@ -625,7 +634,14 @@ function secureWindow(window: BrowserWindow) {
       }
     },
   );
-  window.setIcon(join(__dirname, "../assets/branding/icon.png"));
+  window.setIcon(appIcon);
+  if (process.platform === "win32")
+    window.setAppDetails({
+      appId: APP_ID,
+      // Windows Shell cannot resolve a relaunch icon inside app.asar.
+      appIconPath: app.isPackaged ? process.execPath : appIcon,
+      appIconIndex: 0,
+    });
   window.on("page-title-updated", (event) => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler(
     (_contents, _permission, callback) => callback(false),
@@ -789,6 +805,8 @@ else {
         y: area.y + area.height - 460,
       };
       pet = new BrowserWindow({
+        title: APP_NAME,
+        icon: appIcon,
         width: 380,
         height: 440,
         ...placePet(position.x, position.y),

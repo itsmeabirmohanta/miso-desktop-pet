@@ -1,7 +1,7 @@
 import { capturePerformance } from "./performance";
 import { IDLE_POSE_INTERVAL } from "../renderer/idle-poses";
 import { app, screen, shell, type BrowserWindow } from "electron";
-import { APP_LINKS, type AppLink } from "../shared/brand";
+import { APP_NAME, APP_LINKS, type AppLink } from "../shared/brand";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { strict as assert } from "node:assert";
@@ -18,6 +18,8 @@ export async function smoke(
   provider: AccountCalendarProvider,
 ) {
   await delay(700);
+  assert.equal(app.getName(), APP_NAME);
+  assert.equal(pet.getTitle(), APP_NAME);
   assert.equal(setup.getTitle(), "Set up MISO");
   const output = join(process.cwd(), "artifacts", "review");
   await mkdir(output, { recursive: true });
