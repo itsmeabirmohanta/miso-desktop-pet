@@ -4,21 +4,12 @@
   "graph": {},
   "nodes": [
     {
-      "label": "Contributor workflow",
-      "file_type": "document",
-      "source_file": "CONTRIBUTING.md",
-      "source_location": "CONTRIBUTING.md:1",
-      "id": "contributing_md",
-      "community": 1,
-      "norm_label": "contributor workflow"
-    },
-    {
       "label": "MISO codebase overview",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "README.md:1",
       "id": "readme_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "miso codebase overview"
     },
     {
@@ -28,7 +19,7 @@
       "source_location": "README.md:24",
       "rationale": "Windows desktop cat for Google Calendar accounts, tasks, reminders and important dates. AI is optional and disabled by default.",
       "id": "readme_miso",
-      "community": 1,
+      "community": 3,
       "norm_label": "miso desktop calendar companion"
     },
     {
@@ -37,7 +28,7 @@
       "source_file": "SECURITY.md",
       "source_location": "SECURITY.md:1",
       "id": "security_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "private security reporting"
     },
     {
@@ -46,7 +37,7 @@
       "source_file": "docs/MANUAL_TESTS.md",
       "source_location": "docs/MANUAL_TESTS.md:1",
       "id": "manual_tests_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "manual acceptance checklist"
     },
     {
@@ -55,7 +46,7 @@
       "source_file": "docs/OPTIMIZATION.md",
       "source_location": "docs/OPTIMIZATION.md:1",
       "id": "optimization_md",
-      "community": 3,
+      "community": 4,
       "norm_label": "sync and timer optimization review"
     },
     {
@@ -65,7 +56,7 @@
       "source_location": "docs/OPTIMIZATION.md:5",
       "rationale": "Background polls consume incremental feeds; completed writes and manual refresh rebuild expanded windows. Account reads have a limit of two, and failed accounts preserve cached reminders.",
       "id": "optimization_incremental_sync",
-      "community": 3,
+      "community": 4,
       "norm_label": "serialized incremental calendar synchronization"
     },
     {
@@ -75,7 +66,7 @@
       "source_location": "docs/OPTIMIZATION.md:15",
       "rationale": "Next-deadline scheduling replaces idle one-second polling; minute checks handle clock changes, quiet hours and catch-up. Snoozes have separate deadlines.",
       "id": "optimization_reminder_deadlines",
-      "community": 3,
+      "community": 4,
       "norm_label": "deadline based reminder scheduling"
     },
     {
@@ -84,7 +75,7 @@
       "source_file": "docs/PUBLICATION-REVIEW.md",
       "source_location": "docs/PUBLICATION-REVIEW.md:1",
       "id": "publication_review_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "publication and exposure review"
     },
     {
@@ -93,7 +84,7 @@
       "source_file": "docs/SECURITY-AND-SHIPPING.md",
       "source_location": "docs/SECURITY-AND-SHIPPING.md:1",
       "id": "security_and_shipping_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "security boundaries and shipping requirements"
     },
     {
@@ -103,7 +94,7 @@
       "source_location": "docs/SECURITY-AND-SHIPPING.md:7",
       "rationale": "Protect all local settings, accounts, events and secrets with Electron safeStorage; fail startup rather than overwrite an unreadable vault. OS user compromise is outside this boundary.",
       "id": "security_and_shipping_encrypted_vault",
-      "community": 7,
+      "community": 1,
       "norm_label": "os encrypted local vault"
     },
     {
@@ -113,7 +104,7 @@
       "source_location": "docs/SECURITY-AND-SHIPPING.md:19",
       "rationale": "Bundled desktop app identity enables setup without a Cloud project. Desktop client configuration is extractable and must stay distinct from private account tokens and AI keys.",
       "id": "security_and_shipping_desktop_oauth",
-      "community": 1,
+      "community": 3,
       "norm_label": "google desktop oauth public-client configuration"
     },
     {
@@ -123,7 +114,7 @@
       "source_location": "docs/SECURITY-AND-SHIPPING.md:14",
       "rationale": "Calendar features do not require AI. Enabled commands and clarification context go to the chosen provider or local endpoint.",
       "id": "security_and_shipping_optional_ai",
-      "community": 1,
+      "community": 3,
       "norm_label": "optional ai commands"
     },
     {
@@ -151,7 +142,7 @@
       "source_file": "docs/SHARING.md",
       "source_location": "docs/SHARING.md:1",
       "id": "sharing_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "public distribution and sharing"
     },
     {
@@ -160,7 +151,7 @@
       "source_file": "docs/SHARING.md",
       "source_location": "docs/SHARING.md:9",
       "id": "sharing_windows_installer",
-      "community": 1,
+      "community": 3,
       "norm_label": "windows x64 installer and checksum"
     },
     {
@@ -169,7 +160,7 @@
       "source_file": "docs/UI-BRANDING.md",
       "source_location": "docs/UI-BRANDING.md:1",
       "id": "ui_branding_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "miso visual styling"
     },
     {
@@ -178,7 +169,7 @@
       "source_file": "docs/UI-BRANDING.md",
       "source_location": "docs/UI-BRANDING.md:5",
       "id": "ui_branding_shared_tokens",
-      "community": 5,
+      "community": 6,
       "norm_label": "shared miso visual tokens"
     },
     {
@@ -187,7 +178,7 @@
       "source_file": "docs/VERIFICATION.md",
       "source_location": "docs/VERIFICATION.md:1",
       "id": "verification_md",
-      "community": 1,
+      "community": 3,
       "norm_label": "implementation verification and remaining limitations"
     },
     {
@@ -197,7 +188,7 @@
       "source_location": "docs/VERIFICATION.md:8",
       "rationale": "Offline and Electron workflow tests avoid personal calendar data and credentials. Live consent, DST and device integration still require manual checks.",
       "id": "verification_synthetic_accounts",
-      "community": 1,
+      "community": 3,
       "norm_label": "isolated synthetic-account verification"
     },
     {
@@ -206,7 +197,7 @@
       "source_file": "src/assets/README.md",
       "source_location": "src/assets/README.md:1",
       "id": "assets_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "artwork drop-in guide"
     },
     {
@@ -216,7 +207,7 @@
       "source_location": "src/assets/README.md:44",
       "rationale": "Select supplied artwork by exact base name with WebP, PNG, GIF, SVG priority. Preserve original art and use original cat fallback for absent or failed poses.",
       "id": "assets_generated_manifest",
-      "community": 5,
+      "community": 6,
       "norm_label": "generated artwork manifest"
     },
     {
@@ -225,7 +216,7 @@
       "source_file": "src/assets/branding/README.md",
       "source_location": "src/assets/branding/README.md:1",
       "id": "branding_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "branding replacement guide"
     },
     {
@@ -234,7 +225,7 @@
       "source_file": "src/assets/fonts/README.md",
       "source_location": "src/assets/fonts/README.md:1",
       "id": "fonts_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "bundled typography and font licenses"
     },
     {
@@ -243,7 +234,7 @@
       "source_file": "src/assets/fonts/README.md",
       "source_location": "src/assets/fonts/README.md:5",
       "id": "fonts_baloo2",
-      "community": 5,
+      "community": 6,
       "norm_label": "baloo 2 headings font"
     },
     {
@@ -252,7 +243,7 @@
       "source_file": "src/assets/fonts/README.md",
       "source_location": "src/assets/fonts/README.md:6",
       "id": "fonts_inter",
-      "community": 5,
+      "community": 6,
       "norm_label": "inter interface font"
     },
     {
@@ -261,7 +252,7 @@
       "source_file": "src/assets/fonts/README.md",
       "source_location": "src/assets/fonts/README.md:8",
       "id": "fonts_sil_ofl",
-      "community": 5,
+      "community": 6,
       "norm_label": "sil open font license"
     },
     {
@@ -270,7 +261,7 @@
       "source_file": "src/assets/mascot/alert/README.md",
       "source_location": "src/assets/mascot/alert/README.md:1",
       "id": "mascot_alert_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "alert mascot artwork guide"
     },
     {
@@ -279,7 +270,7 @@
       "source_file": "src/assets/mascot/happy/README.md",
       "source_location": "src/assets/mascot/happy/README.md:1",
       "id": "mascot_happy_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "happy mascot artwork guide"
     },
     {
@@ -288,7 +279,7 @@
       "source_file": "src/assets/mascot/idle/README.md",
       "source_location": "src/assets/mascot/idle/README.md:1",
       "id": "mascot_idle_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "idle mascot artwork guide"
     },
     {
@@ -297,7 +288,7 @@
       "source_file": "src/assets/mascot/sleep/README.md",
       "source_location": "src/assets/mascot/sleep/README.md:1",
       "id": "mascot_sleep_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "sleep mascot artwork guide"
     },
     {
@@ -306,7 +297,7 @@
       "source_file": "src/assets/mascot/thinking/README.md",
       "source_location": "src/assets/mascot/thinking/README.md:1",
       "id": "mascot_thinking_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "thinking mascot artwork guide"
     },
     {
@@ -315,7 +306,7 @@
       "source_file": "src/assets/mascot/walk/README.md",
       "source_location": "src/assets/mascot/walk/README.md:1",
       "id": "mascot_walk_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "walk mascot artwork guide"
     },
     {
@@ -324,7 +315,7 @@
       "source_file": "src/assets/mascot/wink/README.md",
       "source_location": "src/assets/mascot/wink/README.md:1",
       "id": "mascot_wink_readme_md",
-      "community": 5,
+      "community": 6,
       "norm_label": "wink mascot artwork guide"
     },
     {
@@ -333,7 +324,7 @@
       "source_file": "src/renderer/index.html",
       "source_location": "src/renderer/index.html:1",
       "id": "renderer_index_html",
-      "community": 5,
+      "community": 6,
       "norm_label": "renderer html and content security policy"
     },
     {
@@ -346,53 +337,6 @@
       "norm_label": "package scripts and shipping configuration"
     },
     {
-      "label": "Agent architecture and verification instructions",
-      "file_type": "document",
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:1",
-      "id": "agents_md",
-      "community": 0,
-      "norm_label": "agent architecture and verification instructions"
-    },
-    {
-      "label": "Contributor graph-first onboarding",
-      "file_type": "document",
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:3",
-      "rationale": "Read map coverage, relevant communities, symbol neighbors, authoritative source and tests before changes; refresh stale maps without blocking an unrelated small fix.",
-      "id": "agents_graph_first_onboarding",
-      "community": 0,
-      "norm_label": "contributor graph-first onboarding"
-    },
-    {
-      "label": "Installation and recovery guide",
-      "file_type": "document",
-      "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:1",
-      "id": "user_guide_md",
-      "community": 1,
-      "norm_label": "installation and recovery guide"
-    },
-    {
-      "label": "Separate recovery profile",
-      "file_type": "document",
-      "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:34",
-      "rationale": "Open an empty recovery profile without deleting the unreadable original vault; retain the marker-controlled profile choice.",
-      "id": "user_guide_recovery_profile",
-      "community": 1,
-      "norm_label": "separate recovery profile"
-    },
-    {
-      "label": "MISO installer artwork guide",
-      "file_type": "document",
-      "source_file": "resources/installer/README.md",
-      "source_location": "resources/installer/README.md:1",
-      "id": "installer_readme_md",
-      "community": 1,
-      "norm_label": "miso installer artwork guide"
-    },
-    {
       "label": "Windows AppUserModelID alignment",
       "file_type": "code",
       "source_file": "src/shared/brand.ts",
@@ -403,20 +347,10 @@
       "norm_label": "windows appusermodelid alignment"
     },
     {
-      "label": "Branded NSIS wizard resources",
-      "file_type": "document",
-      "source_file": "resources/installer/README.md",
-      "source_location": "resources/installer/README.md:3",
-      "rationale": "Commit 24-bit header/sidebar BMPs for platform-independent packaging; use existing mascot, icon and bundled fonts.",
-      "id": "installer_branded_nsis_wizard",
-      "community": 1,
-      "norm_label": "branded nsis wizard resources"
-    },
-    {
       "label": "Embedded PE metadata and icon auditing",
       "file_type": "code",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "scripts/audit-release.mjs:147",
+      "source_location": "scripts/audit-release.mjs:165",
       "rationale": "Read actual executable ProductName, FileDescription and icon payloads to establish packaged Windows branding beyond configuration assertions.",
       "id": "audit_release_embedded_pe_branding",
       "community": 1,
@@ -432,13 +366,175 @@
       "norm_label": "installer.nsh"
     },
     {
-      "label": "prepare-installer.ps1",
-      "file_type": "code",
-      "source_file": "scripts/prepare-installer.ps1",
-      "source_location": "L1",
-      "id": "scripts_prepare_installer_ps1",
+      "label": "Contributor workflow",
+      "file_type": "document",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:1",
+      "id": "contributing_md",
+      "community": 3,
+      "norm_label": "contributor workflow"
+    },
+    {
+      "label": "Installation and recovery guide",
+      "file_type": "document",
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:1",
+      "id": "user_guide_md",
       "community": 1,
-      "norm_label": "prepare-installer.ps1"
+      "norm_label": "installation and recovery guide"
+    },
+    {
+      "label": "Separate recovery profile",
+      "file_type": "document",
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:42",
+      "rationale": "Open an empty recovery profile without deleting the unreadable original vault; retain the marker-controlled profile choice.",
+      "id": "user_guide_recovery_profile",
+      "community": 1,
+      "norm_label": "separate recovery profile"
+    },
+    {
+      "label": "MISO installer artwork guide",
+      "file_type": "document",
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:1",
+      "id": "installer_readme_md",
+      "community": 1,
+      "norm_label": "miso installer artwork guide"
+    },
+    {
+      "label": "Branded NSIS wizard resources",
+      "file_type": "document",
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:3",
+      "rationale": "Commit 24-bit header/sidebar BMPs for platform-independent packaging; use existing mascot, icon and bundled fonts.",
+      "id": "installer_branded_nsis_wizard",
+      "community": 1,
+      "norm_label": "branded nsis wizard resources"
+    },
+    {
+      "label": "Installer upgrade policy hooks",
+      "file_type": "code",
+      "source_file": "scripts/installer-upgrade.nsh",
+      "source_location": "scripts/installer-upgrade.nsh:1",
+      "id": "scripts_installer_upgrade_nsh",
+      "community": 1,
+      "norm_label": "installer upgrade policy hooks"
+    },
+    {
+      "label": "Stable MISO and Butler installation identity",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "package.json:91",
+      "rationale": "Keep appId dev.butler.desktop and NSIS GUID d42cf777-6b55-53ad-8b39-da340cc05379 stable across releases.",
+      "id": "installer_stable_registration_guid",
+      "community": 1,
+      "norm_label": "stable miso and butler installation identity"
+    },
+    {
+      "label": "Existing machine-wide scope and elevation",
+      "file_type": "code",
+      "source_file": "scripts/installer-upgrade.nsh",
+      "source_location": "scripts/installer-upgrade.nsh:14",
+      "rationale": "Read registered HKLM location and uninstall command; force machine scope for assisted install mode and initialize elevation explicitly for silent mode.",
+      "id": "installer_existing_machine_scope",
+      "community": 1,
+      "norm_label": "existing machine-wide scope and elevation"
+    },
+    {
+      "label": "Stop setup if previous uninstall fails",
+      "file_type": "code",
+      "source_file": "scripts/installer-upgrade.nsh",
+      "source_location": "scripts/installer-upgrade.nsh:44",
+      "rationale": "Launch errors and nonzero uninstall results stop setup with exit code 2; both standard and current-user checks use the same policy.",
+      "id": "installer_fail_closed_removal",
+      "community": 1,
+      "norm_label": "stop setup if previous uninstall fails"
+    },
+    {
+      "label": "Preserved accounts and settings across reinstalls",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "package.json:94",
+      "rationale": "deleteAppDataOnUninstall remains false; reinstall fixtures require KEEP_APP_DATA and verify a saved profile marker remains.",
+      "id": "installer_preserved_profile",
+      "community": 1,
+      "norm_label": "preserved accounts and settings across reinstalls"
+    },
+    {
+      "label": "Replace registered installations before copying files",
+      "file_type": "document",
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:20",
+      "rationale": "Same installation ID identifies prior MISO/Butler versions. Standard NSIS removes registered HKLM and current HKCU copies, including changed-directory installs. Other users private profiles, portable copies, source checkouts, and downloaded installers are outside scope.",
+      "id": "installer_registered_replacement",
+      "community": 1,
+      "norm_label": "replace registered installations before copying files"
+    },
+    {
+      "label": "Compiled upgrade policy fixture",
+      "file_type": "code",
+      "source_file": "tests/installer/upgrade-policy.nsi",
+      "source_location": "tests/installer/upgrade-policy.nsi:1",
+      "id": "tests_installer_upgrade_policy_nsi",
+      "community": 1,
+      "norm_label": "compiled upgrade policy fixture"
+    },
+    {
+      "label": "Stock NSIS uninstallOldVersion reinstall fixture",
+      "file_type": "code",
+      "source_file": "tests/installer/reinstall.nsi",
+      "source_location": "tests/installer/reinstall.nsi:1",
+      "id": "tests_installer_reinstall_nsi",
+      "community": 1,
+      "norm_label": "stock nsis uninstalloldversion reinstall fixture"
+    },
+    {
+      "label": "Isolated old-uninstaller fixture",
+      "file_type": "code",
+      "source_file": "tests/installer/old-uninstaller.nsi",
+      "source_location": "tests/installer/old-uninstaller.nsi:1",
+      "id": "tests_installer_old_uninstaller_nsi",
+      "community": 1,
+      "norm_label": "isolated old-uninstaller fixture"
+    },
+    {
+      "label": "Eleven compiled installer upgrade scenarios",
+      "file_type": "code",
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:48",
+      "rationale": "Nine scope/removal policy cases plus actual stock NSIS uninstallOldVersion same-directory and changed-directory replacement. Synthetic registry namespace, temporary files, and profile preservation markers avoid production registrations.",
+      "id": "installer_eleven_compiled_cases",
+      "community": 1,
+      "norm_label": "eleven compiled installer upgrade scenarios"
+    },
+    {
+      "label": "Windows installer CI verification",
+      "file_type": "code",
+      "source_file": ".github/workflows/check.yml",
+      "source_location": ".github/workflows/check.yml:21",
+      "id": "github_workflows_check_yml",
+      "community": 1,
+      "norm_label": "windows installer ci verification"
+    },
+    {
+      "label": "Agent architecture and verification instructions",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:1",
+      "id": "agents_md",
+      "community": 1,
+      "norm_label": "agent architecture and verification instructions"
+    },
+    {
+      "label": "Contributor graph-first onboarding",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:3",
+      "rationale": "Read map coverage, relevant communities, symbol neighbors, authoritative source and tests before changes; refresh stale maps without blocking an unrelated small fix.",
+      "id": "agents_graph_first_onboarding",
+      "community": 1,
+      "norm_label": "contributor graph-first onboarding"
     },
     {
       "label": "audit-release.mjs",
@@ -453,7 +549,7 @@
       "label": "walk()",
       "file_type": "code",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L51",
+      "source_location": "L69",
       "id": "scripts_audit_release_walk",
       "community": 1,
       "norm_label": "walk()"
@@ -462,7 +558,7 @@
       "label": "get()",
       "file_type": "code",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L99",
+      "source_location": "L117",
       "id": "scripts_audit_release_get",
       "community": 1,
       "norm_label": "get()"
@@ -471,7 +567,7 @@
       "label": "verifyBranding()",
       "file_type": "code",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L161",
+      "source_location": "L179",
       "id": "scripts_audit_release_verifybranding",
       "community": 1,
       "norm_label": "verifybranding()"
@@ -491,7 +587,7 @@
       "source_file": "scripts/build.mjs",
       "source_location": "L1",
       "id": "scripts_build_mjs",
-      "community": 5,
+      "community": 6,
       "norm_label": "build.mjs"
     },
     {
@@ -500,7 +596,7 @@
       "source_file": "scripts/make-icon.mjs",
       "source_location": "L1",
       "id": "scripts_make_icon_mjs",
-      "community": 15,
+      "community": 14,
       "norm_label": "make-icon.mjs"
     },
     {
@@ -509,7 +605,7 @@
       "source_file": "scripts/make-icon.mjs",
       "source_location": "L3",
       "id": "scripts_make_icon_writefallback",
-      "community": 15,
+      "community": 14,
       "norm_label": "writefallback()"
     },
     {
@@ -518,7 +614,7 @@
       "source_file": "scripts/make-icon.mjs",
       "source_location": "L10",
       "id": "scripts_make_icon_crc",
-      "community": 15,
+      "community": 14,
       "norm_label": "crc()"
     },
     {
@@ -527,7 +623,7 @@
       "source_file": "scripts/make-icon.mjs",
       "source_location": "L19",
       "id": "scripts_make_icon_chunk",
-      "community": 15,
+      "community": 14,
       "norm_label": "chunk()"
     },
     {
@@ -536,7 +632,7 @@
       "source_file": "scripts/prepare-assets.mjs",
       "source_location": "L1",
       "id": "scripts_prepare_assets_mjs",
-      "community": 5,
+      "community": 6,
       "norm_label": "prepare-assets.mjs"
     },
     {
@@ -545,7 +641,7 @@
       "source_file": "scripts/prepare-assets.mjs",
       "source_location": "L13",
       "id": "scripts_prepare_assets_selectimage",
-      "community": 5,
+      "community": 6,
       "norm_label": "selectimage()"
     },
     {
@@ -554,8 +650,17 @@
       "source_file": "scripts/prepare-assets.mjs",
       "source_location": "L23",
       "id": "scripts_prepare_assets_prepareassets",
-      "community": 5,
+      "community": 6,
       "norm_label": "prepareassets()"
+    },
+    {
+      "label": "prepare-installer.ps1",
+      "file_type": "code",
+      "source_file": "scripts/prepare-installer.ps1",
+      "source_location": "L1",
+      "id": "scripts_prepare_installer_ps1",
+      "community": 1,
+      "norm_label": "prepare-installer.ps1"
     },
     {
       "label": "New-Canvas()",
@@ -581,8 +686,26 @@
       "source_file": "scripts/start.mjs",
       "source_location": "L1",
       "id": "scripts_start_mjs",
-      "community": 16,
+      "community": 15,
       "norm_label": "start.mjs"
+    },
+    {
+      "label": "test-installer-upgrade.mjs",
+      "file_type": "code",
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "L1",
+      "id": "scripts_test_installer_upgrade_mjs",
+      "community": 1,
+      "norm_label": "test-installer-upgrade.mjs"
+    },
+    {
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "L28",
+      "id": "scripts_test_installer_upgrade_run",
+      "community": 1,
+      "norm_label": "run()"
     },
     {
       "label": "verify-packaged.mjs",
@@ -590,7 +713,7 @@
       "source_file": "scripts/verify-packaged.mjs",
       "source_location": "L1",
       "id": "scripts_verify_packaged_mjs",
-      "community": 1,
+      "community": 3,
       "norm_label": "verify-packaged.mjs"
     },
     {
@@ -599,7 +722,7 @@
       "source_file": "scripts/verify-packaged.mjs",
       "source_location": "L35",
       "id": "scripts_verify_packaged_delay",
-      "community": 1,
+      "community": 3,
       "norm_label": "delay()"
     },
     {
@@ -833,7 +956,7 @@
       "source_file": "src/main/index.ts",
       "source_location": "L340",
       "id": "main_index_performsync",
-      "community": 3,
+      "community": 4,
       "norm_label": "performsync()"
     },
     {
@@ -1013,7 +1136,7 @@
       "source_file": "src/main/performance.ts",
       "source_location": "L1",
       "id": "src_main_performance_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "performance.ts"
     },
     {
@@ -1022,7 +1145,7 @@
       "source_file": "src/main/performance.ts",
       "source_location": "L4",
       "id": "main_performance_wait",
-      "community": 3,
+      "community": 4,
       "norm_label": "wait()"
     },
     {
@@ -1031,7 +1154,7 @@
       "source_file": "src/main/performance.ts",
       "source_location": "L5",
       "id": "main_performance_captureperformance",
-      "community": 3,
+      "community": 4,
       "norm_label": "captureperformance()"
     },
     {
@@ -1121,7 +1244,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L23",
       "id": "calendar_accounts_accountcalendarprovider",
-      "community": 6,
+      "community": 7,
       "norm_label": "accountcalendarprovider"
     },
     {
@@ -1130,7 +1253,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L33",
       "id": "calendar_accounts_accountcalendarprovider_constructor",
-      "community": 6,
+      "community": 7,
       "norm_label": ".constructor()"
     },
     {
@@ -1139,7 +1262,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L34",
       "id": "calendar_accounts_accountcalendarprovider_add",
-      "community": 6,
+      "community": 7,
       "norm_label": ".add()"
     },
     {
@@ -1148,7 +1271,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L42",
       "id": "calendar_accounts_accountcalendarprovider_remove",
-      "community": 6,
+      "community": 7,
       "norm_label": ".remove()"
     },
     {
@@ -1157,7 +1280,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L45",
       "id": "calendar_accounts_accountcalendarprovider_statuses",
-      "community": 6,
+      "community": 7,
       "norm_label": ".statuses()"
     },
     {
@@ -1166,7 +1289,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L58",
       "id": "calendar_accounts_accountcalendarprovider_wrap",
-      "community": 6,
+      "community": 7,
       "norm_label": ".wrap()"
     },
     {
@@ -1175,7 +1298,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L64",
       "id": "calendar_accounts_accountcalendarprovider_call",
-      "community": 6,
+      "community": 7,
       "norm_label": ".call()"
     },
     {
@@ -1184,7 +1307,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L93",
       "id": "calendar_accounts_accountcalendarprovider_listcalendars",
-      "community": 6,
+      "community": 7,
       "norm_label": ".listcalendars()"
     },
     {
@@ -1193,7 +1316,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L120",
       "id": "calendar_accounts_accountcalendarprovider_ensurecalendar",
-      "community": 6,
+      "community": 7,
       "norm_label": ".ensurecalendar()"
     },
     {
@@ -1202,7 +1325,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L128",
       "id": "calendar_accounts_accountcalendarprovider_listevents",
-      "community": 6,
+      "community": 7,
       "norm_label": ".listevents()"
     },
     {
@@ -1211,7 +1334,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L137",
       "id": "calendar_accounts_accountcalendarprovider_getevent",
-      "community": 6,
+      "community": 7,
       "norm_label": ".getevent()"
     },
     {
@@ -1220,7 +1343,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L142",
       "id": "calendar_accounts_accountcalendarprovider_createevent",
-      "community": 6,
+      "community": 7,
       "norm_label": ".createevent()"
     },
     {
@@ -1229,7 +1352,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L147",
       "id": "calendar_accounts_accountcalendarprovider_updateevent",
-      "community": 6,
+      "community": 7,
       "norm_label": ".updateevent()"
     },
     {
@@ -1238,7 +1361,7 @@
       "source_file": "src/main/calendar/accounts.ts",
       "source_location": "L157",
       "id": "calendar_accounts_accountcalendarprovider_deleteevent",
-      "community": 6,
+      "community": 7,
       "norm_label": ".deleteevent()"
     },
     {
@@ -1247,7 +1370,7 @@
       "source_file": "src/main/calendar/auth-errors.ts",
       "source_location": "L1",
       "id": "src_main_calendar_auth_errors_ts",
-      "community": 13,
+      "community": 12,
       "norm_label": "auth-errors.ts"
     },
     {
@@ -1256,7 +1379,7 @@
       "source_file": "src/main/calendar/auth-errors.ts",
       "source_location": "L31",
       "id": "calendar_auth_errors_googlesigninerror",
-      "community": 13,
+      "community": 12,
       "norm_label": "googlesigninerror"
     },
     {
@@ -1265,7 +1388,7 @@
       "source_file": "src/main/calendar/auth-errors.ts",
       "source_location": "L32",
       "id": "calendar_auth_errors_googlesigninerror_constructor",
-      "community": 13,
+      "community": 12,
       "norm_label": ".constructor()"
     },
     {
@@ -1274,7 +1397,7 @@
       "source_file": "src/main/calendar/auth-errors.ts",
       "source_location": "L41",
       "id": "calendar_auth_errors_signinerror",
-      "community": 13,
+      "community": 12,
       "norm_label": "signinerror()"
     },
     {
@@ -1283,7 +1406,7 @@
       "source_file": "src/main/calendar/auth.ts",
       "source_location": "L1",
       "id": "src_main_calendar_auth_ts",
-      "community": 13,
+      "community": 12,
       "norm_label": "auth.ts"
     },
     {
@@ -1292,7 +1415,7 @@
       "source_file": "src/main/calendar/auth.ts",
       "source_location": "L11",
       "id": "calendar_auth_makeauth",
-      "community": 13,
+      "community": 12,
       "norm_label": "makeauth()"
     },
     {
@@ -1301,7 +1424,7 @@
       "source_file": "src/main/calendar/auth.ts",
       "source_location": "L33",
       "id": "calendar_auth_connectgoogle",
-      "community": 13,
+      "community": 12,
       "norm_label": "connectgoogle()"
     },
     {
@@ -1562,7 +1685,7 @@
       "source_file": "src/main/calendar/oauth-config.ts",
       "source_location": "L1",
       "id": "src_main_calendar_oauth_config_ts",
-      "community": 14,
+      "community": 13,
       "norm_label": "oauth-config.ts"
     },
     {
@@ -1571,7 +1694,7 @@
       "source_file": "src/main/calendar/oauth-config.ts",
       "source_location": "L4",
       "id": "calendar_oauth_config_bundledoauthconfig",
-      "community": 14,
+      "community": 13,
       "norm_label": "bundledoauthconfig()"
     },
     {
@@ -1580,7 +1703,7 @@
       "source_file": "src/main/calendar/oauth-config.ts",
       "source_location": "L16",
       "id": "calendar_oauth_config_defaultoauthconfig",
-      "community": 14,
+      "community": 13,
       "norm_label": "defaultoauthconfig()"
     },
     {
@@ -1589,7 +1712,7 @@
       "source_file": "src/main/calendar/oauth-config.ts",
       "source_location": "L29",
       "id": "calendar_oauth_config_loadoauthconfig",
-      "community": 14,
+      "community": 13,
       "norm_label": "loadoauthconfig()"
     },
     {
@@ -1661,7 +1784,7 @@
       "source_file": "src/main/nlu/input.ts",
       "source_location": "L21",
       "id": "nlu_input_inputservice",
-      "community": 1,
+      "community": 3,
       "norm_label": "inputservice"
     },
     {
@@ -1670,7 +1793,7 @@
       "source_file": "src/main/nlu/input.ts",
       "source_location": "L22",
       "id": "nlu_input_inputservice_constructor",
-      "community": 1,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -1679,7 +1802,7 @@
       "source_file": "src/main/nlu/input.ts",
       "source_location": "L33",
       "id": "nlu_input_inputservice_parse",
-      "community": 1,
+      "community": 3,
       "norm_label": ".parse()"
     },
     {
@@ -1742,7 +1865,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L32",
       "id": "settings_store_settingsstore",
-      "community": 7,
+      "community": 1,
       "norm_label": "settingsstore"
     },
     {
@@ -1751,7 +1874,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L35",
       "id": "settings_store_settingsstore_constructor",
-      "community": 7,
+      "community": 1,
       "norm_label": ".constructor()"
     },
     {
@@ -1760,7 +1883,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L68",
       "id": "settings_store_settingsstore_persist",
-      "community": 7,
+      "community": 1,
       "norm_label": ".persist()"
     },
     {
@@ -1769,7 +1892,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L88",
       "id": "settings_store_settingsstore_settings",
-      "community": 7,
+      "community": 1,
       "norm_label": ".settings()"
     },
     {
@@ -1778,7 +1901,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L91",
       "id": "settings_store_settingsstore_save",
-      "community": 7,
+      "community": 1,
       "norm_label": ".save()"
     },
     {
@@ -1787,7 +1910,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L99",
       "id": "settings_store_settingsstore_resetpersonaldata",
-      "community": 7,
+      "community": 1,
       "norm_label": ".resetpersonaldata()"
     },
     {
@@ -1796,7 +1919,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L110",
       "id": "settings_store_settingsstore_cache",
-      "community": 7,
+      "community": 1,
       "norm_label": ".cache()"
     },
     {
@@ -1805,7 +1928,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L142",
       "id": "settings_store_settingsstore_fired",
-      "community": 7,
+      "community": 1,
       "norm_label": ".fired()"
     },
     {
@@ -1814,7 +1937,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L149",
       "id": "settings_store_settingsstore_assertsecure",
-      "community": 7,
+      "community": 1,
       "norm_label": ".assertsecure()"
     },
     {
@@ -1823,7 +1946,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L162",
       "id": "settings_store_settingsstore_secret",
-      "community": 7,
+      "community": 1,
       "norm_label": ".secret()"
     },
     {
@@ -1832,7 +1955,7 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "L168",
       "id": "settings_store_settingsstore_setsecret",
-      "community": 7,
+      "community": 1,
       "norm_label": ".setsecret()"
     },
     {
@@ -1841,7 +1964,7 @@
       "source_file": "src/main/sync/concurrency.ts",
       "source_location": "L1",
       "id": "src_main_sync_concurrency_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "concurrency.ts"
     },
     {
@@ -1850,7 +1973,7 @@
       "source_file": "src/main/sync/concurrency.ts",
       "source_location": "L1",
       "id": "sync_concurrency_maplimited",
-      "community": 3,
+      "community": 4,
       "norm_label": "maplimited()"
     },
     {
@@ -1859,7 +1982,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L1",
       "id": "src_main_sync_reminders_ts",
-      "community": 3,
+      "community": 2,
       "norm_label": "reminders.ts"
     },
     {
@@ -1868,7 +1991,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L3",
       "id": "sync_reminders_eventstart",
-      "community": 3,
+      "community": 2,
       "norm_label": "eventstart()"
     },
     {
@@ -1877,7 +2000,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L14",
       "id": "sync_reminders_plans",
-      "community": 3,
+      "community": 2,
       "norm_label": "plans()"
     },
     {
@@ -1886,7 +2009,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L46",
       "id": "sync_reminders_inquiethours",
-      "community": 3,
+      "community": 2,
       "norm_label": "inquiethours()"
     },
     {
@@ -1895,7 +2018,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L55",
       "id": "sync_reminders_reminderengine",
-      "community": 3,
+      "community": 4,
       "norm_label": "reminderengine"
     },
     {
@@ -1904,7 +2027,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L62",
       "id": "sync_reminders_reminderengine_constructor",
-      "community": 3,
+      "community": 4,
       "norm_label": ".constructor()"
     },
     {
@@ -1913,7 +2036,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L72",
       "id": "sync_reminders_reminderengine_start",
-      "community": 3,
+      "community": 4,
       "norm_label": ".start()"
     },
     {
@@ -1922,7 +2045,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L77",
       "id": "sync_reminders_reminderengine_stop",
-      "community": 3,
+      "community": 4,
       "norm_label": ".stop()"
     },
     {
@@ -1931,7 +2054,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L82",
       "id": "sync_reminders_reminderengine_rebuild",
-      "community": 3,
+      "community": 4,
       "norm_label": ".rebuild()"
     },
     {
@@ -1940,7 +2063,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L86",
       "id": "sync_reminders_reminderengine_tick",
-      "community": 3,
+      "community": 4,
       "norm_label": ".tick()"
     },
     {
@@ -1949,7 +2072,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L127",
       "id": "sync_reminders_reminderengine_schedule",
-      "community": 3,
+      "community": 4,
       "norm_label": ".schedule()"
     },
     {
@@ -1958,7 +2081,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L138",
       "id": "sync_reminders_reminderengine_snooze",
-      "community": 3,
+      "community": 4,
       "norm_label": ".snooze()"
     },
     {
@@ -1967,7 +2090,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L152",
       "id": "sync_reminders_reminderengine_done",
-      "community": 3,
+      "community": 4,
       "norm_label": ".done()"
     },
     {
@@ -1976,7 +2099,7 @@
       "source_file": "src/main/sync/reminders.ts",
       "source_location": "L155",
       "id": "sync_reminders_reminderengine_clear",
-      "community": 3,
+      "community": 4,
       "norm_label": ".clear()"
     },
     {
@@ -1994,7 +2117,7 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "L5",
       "id": "sync_sync_syncservice",
-      "community": 3,
+      "community": 4,
       "norm_label": "syncservice"
     },
     {
@@ -2003,7 +2126,7 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "L13",
       "id": "sync_sync_syncservice_constructor",
-      "community": 3,
+      "community": 4,
       "norm_label": ".constructor()"
     },
     {
@@ -2012,7 +2135,7 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "L20",
       "id": "sync_sync_syncservice_stop",
-      "community": 3,
+      "community": 4,
       "norm_label": ".stop()"
     },
     {
@@ -2021,7 +2144,7 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "L23",
       "id": "sync_sync_syncservice_run",
-      "community": 3,
+      "community": 4,
       "norm_label": ".run()"
     },
     {
@@ -2030,7 +2153,7 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "L30",
       "id": "sync_sync_syncservice_perform",
-      "community": 3,
+      "community": 4,
       "norm_label": ".perform()"
     },
     {
@@ -2066,7 +2189,7 @@
       "source_file": "src/renderer/app.ts",
       "source_location": "L1",
       "id": "src_renderer_app_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "app.ts"
     },
     {
@@ -2075,7 +2198,7 @@
       "source_file": "src/renderer/app.ts",
       "source_location": "L13",
       "id": "renderer_app_el",
-      "community": 4,
+      "community": 5,
       "norm_label": "el()"
     },
     {
@@ -2084,7 +2207,7 @@
       "source_file": "src/renderer/app.ts",
       "source_location": "L17",
       "id": "renderer_app_text",
-      "community": 4,
+      "community": 5,
       "norm_label": "text()"
     },
     {
@@ -2093,7 +2216,7 @@
       "source_file": "src/renderer/app.ts",
       "source_location": "L23",
       "id": "renderer_app_button",
-      "community": 4,
+      "community": 5,
       "norm_label": "button()"
     },
     {
@@ -2102,7 +2225,7 @@
       "source_file": "src/renderer/app.ts",
       "source_location": "L33",
       "id": "renderer_app_setuppet",
-      "community": 4,
+      "community": 5,
       "norm_label": "setuppet()"
     },
     {
@@ -2111,7 +2234,7 @@
       "source_file": "src/renderer/calendar-view.ts",
       "source_location": "L1",
       "id": "src_renderer_calendar_view_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "calendar-view.ts"
     },
     {
@@ -2120,7 +2243,7 @@
       "source_file": "src/renderer/calendar-view.ts",
       "source_location": "L3",
       "id": "renderer_calendar_view_calendarview",
-      "community": 4,
+      "community": 5,
       "norm_label": "calendarview()"
     },
     {
@@ -2129,7 +2252,7 @@
       "source_file": "src/renderer/dashboard.ts",
       "source_location": "L1",
       "id": "src_renderer_dashboard_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "dashboard.ts"
     },
     {
@@ -2138,7 +2261,7 @@
       "source_file": "src/renderer/dashboard.ts",
       "source_location": "L7",
       "id": "renderer_dashboard_setupdashboard",
-      "community": 4,
+      "community": 5,
       "norm_label": "setupdashboard()"
     },
     {
@@ -2147,7 +2270,7 @@
       "source_file": "src/renderer/dialogs.ts",
       "source_location": "L1",
       "id": "src_renderer_dialogs_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "dialogs.ts"
     },
     {
@@ -2156,7 +2279,7 @@
       "source_file": "src/renderer/dialogs.ts",
       "source_location": "L1",
       "id": "renderer_dialogs_choicedialog",
-      "community": 4,
+      "community": 5,
       "norm_label": "choicedialog()"
     },
     {
@@ -2165,7 +2288,7 @@
       "source_file": "src/renderer/dialogs.ts",
       "source_location": "L48",
       "id": "renderer_dialogs_confirmdialog",
-      "community": 4,
+      "community": 5,
       "norm_label": "confirmdialog()"
     },
     {
@@ -2174,7 +2297,7 @@
       "source_file": "src/renderer/dialogs.ts",
       "source_location": "L57",
       "id": "renderer_dialogs_resultdialog",
-      "community": 4,
+      "community": 5,
       "norm_label": "resultdialog()"
     },
     {
@@ -2183,7 +2306,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L1",
       "id": "src_renderer_idle_poses_ts",
-      "community": 12,
+      "community": 3,
       "norm_label": "idle-poses.ts"
     },
     {
@@ -2192,7 +2315,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L6",
       "id": "renderer_idle_poses_idleposecycle",
-      "community": 12,
+      "community": 3,
       "norm_label": "idleposecycle"
     },
     {
@@ -2201,7 +2324,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L10",
       "id": "renderer_idle_poses_idleposecycle_constructor",
-      "community": 12,
+      "community": 3,
       "norm_label": ".constructor()"
     },
     {
@@ -2210,7 +2333,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L11",
       "id": "renderer_idle_poses_idleposecycle_enabled",
-      "community": 12,
+      "community": 3,
       "norm_label": ".enabled()"
     },
     {
@@ -2219,7 +2342,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L14",
       "id": "renderer_idle_poses_idleposecycle_setenabled",
-      "community": 12,
+      "community": 3,
       "norm_label": ".setenabled()"
     },
     {
@@ -2228,7 +2351,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L28",
       "id": "renderer_idle_poses_idleposecycle_schedule",
-      "community": 12,
+      "community": 3,
       "norm_label": ".schedule()"
     },
     {
@@ -2237,7 +2360,7 @@
       "source_file": "src/renderer/idle-poses.ts",
       "source_location": "L37",
       "id": "renderer_idle_poses_idleposecycle_dispose",
-      "community": 12,
+      "community": 3,
       "norm_label": ".dispose()"
     },
     {
@@ -2246,7 +2369,7 @@
       "source_file": "src/renderer/quick-add.ts",
       "source_location": "L1",
       "id": "src_renderer_quick_add_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "quick-add.ts"
     },
     {
@@ -2255,7 +2378,7 @@
       "source_file": "src/renderer/quick-add.ts",
       "source_location": "L3",
       "id": "renderer_quick_add_quickadd",
-      "community": 4,
+      "community": 5,
       "norm_label": "quickadd()"
     },
     {
@@ -2264,7 +2387,7 @@
       "source_file": "src/renderer/setup.ts",
       "source_location": "L1",
       "id": "src_renderer_setup_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "setup.ts"
     },
     {
@@ -2273,7 +2396,7 @@
       "source_file": "src/renderer/setup.ts",
       "source_location": "L5",
       "id": "renderer_setup_setupwizard",
-      "community": 4,
+      "community": 5,
       "norm_label": "setupwizard()"
     },
     {
@@ -2282,7 +2405,7 @@
       "source_file": "src/renderer/site-links.ts",
       "source_location": "L1",
       "id": "src_renderer_site_links_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "site-links.ts"
     },
     {
@@ -2291,7 +2414,7 @@
       "source_file": "src/renderer/site-links.ts",
       "source_location": "L4",
       "id": "renderer_site_links_addsitelinks",
-      "community": 4,
+      "community": 5,
       "norm_label": "addsitelinks()"
     },
     {
@@ -2336,7 +2459,7 @@
       "source_file": "src/shared/brand.ts",
       "source_location": "L1",
       "id": "src_shared_brand_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "brand.ts"
     },
     {
@@ -2345,7 +2468,7 @@
       "source_file": "src/shared/hotkey.ts",
       "source_location": "L1",
       "id": "src_shared_hotkey_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "hotkey.ts"
     },
     {
@@ -2354,7 +2477,7 @@
       "source_file": "src/shared/hotkey.ts",
       "source_location": "L3",
       "id": "shared_hotkey_capturehotkey",
-      "community": 4,
+      "community": 5,
       "norm_label": "capturehotkey()"
     },
     {
@@ -2426,7 +2549,7 @@
       "source_file": "tests/auth-errors.test.ts",
       "source_location": "L1",
       "id": "tests_auth_errors_test_ts",
-      "community": 13,
+      "community": 12,
       "norm_label": "auth-errors.test.ts"
     },
     {
@@ -2444,7 +2567,7 @@
       "source_file": "tests/concurrency.test.ts",
       "source_location": "L1",
       "id": "tests_concurrency_test_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "concurrency.test.ts"
     },
     {
@@ -2471,7 +2594,7 @@
       "source_file": "tests/hotkey.test.ts",
       "source_location": "L1",
       "id": "tests_hotkey_test_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "hotkey.test.ts"
     },
     {
@@ -2480,7 +2603,7 @@
       "source_file": "tests/idle-poses.test.ts",
       "source_location": "L1",
       "id": "tests_idle_poses_test_ts",
-      "community": 12,
+      "community": 3,
       "norm_label": "idle-poses.test.ts"
     },
     {
@@ -2498,7 +2621,7 @@
       "source_file": "tests/oauth-config.test.ts",
       "source_location": "L1",
       "id": "tests_oauth_config_test_ts",
-      "community": 14,
+      "community": 13,
       "norm_label": "oauth-config.test.ts"
     },
     {
@@ -2507,7 +2630,7 @@
       "source_file": "tests/oauth-config.test.ts",
       "source_location": "L16",
       "id": "tests_oauth_config_test_store",
-      "community": 14,
+      "community": 13,
       "norm_label": "store()"
     },
     {
@@ -2543,7 +2666,7 @@
       "source_file": "tests/reminders.test.ts",
       "source_location": "L1",
       "id": "tests_reminders_test_ts",
-      "community": 3,
+      "community": 2,
       "norm_label": "reminders.test.ts"
     },
     {
@@ -2552,7 +2675,7 @@
       "source_file": "tests/secure-store.test.ts",
       "source_location": "L1",
       "id": "tests_secure_store_test_ts",
-      "community": 1,
+      "community": 3,
       "norm_label": "secure-store.test.ts"
     },
     {
@@ -2561,7 +2684,7 @@
       "source_file": "tests/secure-store.test.ts",
       "source_location": "L9",
       "id": "tests_secure_store_test_store",
-      "community": 1,
+      "community": 3,
       "norm_label": "store()"
     },
     {
@@ -2579,73 +2702,13 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "CONTRIBUTING.md",
-      "source_location": "CONTRIBUTING.md:5",
-      "weight": 1.0,
-      "_src": "contributing_md",
-      "_tgt": "assets_readme_md",
-      "source": "contributing_md",
-      "target": "assets_readme_md"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CONTRIBUTING.md",
-      "source_location": "CONTRIBUTING.md:18",
-      "weight": 1.0,
-      "_src": "contributing_md",
-      "_tgt": "security_md",
-      "source": "contributing_md",
-      "target": "security_md"
-    },
-    {
-      "relation": "requires",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CONTRIBUTING.md",
-      "source_location": "CONTRIBUTING.md:16",
-      "weight": 1.0,
-      "_src": "contributing_md",
-      "_tgt": "verification_synthetic_accounts",
-      "source": "contributing_md",
-      "target": "verification_synthetic_accounts"
-    },
-    {
-      "relation": "requires_check_and_format_commands",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CONTRIBUTING.md",
-      "source_location": "CONTRIBUTING.md:9",
-      "weight": 1.0,
-      "_src": "contributing_md",
-      "_tgt": "package_json",
-      "source": "contributing_md",
-      "target": "package_json"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
       "source_location": "README.md:146",
       "weight": 1.0,
       "_src": "readme_md",
       "_tgt": "contributing_md",
-      "source": "contributing_md",
-      "target": "readme_md"
-    },
-    {
-      "relation": "requires_contributor_verification",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:26",
-      "weight": 1,
-      "_src": "agents_graph_first_onboarding",
-      "_tgt": "contributing_md",
-      "source": "contributing_md",
-      "target": "agents_graph_first_onboarding"
+      "source": "readme_md",
+      "target": "contributing_md"
     },
     {
       "relation": "references",
@@ -2852,6 +2915,18 @@
       "target": "publication_review_md"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:18",
+      "weight": 1.0,
+      "_src": "contributing_md",
+      "_tgt": "security_md",
+      "source": "security_md",
+      "target": "contributing_md"
+    },
+    {
       "relation": "distinguishes_from_live_acceptance",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -2918,8 +2993,8 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "src/main/sync/sync.ts:23",
       "weight": 1.0,
-      "_src": "sync_sync_syncservice_run",
-      "_tgt": "optimization_incremental_sync",
+      "_src": "optimization_incremental_sync",
+      "_tgt": "sync_sync_syncservice_run",
       "source": "optimization_incremental_sync",
       "target": "sync_sync_syncservice_run"
     },
@@ -2930,8 +3005,8 @@
       "source_file": "src/main/sync/sync.ts",
       "source_location": "src/main/sync/sync.ts:47",
       "weight": 1.0,
-      "_src": "sync_sync_syncservice_perform",
-      "_tgt": "optimization_incremental_sync",
+      "_src": "optimization_incremental_sync",
+      "_tgt": "sync_sync_syncservice_perform",
       "source": "optimization_incremental_sync",
       "target": "sync_sync_syncservice_perform"
     },
@@ -3086,8 +3161,8 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "src/main/settings/store.ts:49",
       "weight": 1.0,
-      "_src": "settings_store_settingsstore_constructor",
-      "_tgt": "security_and_shipping_encrypted_vault",
+      "_src": "security_and_shipping_encrypted_vault",
+      "_tgt": "settings_store_settingsstore_constructor",
       "source": "security_and_shipping_encrypted_vault",
       "target": "settings_store_settingsstore_constructor"
     },
@@ -3098,8 +3173,8 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "src/main/settings/store.ts:73",
       "weight": 1.0,
-      "_src": "settings_store_settingsstore_persist",
-      "_tgt": "security_and_shipping_encrypted_vault",
+      "_src": "security_and_shipping_encrypted_vault",
+      "_tgt": "settings_store_settingsstore_persist",
       "source": "security_and_shipping_encrypted_vault",
       "target": "settings_store_settingsstore_persist"
     },
@@ -3110,8 +3185,8 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "src/main/settings/store.ts:149",
       "weight": 1.0,
-      "_src": "settings_store_settingsstore_assertsecure",
-      "_tgt": "security_and_shipping_encrypted_vault",
+      "_src": "security_and_shipping_encrypted_vault",
+      "_tgt": "settings_store_settingsstore_assertsecure",
       "source": "security_and_shipping_encrypted_vault",
       "target": "settings_store_settingsstore_assertsecure"
     },
@@ -3120,8 +3195,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:20",
-      "weight": 1,
+      "source_location": "docs/USER-GUIDE.md:28",
+      "weight": 1.0,
       "_src": "user_guide_md",
       "_tgt": "security_and_shipping_encrypted_vault",
       "source": "security_and_shipping_encrypted_vault",
@@ -3132,8 +3207,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:34",
-      "weight": 1,
+      "source_location": "docs/USER-GUIDE.md:42",
+      "weight": 1.0,
       "_src": "user_guide_recovery_profile",
       "_tgt": "security_and_shipping_encrypted_vault",
       "source": "security_and_shipping_encrypted_vault",
@@ -3146,8 +3221,8 @@
       "source_file": "scripts/build.mjs",
       "source_location": "scripts/build.mjs:61",
       "weight": 1.0,
-      "_src": "scripts_build_mjs",
-      "_tgt": "security_and_shipping_desktop_oauth",
+      "_src": "security_and_shipping_desktop_oauth",
+      "_tgt": "scripts_build_mjs",
       "source": "security_and_shipping_desktop_oauth",
       "target": "scripts_build_mjs"
     },
@@ -3158,8 +3233,8 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "src/main/settings/store.ts:99",
       "weight": 1.0,
-      "_src": "settings_store_settingsstore_resetpersonaldata",
-      "_tgt": "security_and_shipping_desktop_oauth",
+      "_src": "security_and_shipping_desktop_oauth",
+      "_tgt": "settings_store_settingsstore_resetpersonaldata",
       "source": "security_and_shipping_desktop_oauth",
       "target": "settings_store_settingsstore_resetpersonaldata"
     },
@@ -3182,8 +3257,8 @@
       "source_file": "src/main/settings/store.ts",
       "source_location": "src/main/settings/store.ts:14",
       "weight": 1.0,
-      "_src": "src_main_settings_store_ts",
-      "_tgt": "security_and_shipping_optional_ai",
+      "_src": "security_and_shipping_optional_ai",
+      "_tgt": "src_main_settings_store_ts",
       "source": "security_and_shipping_optional_ai",
       "target": "src_main_settings_store_ts"
     },
@@ -3193,7 +3268,7 @@
       "confidence_score": 1.0,
       "source_file": "docs/USER-GUIDE.md",
       "source_location": "docs/USER-GUIDE.md:6",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "user_guide_md",
       "_tgt": "security_and_shipping_optional_ai",
       "source": "security_and_shipping_optional_ai",
@@ -3218,8 +3293,8 @@
       "source_file": "src/main/preload.ts",
       "source_location": "src/main/preload.ts:53",
       "weight": 1.0,
-      "_src": "src_main_preload_ts",
-      "_tgt": "security_and_shipping_renderer_isolation",
+      "_src": "security_and_shipping_renderer_isolation",
+      "_tgt": "src_main_preload_ts",
       "source": "security_and_shipping_renderer_isolation",
       "target": "src_main_preload_ts"
     },
@@ -3230,8 +3305,8 @@
       "source_file": "src/main/index.ts",
       "source_location": "src/main/index.ts:646",
       "weight": 1,
-      "_src": "main_index_securewindow",
-      "_tgt": "security_and_shipping_renderer_isolation",
+      "_src": "security_and_shipping_renderer_isolation",
+      "_tgt": "main_index_securewindow",
       "source": "security_and_shipping_renderer_isolation",
       "target": "main_index_securewindow"
     },
@@ -3242,8 +3317,8 @@
       "source_file": "src/main/index.ts",
       "source_location": "src/main/index.ts:742",
       "weight": 1,
-      "_src": "main_index_handle",
-      "_tgt": "security_and_shipping_renderer_isolation",
+      "_src": "security_and_shipping_renderer_isolation",
+      "_tgt": "main_index_handle",
       "source": "security_and_shipping_renderer_isolation",
       "target": "main_index_handle"
     },
@@ -3252,8 +3327,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "package.json:102",
-      "weight": 1,
+      "source_location": "package.json:106",
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "security_and_shipping_runtime_fuses",
       "source": "security_and_shipping_runtime_fuses",
@@ -3428,6 +3503,18 @@
       "target": "tests_idle_poses_test_ts"
     },
     {
+      "relation": "requires",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:16",
+      "weight": 1.0,
+      "_src": "contributing_md",
+      "_tgt": "verification_synthetic_accounts",
+      "source": "verification_synthetic_accounts",
+      "target": "contributing_md"
+    },
+    {
       "relation": "documents",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -3536,14 +3623,26 @@
       "target": "mascot_wink_readme_md"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:5",
+      "weight": 1.0,
+      "_src": "contributing_md",
+      "_tgt": "assets_readme_md",
+      "source": "assets_readme_md",
+      "target": "contributing_md"
+    },
+    {
       "relation": "builds_before_asset_copy",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/build.mjs",
       "source_location": "scripts/build.mjs:16",
       "weight": 1.0,
-      "_src": "scripts_build_mjs",
-      "_tgt": "assets_generated_manifest",
+      "_src": "assets_generated_manifest",
+      "_tgt": "scripts_build_mjs",
       "source": "assets_generated_manifest",
       "target": "scripts_build_mjs"
     },
@@ -3554,8 +3653,8 @@
       "source_file": "scripts/prepare-assets.mjs",
       "source_location": "scripts/prepare-assets.mjs:12",
       "weight": 1.0,
-      "_src": "scripts_prepare_assets_selectimage",
-      "_tgt": "assets_generated_manifest",
+      "_src": "assets_generated_manifest",
+      "_tgt": "scripts_prepare_assets_selectimage",
       "source": "assets_generated_manifest",
       "target": "scripts_prepare_assets_selectimage"
     },
@@ -3566,8 +3665,8 @@
       "source_file": "scripts/prepare-assets.mjs",
       "source_location": "scripts/prepare-assets.mjs:43",
       "weight": 1.0,
-      "_src": "scripts_prepare_assets_prepareassets",
-      "_tgt": "assets_generated_manifest",
+      "_src": "assets_generated_manifest",
+      "_tgt": "scripts_prepare_assets_prepareassets",
       "source": "assets_generated_manifest",
       "target": "scripts_prepare_assets_prepareassets"
     },
@@ -3614,8 +3713,8 @@
       "source_file": "scripts/build.mjs",
       "source_location": "scripts/build.mjs:50",
       "weight": 1.0,
-      "_src": "scripts_build_mjs",
-      "_tgt": "fonts_baloo2",
+      "_src": "fonts_baloo2",
+      "_tgt": "scripts_build_mjs",
       "source": "fonts_baloo2",
       "target": "scripts_build_mjs"
     },
@@ -3638,8 +3737,8 @@
       "source_file": "scripts/build.mjs",
       "source_location": "scripts/build.mjs:50",
       "weight": 1.0,
-      "_src": "scripts_build_mjs",
-      "_tgt": "fonts_inter",
+      "_src": "fonts_inter",
+      "_tgt": "scripts_build_mjs",
       "source": "fonts_inter",
       "target": "scripts_build_mjs"
     },
@@ -3650,22 +3749,22 @@
       "source_file": "scripts/build.mjs",
       "source_location": "scripts/build.mjs:40",
       "weight": 1.0,
-      "_src": "scripts_build_mjs",
-      "_tgt": "renderer_index_html",
+      "_src": "renderer_index_html",
+      "_tgt": "scripts_build_mjs",
       "source": "renderer_index_html",
       "target": "scripts_build_mjs"
     },
     {
-      "relation": "requires_project_checks",
+      "relation": "requires_check_and_format_commands",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:26",
-      "weight": 1,
-      "_src": "agents_md",
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:9",
+      "weight": 1.0,
+      "_src": "contributing_md",
       "_tgt": "package_json",
       "source": "package_json",
-      "target": "agents_md"
+      "target": "contributing_md"
     },
     {
       "relation": "identifies_resource_configuration",
@@ -3673,7 +3772,7 @@
       "confidence_score": 1.0,
       "source_file": "resources/installer/README.md",
       "source_location": "resources/installer/README.md:11",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "installer_readme_md",
       "_tgt": "package_json",
       "source": "package_json",
@@ -3684,8 +3783,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "package.json:44",
-      "weight": 1,
+      "source_location": "package.json:45",
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "brand_windows_app_identity",
       "source": "package_json",
@@ -3696,8 +3795,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "package.json:93",
-      "weight": 1,
+      "source_location": "package.json:97",
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "installer_branded_nsis_wizard",
       "source": "package_json",
@@ -3708,8 +3807,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "package.json:69",
-      "weight": 1,
+      "source_location": "package.json:70",
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "audit_release_embedded_pe_branding",
       "source": "package_json",
@@ -3721,7 +3820,7 @@
       "confidence_score": 1.0,
       "source_file": "package.json",
       "source_location": "package.json:15",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "scripts_audit_release_mjs",
       "source": "package_json",
@@ -3732,8 +3831,8 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "package.json:22",
-      "weight": 1,
+      "source_location": "package.json:23",
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "scripts_build_configured_release_mjs",
       "source": "package_json",
@@ -3745,7 +3844,7 @@
       "confidence_score": 1.0,
       "source_file": "package.json",
       "source_location": "package.json:9",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "scripts_build_mjs",
       "source": "package_json",
@@ -3757,7 +3856,7 @@
       "confidence_score": 1.0,
       "source_file": "package.json",
       "source_location": "package.json:16",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "scripts_smoke_mjs",
       "source": "package_json",
@@ -3769,107 +3868,359 @@
       "confidence_score": 1.0,
       "source_file": "package.json",
       "source_location": "package.json:17",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "package_json",
       "_tgt": "scripts_verify_packaged_mjs",
       "source": "package_json",
       "target": "scripts_verify_packaged_mjs"
     },
     {
-      "relation": "requires",
+      "relation": "pins_installation_guid",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:7",
-      "weight": 1,
-      "_src": "agents_md",
-      "_tgt": "agents_graph_first_onboarding",
-      "source": "agents_md",
-      "target": "agents_graph_first_onboarding"
+      "source_file": "package.json",
+      "source_location": "package.json:91",
+      "weight": 1.0,
+      "_src": "package_json",
+      "_tgt": "installer_stable_registration_guid",
+      "source": "package_json",
+      "target": "installer_stable_registration_guid"
     },
     {
-      "relation": "identifies_lifecycle_entry_point",
+      "relation": "preserves_app_data_on_uninstall",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "package.json",
+      "source_location": "package.json:94",
+      "weight": 1.0,
+      "_src": "package_json",
+      "_tgt": "installer_preserved_profile",
+      "source": "package_json",
+      "target": "installer_preserved_profile"
+    },
+    {
+      "relation": "runs_compiled_installer_tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "package.json",
+      "source_location": "package.json:18",
+      "weight": 1.0,
+      "_src": "package_json",
+      "_tgt": "scripts_test_installer_upgrade_mjs",
+      "source": "package_json",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "requires_project_checks",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:16",
-      "weight": 1,
+      "source_location": "AGENTS.md:26",
+      "weight": 1.0,
       "_src": "agents_md",
+      "_tgt": "package_json",
+      "source": "package_json",
+      "target": "agents_md"
+    },
+    {
+      "relation": "defines_app_id",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/shared/brand.ts",
+      "source_location": "src/shared/brand.ts:3",
+      "weight": 1,
+      "_src": "brand_windows_app_identity",
+      "_tgt": "src_shared_brand_ts",
+      "source": "brand_windows_app_identity",
+      "target": "src_shared_brand_ts"
+    },
+    {
+      "relation": "sets_windows_app_identity",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/main/index.ts",
+      "source_location": "src/main/index.ts:127",
+      "weight": 1,
+      "_src": "brand_windows_app_identity",
       "_tgt": "src_main_index_ts",
-      "source": "agents_md",
+      "source": "brand_windows_app_identity",
       "target": "src_main_index_ts"
     },
     {
-      "relation": "identifies_renderer_bridge",
+      "relation": "sets_window_icon_and_shell_details",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:17",
+      "source_file": "src/main/index.ts",
+      "source_location": "src/main/index.ts:637",
       "weight": 1,
-      "_src": "agents_md",
-      "_tgt": "src_main_preload_ts",
-      "source": "agents_md",
-      "target": "src_main_preload_ts"
+      "_src": "brand_windows_app_identity",
+      "_tgt": "main_index_securewindow",
+      "source": "brand_windows_app_identity",
+      "target": "main_index_securewindow"
     },
     {
-      "relation": "identifies_api_contract",
+      "relation": "uses_brand_icon",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "AGENTS.md",
-      "source_location": "AGENTS.md:17",
+      "source_file": "src/main/index.ts",
+      "source_location": "src/main/index.ts:496",
       "weight": 1,
-      "_src": "agents_md",
-      "_tgt": "src_shared_types_ts",
-      "source": "agents_md",
-      "target": "src_shared_types_ts"
+      "_src": "brand_windows_app_identity",
+      "_tgt": "main_index_opensettings",
+      "source": "brand_windows_app_identity",
+      "target": "main_index_opensettings"
     },
     {
-      "relation": "documents",
+      "relation": "uses_brand_icon",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:34",
+      "source_file": "src/main/index.ts",
+      "source_location": "src/main/index.ts:548",
       "weight": 1,
-      "_src": "user_guide_md",
-      "_tgt": "user_guide_recovery_profile",
-      "source": "user_guide_md",
-      "target": "user_guide_recovery_profile"
+      "_src": "brand_windows_app_identity",
+      "_tgt": "main_index_opensetup",
+      "source": "brand_windows_app_identity",
+      "target": "main_index_opensetup"
     },
     {
       "relation": "explains_taskbar_identity_and_stale_pins",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:28",
-      "weight": 1,
+      "source_location": "docs/USER-GUIDE.md:38",
+      "weight": 1.0,
       "_src": "user_guide_md",
       "_tgt": "brand_windows_app_identity",
-      "source": "user_guide_md",
-      "target": "brand_windows_app_identity"
+      "source": "brand_windows_app_identity",
+      "target": "user_guide_md"
     },
     {
-      "relation": "documents_custom_wizard",
+      "relation": "assigns_safe_and_recovery_shortcut_aumi",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:28",
+      "source_file": "scripts/installer.nsh",
+      "source_location": "scripts/installer.nsh:5",
+      "weight": 1.0,
+      "_src": "scripts_installer_nsh",
+      "_tgt": "brand_windows_app_identity",
+      "source": "brand_windows_app_identity",
+      "target": "scripts_installer_nsh"
+    },
+    {
+      "relation": "depends_on_embedded_executable_icon_for_packaged_shell",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "src/main/index.ts",
+      "source_location": "src/main/index.ts:642",
       "weight": 1,
-      "_src": "user_guide_md",
-      "_tgt": "installer_branded_nsis_wizard",
-      "source": "user_guide_md",
-      "target": "installer_branded_nsis_wizard"
+      "_src": "audit_release_embedded_pe_branding",
+      "_tgt": "main_index_securewindow",
+      "source": "audit_release_embedded_pe_branding",
+      "target": "main_index_securewindow"
     },
     {
       "relation": "documents_shipping_process_identity",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "docs/USER-GUIDE.md",
-      "source_location": "docs/USER-GUIDE.md:28",
-      "weight": 1,
+      "source_location": "docs/USER-GUIDE.md:36",
+      "weight": 1.0,
       "_src": "user_guide_md",
       "_tgt": "audit_release_embedded_pe_branding",
+      "source": "audit_release_embedded_pe_branding",
+      "target": "user_guide_md"
+    },
+    {
+      "relation": "documents_audit",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:11",
+      "weight": 1.0,
+      "_src": "installer_readme_md",
+      "_tgt": "audit_release_embedded_pe_branding",
+      "source": "audit_release_embedded_pe_branding",
+      "target": "installer_readme_md"
+    },
+    {
+      "relation": "validates_actual_pe_resources",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/audit-release.mjs",
+      "source_location": "scripts/audit-release.mjs:179",
+      "weight": 1.0,
+      "_src": "scripts_audit_release_verifybranding",
+      "_tgt": "audit_release_embedded_pe_branding",
+      "source": "audit_release_embedded_pe_branding",
+      "target": "scripts_audit_release_verifybranding"
+    },
+    {
+      "relation": "audits_app_and_installer",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/audit-release.mjs",
+      "source_location": "scripts/audit-release.mjs:220",
+      "weight": 1.0,
+      "_src": "scripts_audit_release_mjs",
+      "_tgt": "audit_release_embedded_pe_branding",
+      "source": "audit_release_embedded_pe_branding",
+      "target": "scripts_audit_release_mjs"
+    },
+    {
+      "relation": "identifies_product_copy_source",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:11",
+      "weight": 1.0,
+      "_src": "installer_readme_md",
+      "_tgt": "scripts_installer_nsh",
+      "source": "scripts_installer_nsh",
+      "target": "installer_readme_md"
+    },
+    {
+      "relation": "defines_welcome_finish_and_uninstall_pages",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/installer.nsh",
+      "source_location": "scripts/installer.nsh:22",
+      "weight": 1.0,
+      "_src": "scripts_installer_nsh",
+      "_tgt": "installer_branded_nsis_wizard",
+      "source": "scripts_installer_nsh",
+      "target": "installer_branded_nsis_wizard"
+    },
+    {
+      "relation": "includes_upgrade_hooks",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/installer.nsh",
+      "source_location": "scripts/installer.nsh:1",
+      "weight": 1.0,
+      "_src": "scripts_installer_nsh",
+      "_tgt": "scripts_installer_upgrade_nsh",
+      "source": "scripts_installer_nsh",
+      "target": "scripts_installer_upgrade_nsh"
+    },
+    {
+      "relation": "requires_windows_installer_tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:14",
+      "weight": 1.0,
+      "_src": "contributing_md",
+      "_tgt": "scripts_test_installer_upgrade_mjs",
+      "source": "contributing_md",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "documents_isolated_fixture_coverage",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTRIBUTING.md",
+      "source_location": "CONTRIBUTING.md:14",
+      "weight": 1.0,
+      "_src": "contributing_md",
+      "_tgt": "installer_eleven_compiled_cases",
+      "source": "contributing_md",
+      "target": "installer_eleven_compiled_cases"
+    },
+    {
+      "relation": "requires_contributor_verification",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:26",
+      "weight": 1.0,
+      "_src": "agents_graph_first_onboarding",
+      "_tgt": "contributing_md",
+      "source": "contributing_md",
+      "target": "agents_graph_first_onboarding"
+    },
+    {
+      "relation": "documents",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:42",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "user_guide_recovery_profile",
       "source": "user_guide_md",
-      "target": "audit_release_embedded_pe_branding"
+      "target": "user_guide_recovery_profile"
+    },
+    {
+      "relation": "documents_custom_wizard",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:36",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_branded_nsis_wizard",
+      "source": "user_guide_md",
+      "target": "installer_branded_nsis_wizard"
+    },
+    {
+      "relation": "documents_registered_replacement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:20",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_registered_replacement",
+      "source": "user_guide_md",
+      "target": "installer_registered_replacement"
+    },
+    {
+      "relation": "documents_machine_scope_and_current_user_cleanup",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:22",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_existing_machine_scope",
+      "source": "user_guide_md",
+      "target": "installer_existing_machine_scope"
+    },
+    {
+      "relation": "documents_repair_required_after_failure",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:24",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_fail_closed_removal",
+      "source": "user_guide_md",
+      "target": "installer_fail_closed_removal"
+    },
+    {
+      "relation": "documents_saved_profile_preservation",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:24",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_preserved_profile",
+      "source": "user_guide_md",
+      "target": "installer_preserved_profile"
+    },
+    {
+      "relation": "documents_shared_installation_id",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/USER-GUIDE.md",
+      "source_location": "docs/USER-GUIDE.md:20",
+      "weight": 1.0,
+      "_src": "user_guide_md",
+      "_tgt": "installer_stable_registration_guid",
+      "source": "user_guide_md",
+      "target": "installer_stable_registration_guid"
     },
     {
       "relation": "documents",
@@ -3877,7 +4228,7 @@
       "confidence_score": 1.0,
       "source_file": "resources/installer/README.md",
       "source_location": "resources/installer/README.md:3",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "installer_readme_md",
       "_tgt": "installer_branded_nsis_wizard",
       "source": "installer_readme_md",
@@ -3889,119 +4240,59 @@
       "confidence_score": 1.0,
       "source_file": "resources/installer/README.md",
       "source_location": "resources/installer/README.md:8",
-      "weight": 1,
+      "weight": 1.0,
       "_src": "installer_readme_md",
       "_tgt": "scripts_prepare_installer_ps1",
       "source": "installer_readme_md",
       "target": "scripts_prepare_installer_ps1"
     },
     {
-      "relation": "identifies_product_copy_source",
+      "relation": "documents_upgrade_policy",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "resources/installer/README.md",
-      "source_location": "resources/installer/README.md:11",
-      "weight": 1,
+      "source_location": "resources/installer/README.md:13",
+      "weight": 1.0,
       "_src": "installer_readme_md",
-      "_tgt": "scripts_installer_nsh",
+      "_tgt": "scripts_installer_upgrade_nsh",
       "source": "installer_readme_md",
-      "target": "scripts_installer_nsh"
+      "target": "scripts_installer_upgrade_nsh"
     },
     {
-      "relation": "documents_audit",
+      "relation": "requires_stable_registration",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "resources/installer/README.md",
-      "source_location": "resources/installer/README.md:11",
-      "weight": 1,
+      "source_location": "resources/installer/README.md:13",
+      "weight": 1.0,
       "_src": "installer_readme_md",
-      "_tgt": "audit_release_embedded_pe_branding",
+      "_tgt": "installer_stable_registration_guid",
       "source": "installer_readme_md",
-      "target": "audit_release_embedded_pe_branding"
+      "target": "installer_stable_registration_guid"
     },
     {
-      "relation": "defines_app_id",
+      "relation": "requires_app_data_preservation",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "src/shared/brand.ts",
-      "source_location": "src/shared/brand.ts:3",
-      "weight": 1,
-      "_src": "src_shared_brand_ts",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "src_shared_brand_ts"
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:13",
+      "weight": 1.0,
+      "_src": "installer_readme_md",
+      "_tgt": "installer_preserved_profile",
+      "source": "installer_readme_md",
+      "target": "installer_preserved_profile"
     },
     {
-      "relation": "sets_windows_app_identity",
+      "relation": "requires_compiled_upgrade_checks",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "src/main/index.ts",
-      "source_location": "src/main/index.ts:127",
-      "weight": 1,
-      "_src": "src_main_index_ts",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "src_main_index_ts"
-    },
-    {
-      "relation": "sets_window_icon_and_shell_details",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/main/index.ts",
-      "source_location": "src/main/index.ts:637",
-      "weight": 1,
-      "_src": "main_index_securewindow",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "main_index_securewindow"
-    },
-    {
-      "relation": "uses_brand_icon",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/main/index.ts",
-      "source_location": "src/main/index.ts:496",
-      "weight": 1,
-      "_src": "main_index_opensettings",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "main_index_opensettings"
-    },
-    {
-      "relation": "uses_brand_icon",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/main/index.ts",
-      "source_location": "src/main/index.ts:548",
-      "weight": 1,
-      "_src": "main_index_opensetup",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "main_index_opensetup"
-    },
-    {
-      "relation": "assigns_safe_and_recovery_shortcut_aumi",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "scripts/installer.nsh",
-      "source_location": "scripts/installer.nsh:3",
-      "weight": 1,
-      "_src": "scripts_installer_nsh",
-      "_tgt": "brand_windows_app_identity",
-      "source": "brand_windows_app_identity",
-      "target": "scripts_installer_nsh"
-    },
-    {
-      "relation": "defines_welcome_finish_and_uninstall_pages",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "scripts/installer.nsh",
-      "source_location": "scripts/installer.nsh:20",
-      "weight": 1,
-      "_src": "scripts_installer_nsh",
-      "_tgt": "installer_branded_nsis_wizard",
-      "source": "installer_branded_nsis_wizard",
-      "target": "scripts_installer_nsh"
+      "source_file": "resources/installer/README.md",
+      "source_location": "resources/installer/README.md:13",
+      "weight": 1.0,
+      "_src": "installer_readme_md",
+      "_tgt": "scripts_test_installer_upgrade_mjs",
+      "source": "installer_readme_md",
+      "target": "scripts_test_installer_upgrade_mjs"
     },
     {
       "relation": "generates_24_bit_bitmaps",
@@ -4010,8 +4301,8 @@
       "source_file": "scripts/prepare-installer.ps1",
       "source_location": "scripts/prepare-installer.ps1:24",
       "weight": 1,
-      "_src": "scripts_prepare_installer_ps1",
-      "_tgt": "installer_branded_nsis_wizard",
+      "_src": "installer_branded_nsis_wizard",
+      "_tgt": "scripts_prepare_installer_ps1",
       "source": "installer_branded_nsis_wizard",
       "target": "scripts_prepare_installer_ps1"
     },
@@ -4020,66 +4311,306 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "scripts/audit-release.mjs:15",
-      "weight": 1,
+      "source_location": "scripts/audit-release.mjs:19",
+      "weight": 1.0,
       "_src": "scripts_audit_release_mjs",
       "_tgt": "installer_branded_nsis_wizard",
       "source": "installer_branded_nsis_wizard",
       "target": "scripts_audit_release_mjs"
     },
     {
-      "relation": "validates_actual_pe_resources",
+      "relation": "requires_all_four_upgrade_hooks",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "scripts/audit-release.mjs:161",
-      "weight": 1,
-      "_src": "scripts_audit_release_verifybranding",
-      "_tgt": "audit_release_embedded_pe_branding",
-      "source": "audit_release_embedded_pe_branding",
-      "target": "scripts_audit_release_verifybranding"
-    },
-    {
-      "relation": "audits_app_and_installer",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "scripts/audit-release.mjs",
-      "source_location": "scripts/audit-release.mjs:201",
-      "weight": 1,
+      "source_location": "scripts/audit-release.mjs:42",
+      "weight": 1.0,
       "_src": "scripts_audit_release_mjs",
-      "_tgt": "audit_release_embedded_pe_branding",
-      "source": "audit_release_embedded_pe_branding",
+      "_tgt": "scripts_installer_upgrade_nsh",
+      "source": "scripts_installer_upgrade_nsh",
       "target": "scripts_audit_release_mjs"
     },
     {
-      "relation": "depends_on_embedded_executable_icon_for_packaged_shell",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "src/main/index.ts",
-      "source_location": "src/main/index.ts:642",
-      "weight": 1,
-      "_src": "main_index_securewindow",
-      "_tgt": "audit_release_embedded_pe_branding",
-      "source": "audit_release_embedded_pe_branding",
-      "target": "main_index_securewindow"
+      "relation": "enforces_assisted_and_silent_machine_scope",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/installer-upgrade.nsh",
+      "source_location": "scripts/installer-upgrade.nsh:14",
+      "weight": 1.0,
+      "_src": "scripts_installer_upgrade_nsh",
+      "_tgt": "installer_existing_machine_scope",
+      "source": "scripts_installer_upgrade_nsh",
+      "target": "installer_existing_machine_scope"
     },
     {
-      "relation": "contains",
+      "relation": "checks_both_uninstall_result_hooks",
       "confidence": "EXTRACTED",
-      "source_file": "scripts/prepare-installer.ps1",
-      "source_location": "L23",
-      "weight": 1.0,
       "confidence_score": 1.0,
-      "_src": "scripts_prepare_installer_ps1",
-      "_tgt": "scripts_prepare_installer_new_canvas",
-      "source": "scripts_prepare_installer_ps1",
-      "target": "scripts_prepare_installer_new_canvas"
+      "source_file": "scripts/installer-upgrade.nsh",
+      "source_location": "scripts/installer-upgrade.nsh:57",
+      "weight": 1.0,
+      "_src": "scripts_installer_upgrade_nsh",
+      "_tgt": "installer_fail_closed_removal",
+      "source": "scripts_installer_upgrade_nsh",
+      "target": "installer_fail_closed_removal"
+    },
+    {
+      "relation": "includes_production_upgrade_policy",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/installer/reinstall.nsi",
+      "source_location": "tests/installer/reinstall.nsi:16",
+      "weight": 1.0,
+      "_src": "tests_installer_reinstall_nsi",
+      "_tgt": "scripts_installer_upgrade_nsh",
+      "source": "scripts_installer_upgrade_nsh",
+      "target": "tests_installer_reinstall_nsi"
+    },
+    {
+      "relation": "asserts_stable_app_id_and_guid",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/audit-release.mjs",
+      "source_location": "scripts/audit-release.mjs:13",
+      "weight": 1.0,
+      "_src": "scripts_audit_release_mjs",
+      "_tgt": "installer_stable_registration_guid",
+      "source": "installer_stable_registration_guid",
+      "target": "scripts_audit_release_mjs"
+    },
+    {
+      "relation": "requires_stable_installer_guid",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:30",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "installer_stable_registration_guid",
+      "source": "installer_stable_registration_guid",
+      "target": "agents_md"
+    },
+    {
+      "relation": "checks_machine_scope_selection",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/installer/upgrade-policy.nsi",
+      "source_location": "tests/installer/upgrade-policy.nsi:14",
+      "weight": 1.0,
+      "_src": "tests_installer_upgrade_policy_nsi",
+      "_tgt": "installer_existing_machine_scope",
+      "source": "installer_existing_machine_scope",
+      "target": "tests_installer_upgrade_policy_nsi"
+    },
+    {
+      "relation": "executes_both_failure_check_hooks",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/installer/upgrade-policy.nsi",
+      "source_location": "tests/installer/upgrade-policy.nsi:26",
+      "weight": 1.0,
+      "_src": "tests_installer_upgrade_policy_nsi",
+      "_tgt": "installer_fail_closed_removal",
+      "source": "installer_fail_closed_removal",
+      "target": "tests_installer_upgrade_policy_nsi"
+    },
+    {
+      "relation": "asserts_app_data_preservation",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/audit-release.mjs",
+      "source_location": "scripts/audit-release.mjs:16",
+      "weight": 1.0,
+      "_src": "scripts_audit_release_mjs",
+      "_tgt": "installer_preserved_profile",
+      "source": "installer_preserved_profile",
+      "target": "scripts_audit_release_mjs"
+    },
+    {
+      "relation": "asserts_saved_profile_marker_survives",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:171",
+      "weight": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "installer_preserved_profile",
+      "source": "installer_preserved_profile",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "requires_keep_app_data_upgrade_arguments",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/installer/old-uninstaller.nsi",
+      "source_location": "tests/installer/old-uninstaller.nsi:13",
+      "weight": 1.0,
+      "_src": "tests_installer_old_uninstaller_nsi",
+      "_tgt": "installer_preserved_profile",
+      "source": "installer_preserved_profile",
+      "target": "tests_installer_old_uninstaller_nsi"
+    },
+    {
+      "relation": "requires_profile_preservation",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:30",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "installer_preserved_profile",
+      "source": "installer_preserved_profile",
+      "target": "agents_md"
+    },
+    {
+      "relation": "executes_stock_uninstallOldVersion_before_copying",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/installer/reinstall.nsi",
+      "source_location": "tests/installer/reinstall.nsi:26",
+      "weight": 1.0,
+      "_src": "tests_installer_reinstall_nsi",
+      "_tgt": "installer_registered_replacement",
+      "source": "installer_registered_replacement",
+      "target": "tests_installer_reinstall_nsi"
+    },
+    {
+      "relation": "compiles_policy_scenarios",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:97",
+      "weight": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "tests_installer_upgrade_policy_nsi",
+      "source": "tests_installer_upgrade_policy_nsi",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "compiles_same_and_changed_directory_fixtures",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:134",
+      "weight": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "tests_installer_reinstall_nsi",
+      "source": "tests_installer_reinstall_nsi",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "compiles_old_uninstaller_fixture",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:126",
+      "weight": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "tests_installer_old_uninstaller_nsi",
+      "source": "tests_installer_old_uninstaller_nsi",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "compiles_and_executes_nine_policy_and_two_reinstall_cases",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "scripts/test-installer-upgrade.mjs:179",
+      "weight": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "installer_eleven_compiled_cases",
+      "source": "installer_eleven_compiled_cases",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "requires_isolated_registrations_and_files",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:30",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "installer_eleven_compiled_cases",
+      "source": "installer_eleven_compiled_cases",
+      "target": "agents_md"
+    },
+    {
+      "relation": "gates_windows_build_with_installer_tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/check.yml",
+      "source_location": ".github/workflows/check.yml:38",
+      "weight": 1.0,
+      "_src": "github_workflows_check_yml",
+      "_tgt": "scripts_test_installer_upgrade_mjs",
+      "source": "github_workflows_check_yml",
+      "target": "scripts_test_installer_upgrade_mjs"
+    },
+    {
+      "relation": "requires",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:7",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "agents_graph_first_onboarding",
+      "source": "agents_md",
+      "target": "agents_graph_first_onboarding"
+    },
+    {
+      "relation": "identifies_lifecycle_entry_point",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:16",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "src_main_index_ts",
+      "source": "agents_md",
+      "target": "src_main_index_ts"
+    },
+    {
+      "relation": "identifies_renderer_bridge",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:17",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "src_main_preload_ts",
+      "source": "agents_md",
+      "target": "src_main_preload_ts"
+    },
+    {
+      "relation": "identifies_api_contract",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:17",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "src_shared_types_ts",
+      "source": "agents_md",
+      "target": "src_shared_types_ts"
+    },
+    {
+      "relation": "requires_windows_installer_execution_tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "AGENTS.md",
+      "source_location": "AGENTS.md:30",
+      "weight": 1.0,
+      "_src": "agents_md",
+      "_tgt": "scripts_test_installer_upgrade_mjs",
+      "source": "agents_md",
+      "target": "scripts_test_installer_upgrade_mjs"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L51",
+      "source_location": "L69",
       "weight": 1.0,
       "confidence_score": 1.0,
       "_src": "scripts_audit_release_mjs",
@@ -4091,7 +4622,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L99",
+      "source_location": "L117",
       "weight": 1.0,
       "confidence_score": 1.0,
       "_src": "scripts_audit_release_mjs",
@@ -4103,7 +4634,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/audit-release.mjs",
-      "source_location": "L161",
+      "source_location": "L179",
       "weight": 1.0,
       "confidence_score": 1.0,
       "_src": "scripts_audit_release_mjs",
@@ -4194,6 +4725,30 @@
       "_tgt": "scripts_prepare_assets_prepareassets",
       "source": "scripts_prepare_assets_mjs",
       "target": "scripts_prepare_assets_prepareassets"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/prepare-installer.ps1",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "_src": "scripts_prepare_installer_ps1",
+      "_tgt": "scripts_prepare_installer_new_canvas",
+      "source": "scripts_prepare_installer_ps1",
+      "target": "scripts_prepare_installer_new_canvas"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test-installer-upgrade.mjs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "_src": "scripts_test_installer_upgrade_mjs",
+      "_tgt": "scripts_test_installer_upgrade_run",
+      "source": "scripts_test_installer_upgrade_mjs",
+      "target": "scripts_test_installer_upgrade_run"
     },
     {
       "relation": "contains",

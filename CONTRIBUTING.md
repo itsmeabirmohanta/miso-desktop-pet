@@ -11,7 +11,7 @@ npm run format:check
 npm run check
 ```
 
-For renderer, OAuth, storage, or IPC changes, also run `npm run smoke` in a desktop session. For Windows packaging changes, run `npm run dist` and `npm run smoke:packaged`.
+For renderer, OAuth, storage, or IPC changes, also run `npm run smoke` in a desktop session. For Windows packaging changes, run `npm run dist`, `npm run smoke:packaged`, and `npm run test:installer` on Windows. The installer tests compile isolated NSIS fixtures for upgrade scope, failed removal, same/different-directory replacement, and profile preservation; they never use the production install registration.
 
 Tests must use synthetic accounts and mocked providers, not personal calendar data or live credentials. Never attach unredacted logs, screenshots, tokens, OAuth credential files, or OS user-data folders. Live Google acceptance checks belong in a dedicated test account.
 

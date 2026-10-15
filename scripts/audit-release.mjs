@@ -10,6 +10,10 @@ const releaseDir = process.env.MISO_RELEASE_DIR || "release";
 const archive = join(releaseDir, "win-unpacked/resources/app.asar");
 const packageConfig = JSON.parse(await readFile("package.json", "utf8"));
 const nsis = packageConfig.build.nsis;
+assert.equal(packageConfig.build.appId, "dev.butler.desktop");
+assert.equal(nsis.guid, "d42cf777-6b55-53ad-8b39-da340cc05379");
+assert.equal(nsis.allowElevation, true);
+assert.equal(nsis.deleteAppDataOnUninstall, false);
 assert.equal(packageConfig.build.win.executableName, "MISO");
 assert.equal(packageConfig.build.win.signAndEditExecutable, true);
 for (const [file, width, height] of [
@@ -31,6 +35,20 @@ const installerScript = await readFile(
   packageConfig.build.nsis.include,
   "utf8",
 );
+assert.ok(
+  installerScript.includes('!include "${__FILEDIR__}\\installer-upgrade.nsh"'),
+);
+const upgradeScript = await readFile("scripts/installer-upgrade.nsh", "utf8");
+for (const hook of [
+  "customInstallMode",
+  "customInit",
+  "customUnInstallCheck",
+  "customUnInstallCheckCurrentUser",
+])
+  assert.ok(
+    upgradeScript.includes(`!macro ${hook}`),
+    `Missing installer upgrade hook: ${hook}`,
+  );
 for (const page of [
   "customWelcomePage",
   "customFinishPage",

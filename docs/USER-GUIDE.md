@@ -1,6 +1,6 @@
 # Installing MISO
 
-1. Install the Windows x64 installer (`MISO Setup 1.0.8.exe` for the local branded build), or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest).
+1. Install the Windows x64 installer (`MISO Setup 1.0.9.exe` for the local build), or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest).
 2. Open MISO and connect your own Google account. Add more accounts if needed and select the calendars you want reminders from.
 3. Click the cat to add tasks, reminders, important dates, or view your calendar. Drag it to move it. Configure your hotkey in Settings.
 4. AI is optional and off by default. Calendar features do not need an AI key. If you enable AI, enter your own provider key or use your local server; your AI commands will be sent to the service you select.
@@ -14,6 +14,14 @@ The publisher-configured installer includes MISO's Desktop OAuth app configurati
 Advanced developer configuration lets users supply their own Desktop OAuth client instead. Remove connected accounts before switching clients; **Restore default** restores MISO's bundled configuration. Builds made without publisher configuration require this advanced setup. See https://developers.google.com/identity/protocols/oauth2/native-app.
 
 If sign-in fails after returning from Google, share the displayed stage and `GOOGLE_...` support code. Version 1.0.4 distinguishes rejected client configuration, rejected sign-in codes, permission denial, connection/TLS errors, and missing offline access or account identity. These messages do not include tokens or raw server responses.
+
+## Reinstalling and upgrading
+
+Run the new installer to replace a registered MISO installation. The installer keeps the same installation ID across releases, removes the previous version before copying the new files, and refreshes its desktop and Start menu shortcuts. This also works when choosing a different installation directory. Versions from this project's earlier Butler branding are replaced when they use the same installation ID.
+
+If MISO is already installed for the whole computer, setup keeps that installation scope and requests Windows administrator approval when needed. It also removes a registered MISO copy for the current Windows user, preventing those two installation scopes from leaving duplicate copies. On a computer without a machine-wide copy, a per-user installation remains available.
+
+Saved accounts, encrypted settings, and calendar data are preserved. If the old uninstaller is missing or fails, setup stops and asks you to repair/remove the old installation through Windows Settings before trying again. Setup does not search other users' private profiles or delete portable copies, source checkouts, downloaded installers, or unrelated desktop files.
 
 ## Your data and sharing
 

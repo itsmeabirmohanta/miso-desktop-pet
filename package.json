@@ -1,6 +1,6 @@
 {
   "name": "miso-desktop",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "description": "MISO - Your Little Butler: a desktop pet for Google Calendar reminders, tasks, meetings and important dates, with multiple accounts and optional AI.",
   "author": "MISO",
@@ -15,6 +15,7 @@
     "dist": "npm run build:release && node scripts/audit-release.mjs && electron-builder --publish=never && node scripts/audit-release.mjs --packaged",
     "smoke": "npm run build && node scripts/smoke.mjs",
     "smoke:packaged": "node scripts/audit-release.mjs --packaged && node scripts/verify-packaged.mjs",
+    "test:installer": "node scripts/test-installer-upgrade.mjs",
     "format": "prettier --write \"src/**/*.ts\" \"src/renderer/*.css\" \"tests/**/*.ts\" \"scripts/*.mjs\" package.json tsconfig.json",
     "format:check": "prettier --check \"src/**/*.ts\" \"src/renderer/*.css\" \"tests/**/*.ts\" \"scripts/*.mjs\" package.json tsconfig.json",
     "build:release": "node scripts/build.mjs --release",
@@ -87,7 +88,10 @@
       "category": "Utility"
     },
     "nsis": {
+      "guid": "d42cf777-6b55-53ad-8b39-da340cc05379",
       "oneClick": false,
+      "allowElevation": true,
+      "deleteAppDataOnUninstall": false,
       "allowToChangeInstallationDirectory": true,
       "runAfterFinish": false,
       "installerIcon": "src/assets/branding/icon.ico",

@@ -27,7 +27,7 @@ Follow [CONTRIBUTING.md](CONTRIBUTING.md). Use Node.js 22.12 or newer and the sc
 
 - For application changes, run `npm run format:check` and `npm run check` (typecheck, tests, build).
 - For renderer, OAuth, storage, or IPC changes, also run `npm run smoke` in a desktop session.
-- For Windows packaging changes, run `npm run dist` and `npm run smoke:packaged`.
+- For Windows packaging changes, run `npm run dist`, `npm run smoke:packaged`, and `npm run test:installer` on Windows. Preserve the stable installer GUID and user profile data; upgrade tests must use isolated registrations and files.
 - For documentation/map-only changes, validate links, graph provenance, edge endpoints, and generated output consistency; application checks are unnecessary unless application code also changes.
 
 Use synthetic accounts and mocked providers in automated checks. Consult `docs/MANUAL_TESTS.md` for flows requiring live acceptance. Never put live credentials, personal calendar data, user profiles, or unredacted local artifacts in the graph or commits.

@@ -35,6 +35,7 @@ jobs:
           BUTLER_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_ID }}
           BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET }}
       - run: npm run smoke:packaged
+      - run: npm run test:installer
       - run: node scripts/verify-packaged.mjs --safe-mode
       - name: Require default Google sign-in in publisher builds
         if: github.event_name != 'pull_request'

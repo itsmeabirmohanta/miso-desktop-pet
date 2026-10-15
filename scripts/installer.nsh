@@ -1,3 +1,5 @@
+!include "${__FILEDIR__}\installer-upgrade.nsh"
+
 !macro customInstall
   CreateShortCut "$SMPROGRAMS\MISO (Safe Mode).lnk" "$INSTDIR\${APP_EXECUTABLE_FILENAME}" "--safe-mode"
   WinShell::SetLnkAUMI "$SMPROGRAMS\MISO (Safe Mode).lnk" "${APP_ID}"
