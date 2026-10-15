@@ -1,0 +1,18 @@
+# Map maintained source and documentation, excluding generated/private local data.
+node_modules/
+dist/
+release/
+artifacts/
+outputs/
+coverage/
+graphify-out/
+# Artwork and fonts are described by src/assets/README.md and docs/UI-BRANDING.md.
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.ttf
+*-OFL.txt

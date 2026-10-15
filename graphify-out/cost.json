@@ -1,0 +1,15 @@
+{
+  "runs": [
+    {
+      "date": "2026-10-15T11:10:35.702145+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 78,
+      "usage_measured": false
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "usage_measured": false,
+  "note": "Semantic extraction-agent token telemetry is unavailable. Zero counters mean unmeasured, not free execution. AST extraction uses no LLM API calls."
+}
