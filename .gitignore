@@ -8,6 +8,7 @@ coverage/
 oauth*.json
 credentials*.json
 artifacts/
+outputs/
 *.pem
 *.key
 *.p12

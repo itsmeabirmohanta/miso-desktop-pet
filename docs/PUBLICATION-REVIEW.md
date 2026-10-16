@@ -40,3 +40,25 @@ GitHub Actions secret values are not repository files. Publisher builds explicit
 - [GitHub secret scanning](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning)
 - [Google Desktop OAuth](https://developers.google.com/identity/protocols/oauth2/native-app)
 - [Google OAuth branding](https://support.google.com/cloud/answer/15549049?hl=en)
+
+## Follow-up repository audit: 16 October 2026
+
+Reviewed the 139-file tracked snapshot at `dbe0792` (MISO 1.0.11) and all locally available branches/tags. GitHub's advertised `main` matched that commit; the repository was public and its latest three workflow runs had succeeded. This follow-up records local cleanup; it does not claim that the cleanup has been committed or pushed.
+
+### Privacy findings and local cleanup
+
+- Two files under `outputs/` contained a personal contact address, Google Cloud project identifiers, and internal website/verification handoff instructions. Both were already present on public `main`, introduced by `28332ef`. They were removed from the working tree after preserving private backups under ignored `artifacts/`. Added `outputs/` to `.gitignore` to prevent new handoff exports from being added accidentally. An ignore rule alone cannot remove already tracked files.
+- Removed EXIF/XMP export metadata from `src/assets/branding/icon.png`, `src/assets/branding/tray.png`, `src/assets/icon.png`, and `src/assets/tray.png`. Verified identical dimensions and decoded RGBA pixels against private backups. No artwork was redrawn. Other PNGs had no corresponding metadata chunks to remove.
+- Commit email metadata contains GitHub noreply addresses and GitHub's own `noreply@github.com` automation address. No personal commit email was found. Public project URLs and owner identity remain intentionally visible; this repository is not anonymous.
+- These working-tree changes do not erase historical copies, older release assets, GitHub caches, or copies downloaded by others. Removing files from published Git history requires a separately coordinated history rewrite. Existing release assets also need separate review/replacement if their metadata is to be removed. No remote history or releases were changed during this audit.
+
+### Checks rerun
+
+- Gitleaks 8.30.1 scanned all available refs with fully redacted output and found no credential signatures. A separate scan inspected 274 unique historical text blobs; it identified the handoff disclosures above. Current document ZIP contents and PNG metadata were inspected separately because text-only secret scans do not cover every binary disclosure.
+- `npm run format:check` and `npm run check` passed: typecheck, all 150 tests across 15 files, and build.
+- `npm run smoke`, `npm run dist`, `npm run smoke:packaged`, and all 11 compiled `npm run test:installer` scenarios passed. Initial restricted-sandbox desktop/installer attempts failed; reruns outside that restriction passed without disabling application protections or modifying Windows ACLs. The local installer was an unconfigured source build; live Google sign-in and publisher OAuth configuration were not tested.
+- Both production-only and full `npm audit` queries reported zero known vulnerabilities. This reflects advisory data at the audit time, not a guarantee against undiscovered vulnerabilities.
+- All 325 graph node IDs and 545 edge endpoints were consistent; referenced source files existed, graph source paths were relative, and local Markdown file links resolved. No application contracts or module boundaries changed, so structural extraction was not regenerated.
+- Public repository/release descriptions (three releases) had no common credential signatures, personal email patterns, or absolute user paths. There were no public issues or issue comments to inspect. Published installer contents were not rescanned in this follow-up. GitHub account-only secret-scanning/push-protection settings could not be inspected because the CLI was not authenticated.
+
+Redacted scanner reports, private backups, and diagnostic copies remain under ignored `artifacts/`; none are intended for publication. Pattern-based checks cannot certify the absence of every possible secret or personal detail.
