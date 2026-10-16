@@ -1,7 +1,8 @@
 import { DateTime } from "luxon";
 import { parseIntent, intentJSONSchema, type Intent } from "./schema";
-import { normalizeBaseUrl, providers, type AIConfig } from "../../shared/ai";
-import { AICredentialError, AIServiceError, readAIResponse } from "./errors";
+import { providerBaseUrl, providers, type AIConfig } from "../../shared/ai";
+import { AICredentialError, AIServiceError } from "./errors";
+import { requestAI } from "./request";
 export { AICredentialError } from "./errors";
 export function systemPrompt(now: DateTime, locale: string): string {
   return `You interpret commands for a desktop calendar pet. Return exactly one JSON object, no prose.
@@ -36,7 +37,7 @@ export class InputService {
     context?: { original: string; question: string },
   ): Promise<Intent> {
     const config = this.configuration();
-    const baseUrl = normalizeBaseUrl(config.baseUrl);
+    const baseUrl = providerBaseUrl(config.provider, config.baseUrl);
     const key = this.key();
     if (config.keyRequired && !key)
       throw new AICredentialError(
@@ -62,7 +63,7 @@ export class InputService {
       "Content-Type": "application/json",
     };
     let path: string;
-    let body: unknown;
+    let body: Record<string, any>;
     if (config.provider === "anthropic") {
       path = "/messages";
       headers["x-api-key"] = key!;
@@ -87,32 +88,81 @@ export class InputService {
     } else {
       path = "/chat/completions";
       if (key) headers.Authorization = `Bearer ${key}`;
+      const reasoning =
+        config.provider === "openai" &&
+        /^(?:o\d(?:-|$)|gpt-(?:[5-9]|[1-9]\d)(?:[.-]|$))/.test(config.model);
+      const legacy =
+        config.provider === "openai" &&
+        /^o1-(?:mini|preview)(?:-|$)/.test(config.model);
       // Omit sampling/token parameters that differ between reasoning models and compatible servers.
       body = {
         model: config.model,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
+        messages: legacy
+          ? [{ role: "user", content: `${system}\n\nUser command:\n${user}` }]
+          : [
+              { role: reasoning ? "developer" : "system", content: system },
+              { role: "user", content: user },
+            ],
         stream: false,
       };
     }
-    let response: Response;
-    try {
-      response = await this.transport(baseUrl + path, {
-        method: "POST",
-        redirect: "error",
-        signal: AbortSignal.timeout(45000),
-        headers,
-        body: JSON.stringify(body),
-      });
-    } catch {
-      throw new AIServiceError(
-        "Could not reach your AI service. Check the API URL, network or local server, then retry.",
-        "AI_NETWORK",
-      );
+    let result: any;
+    const signal = AbortSignal.timeout(45000);
+    let roleFallback = false;
+    for (;;) {
+      try {
+        result = await requestAI(
+          baseUrl + path,
+          {
+            method: "POST",
+            signal,
+            headers,
+            body: JSON.stringify(body),
+          },
+          config.provider,
+          this.transport,
+        );
+        break;
+      } catch (error) {
+        if (!(error instanceof AIServiceError)) throw error;
+        // Negotiate only explicitly rejected features. All output still passes
+        // the same local intent validation before any calendar operation.
+        if (config.provider === "gemini") {
+          if (
+            error.code === "AI_SCHEMA" &&
+            body.generationConfig?.responseJsonSchema
+          ) {
+            delete body.generationConfig.responseJsonSchema;
+            continue;
+          }
+          if (error.code === "AI_JSON_MODE" && body.generationConfig) {
+            delete body.generationConfig;
+            continue;
+          }
+          if (error.code === "AI_ROLE" && body.systemInstruction) {
+            delete body.systemInstruction;
+            body.contents = [
+              {
+                role: "user",
+                parts: [{ text: `${system}\n\nUser command:\n${user}` }],
+              },
+            ];
+            continue;
+          }
+        } else if (
+          ["openai", "compatible", "ollama"].includes(config.provider) &&
+          error.code === "AI_ROLE" &&
+          !roleFallback
+        ) {
+          roleFallback = true;
+          body.messages = [
+            { role: "user", content: `${system}\n\nUser command:\n${user}` },
+          ];
+          continue;
+        }
+        throw error;
+      }
     }
-    const result = await readAIResponse(response, config.provider);
     let output: string;
     if (config.provider === "anthropic") {
       if (result.stop_reason === "max_tokens")

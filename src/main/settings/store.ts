@@ -70,6 +70,9 @@ export class SettingsStore {
     const previous = existing.vault ? this.data.settings : existing.settings;
     if (previous?.onboardingCompleted === undefined)
       this.data.settings.onboardingCompleted = !!previous?.accounts?.length;
+    // Repair profiles saved before last-account removal reset onboarding.
+    if (!this.data.settings.accounts?.length)
+      this.data.settings.onboardingCompleted = false;
     this.persist();
   }
   private persist() {

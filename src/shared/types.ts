@@ -106,6 +106,7 @@ export interface PetLayout {
   workflowHeight?: number;
 }
 export interface Snapshot {
+  setupNotice?: { id: number; title: string; message: string };
   panelOpen?: boolean;
   petLayout?: PetLayout;
   settings: Settings;

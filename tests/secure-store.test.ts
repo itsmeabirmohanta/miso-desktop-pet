@@ -84,6 +84,20 @@ describe("protected local store", () => {
     };
     expect(new SettingsStore().settings.onboardingCompleted).toBe(true);
   });
+  it("requires onboarding again for older completed profiles with no accounts", () => {
+    fixture.disk = {
+      settings: { onboardingCompleted: true, accounts: [] },
+    };
+    const store = new SettingsStore();
+    expect(store.settings.onboardingCompleted).toBe(false);
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(false);
+    store.save({
+      accounts: [
+        { id: "reconnected", email: "new@example.test", petCalendars: {} },
+      ],
+    });
+    expect(new SettingsStore().settings.onboardingCompleted).toBe(false);
+  });
   it("reports encryption failure without changing the existing file or leaking OS details", () => {
     fixture.disk = { settings: { sound: true } };
     const original = structuredClone(fixture.disk);

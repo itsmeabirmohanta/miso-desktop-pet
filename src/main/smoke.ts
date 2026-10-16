@@ -1,6 +1,7 @@
 import { capturePerformance } from "./performance";
 import { IDLE_POSE_INTERVAL } from "../renderer/idle-poses";
-import { app, screen, shell, type BrowserWindow } from "electron";
+import { app, screen, shell, BrowserWindow } from "electron";
+import { OAuth2Client } from "google-auth-library";
 import { APP_NAME, APP_LINKS, type AppLink } from "../shared/brand";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -52,6 +53,33 @@ export async function smoke(
       await delay(25);
     }
     throw new Error(`View did not reach: ${expression}`);
+  };
+  const dismissResult = async (view: BrowserWindow, title: string) => {
+    await waitForView(view, "!!document.querySelector('dialog')");
+    assert.match(
+      await evaluate(view, "document.querySelector('dialog h2').textContent"),
+      new RegExp(title),
+    );
+    assert.equal(
+      await evaluate(view, "document.querySelectorAll('dialog button').length"),
+      1,
+    );
+    assert.equal(
+      await evaluate(
+        view,
+        "document.querySelector('dialog button').textContent",
+      ),
+      "OK",
+    );
+    assert.equal(
+      await evaluate(
+        view,
+        "document.querySelector('dialog').getAttribute('aria-labelledby') === document.querySelector('dialog h2').id && document.querySelector('dialog').getAttribute('aria-describedby') === document.querySelector('dialog p').id",
+      ),
+      true,
+    );
+    await evaluate(view, "document.querySelector('dialog button').click()");
+    await waitForView(view, "!document.querySelector('dialog')");
   };
   assert.equal(
     await evaluate(settings, "document.querySelector('h1').textContent"),
@@ -119,7 +147,7 @@ export async function smoke(
       pet,
       "window.butler.command('add task').catch(e=>e.message)",
     ),
-    /currently off/,
+    /Connect Google/,
   );
   setup.showInactive();
   await delay(250);
@@ -355,6 +383,7 @@ export async function smoke(
   );
   let aiRequests = 0;
   let rejectAI = true;
+  const aiFailures: { status: number; message: string }[] = [];
   const aiStub = (req: IncomingMessage, res: ServerResponse) => {
     aiRequests++;
     res.setHeader("Content-Type", "application/json");
@@ -385,6 +414,12 @@ export async function smoke(
           ],
         }),
       );
+      return;
+    }
+    const failure = aiFailures.shift();
+    if (failure) {
+      res.writeHead(failure.status, { "retry-after": "0" });
+      res.end(JSON.stringify({ error: { message: failure.message } }));
       return;
     }
     assert.match(
@@ -430,6 +465,7 @@ export async function smoke(
     );
     await captureSetup("onboarding-ai-details.png");
     await evaluate(setup, "document.querySelector('#verify-ai').click()");
+    await dismissResult(setup, "Could not finish");
     await waitForSetup(
       "document.querySelector('#feedback').textContent.includes('rejected access') && !document.querySelector('#onboarding-controls').disabled",
     );
@@ -439,11 +475,15 @@ export async function smoke(
       false,
     );
     rejectAI = false;
+    aiFailures.push(
+      { status: 503, message: "Synthetic overloaded provider" },
+      { status: 400, message: "responseJsonSchema is not supported" },
+    );
     await evaluate(setup, "document.querySelector('#verify-ai').click()");
     await waitForSetup(
       "!document.querySelector('[data-slide=ready]').hidden && !document.querySelector('#onboarding-controls').disabled",
     );
-    assert.equal(aiRequests, 2);
+    assert.equal(aiRequests, 4);
     assert.equal(
       syncSawBusy,
       true,
@@ -469,6 +509,7 @@ export async function smoke(
     setup,
     "document.querySelector('#assistant-continue').click()",
   );
+  await dismissResult(setup, "Could not finish");
   await waitForSetup(
     "!document.querySelector('#retry-sync').hidden && !document.querySelector('#onboarding-controls').disabled",
   );
@@ -1139,6 +1180,191 @@ export async function smoke(
   await delay(100);
   await evaluate(settings, "window.butler.save({hotkey:''})");
   assert.equal(store.settings.hotkey, "");
+  // Exercise the real Settings -> main -> onboarding transition without Google.
+  const originalRevoke = OAuth2Client.prototype.revokeToken;
+  let revocationGate = Promise.resolve();
+  OAuth2Client.prototype.revokeToken = async (token: string) => {
+    assert.equal(token, "smoke-only");
+    await revocationGate;
+    throw new Error("Synthetic revocation failure");
+  };
+  let releaseRevocation = () => {};
+  try {
+    assert.equal(store.settings.accounts.length, 2);
+    assert.equal(store.settings.onboardingCompleted, true);
+    await evaluate(
+      settings,
+      "document.querySelector('#accounts button').click()",
+    );
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    assert.equal(
+      await evaluate(settings, "document.activeElement.textContent"),
+      "Cancel",
+    );
+    await evaluate(
+      settings,
+      "document.querySelector('dialog button:last-child').click()",
+    );
+    assert.equal(store.settings.accounts.length, 2);
+    await waitForView(
+      settings,
+      "!document.querySelector('#accounts button').disabled",
+    );
+    await evaluate(
+      settings,
+      "document.querySelector('#accounts button').click()",
+    );
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    await evaluate(settings, "document.querySelector('dialog button').click()");
+    await dismissResult(settings, "Google account removed");
+    assert.equal(store.settings.accounts.length, 1);
+    assert.equal(store.settings.accounts[0].id, "two");
+    assert.equal(store.settings.onboardingCompleted, true);
+    assert.equal(store.secret("googleRefreshToken:two"), "smoke-only");
+    assert.equal(settings.isVisible(), true);
+    await waitForView(
+      settings,
+      "!document.querySelector('#accounts button').disabled",
+    );
+    await evaluate(
+      settings,
+      "document.querySelector('#accounts button').click()",
+    );
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    assert.match(
+      await evaluate(
+        settings,
+        "document.querySelector('dialog p').textContent",
+      ),
+      /last Google account.*welcome screen/,
+    );
+    // Escape has the same safe result as Cancel.
+    await evaluate(
+      settings,
+      "document.querySelector('dialog').dispatchEvent(new Event('cancel',{cancelable:true}))",
+    );
+    assert.equal(store.settings.accounts.length, 1);
+    assert.equal(store.settings.onboardingCompleted, true);
+    await waitForView(
+      settings,
+      "!document.querySelector('#accounts button').disabled",
+    );
+    revocationGate = new Promise<void>((resolve) => {
+      releaseRevocation = resolve;
+    });
+    await evaluate(
+      settings,
+      "document.querySelector('#accounts button').click()",
+    );
+    await waitForView(settings, "!!document.querySelector('dialog')");
+    await evaluate(settings, "document.querySelector('dialog button').click()");
+    let restartedSetup: BrowserWindow | undefined;
+    for (let i = 0; i < 120; i++) {
+      restartedSetup = BrowserWindow.getAllWindows().find(
+        (w) => w.getTitle() === "Set up MISO",
+      );
+      if (restartedSetup) break;
+      await delay(25);
+    }
+    assert.ok(restartedSetup);
+    await waitForView(
+      restartedSetup,
+      "!!document.querySelector('#start-onboarding') && !document.querySelector('#onboarding-controls').disabled",
+    );
+    assert.equal(store.settings.accounts.length, 0);
+    assert.equal(store.settings.onboardingCompleted, false);
+    assert.equal(
+      new (store.constructor as typeof SettingsStore)().settings
+        .onboardingCompleted,
+      false,
+    );
+    assert.equal(store.secret("googleRefreshToken:two"), undefined);
+    assert.equal(pet.isVisible(), false);
+    assert.equal(settings.isVisible(), false);
+    // New windows are hidden in smoke mode; production opens setup immediately.
+    restartedSetup.showInactive();
+    assert.equal(restartedSetup.isVisible(), true);
+    assert.equal(
+      await evaluate(
+        restartedSetup,
+        "document.querySelector('[data-slide=welcome]').hidden",
+      ),
+      false,
+    );
+    assert.equal(await evaluate(pet, "window.butler.beginQuick()"), false);
+    for (const expression of [
+      "window.butler.command('add a reminder')",
+      "window.butler.createManual({})",
+      "window.butler.confirmEdit('expired')",
+      "window.butler.confirmDelete('expired')",
+      "window.butler.snooze('old-reminder',5)",
+    ])
+      assert.match(
+        await evaluate(pet, `${expression}.catch(e=>e.message)`),
+        /Connect Google/,
+      );
+    assert.match(
+      await evaluate(
+        restartedSetup,
+        "window.butler.finishSetup().catch(e=>e.message)",
+      ),
+      /Connect Google/,
+    );
+    releaseRevocation();
+    await waitForView(restartedSetup, "!!document.querySelector('dialog')");
+    assert.match(
+      await evaluate(
+        restartedSetup,
+        "document.querySelector('dialog p').textContent",
+      ),
+      /could not confirm revocation/,
+    );
+    await writeFile(
+      join(output, "last-account-welcome.png"),
+      (await restartedSetup.webContents.capturePage()).toPNG(),
+    );
+    await dismissResult(restartedSetup, "Google account removed");
+    assert.equal(
+      await evaluate(settings, "document.querySelector('dialog')"),
+      null,
+    );
+    assert.equal(store.cache.length, 0);
+    assert.deepEqual(store.fired, {});
+    await evaluate(
+      restartedSetup,
+      "document.querySelector('#start-onboarding').click()",
+    );
+    assert.equal(
+      await evaluate(
+        restartedSetup,
+        "document.querySelector('[data-slide=google]').hidden",
+      ),
+      false,
+    );
+    assert.equal(
+      await evaluate(
+        restartedSetup,
+        "document.querySelector('#connected-continue').hidden",
+      ),
+      true,
+    );
+    restartedSetup.webContents.reload();
+    await waitForView(
+      restartedSetup,
+      "!!document.querySelector('#start-onboarding') && !document.querySelector('#onboarding-controls').disabled",
+    );
+    assert.equal(
+      await evaluate(
+        restartedSetup,
+        "document.querySelector('[data-slide=welcome]').hidden",
+      ),
+      false,
+    );
+    await dismissResult(restartedSetup, "Google account removed");
+  } finally {
+    releaseRevocation();
+    OAuth2Client.prototype.revokeToken = originalRevoke;
+  }
   store.save({
     googleClientId: "123-test.apps.googleusercontent.com",
     aiEnabled: true,
@@ -1219,6 +1445,6 @@ export async function smoke(
     else process.env.BUTLER_GOOGLE_CLIENT_SECRET = previousSecret;
   }
   console.log(
-    "Electron smoke passed: onboarding, Gemini model discovery/automatic selection, AI scheduling and editable receipt, mode switching, sync retry, two accounts, manual writes and screenshots.",
+    "Electron smoke passed: onboarding, AI scheduling and receipts, sync retry, two accounts, last-account removal/cancellation with delayed failed revocation, accessible dialogs, manual writes and screenshots.",
   );
 }

@@ -1,42 +1,40 @@
-# Graph Report - .  (2026-10-15)
+# Graph Report - .  (2026-10-16)
 
 ## Corpus Check
-- Corpus is ~45,451 words - fits in a single context window. You may not need a graph.
+- Corpus is ~49,154 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 325 nodes · 545 edges · 16 communities detected
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.89)
+- 338 nodes · 602 edges · 14 communities detected
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.89)
 - Token cost: unavailable for the extraction agent; zero counters mean unmeasured, not free execution. Structural extraction uses no LLM API calls.
 
 ## Community Hubs (Navigation)
-- [Windows and IPC Coordination](#community-0---windows-and-ipc-coordination)
-- [AI Workflows and Onboarding](#community-1---ai-workflows-and-onboarding)
-- [Installer and Shipping Verification](#community-2---installer-and-shipping-verification)
-- [Renderer Forms and Contracts](#community-3---renderer-forms-and-contracts)
-- [Manual Calendars and OAuth Configuration](#community-4---manual-calendars-and-oauth-configuration)
-- [Reminder and Desktop Verification](#community-5---reminder-and-desktop-verification)
-- [Artwork and Typography](#community-6---artwork-and-typography)
-- [AI Discovery and Provider Services](#community-7---ai-discovery-and-provider-services)
-- [Account Routing and Concurrency](#community-8---account-routing-and-concurrency)
-- [Intent Parsing and Event Mapping](#community-9---intent-parsing-and-event-mapping)
-- [Synchronization and Reminder Scheduling](#community-10---synchronization-and-reminder-scheduling)
-- [Google Provider and Error Handling](#community-11---google-provider-and-error-handling)
-- [AI Command Confirmation](#community-12---ai-command-confirmation)
-- [OAuth Sign-In and Errors](#community-13---oauth-sign-in-and-errors)
-- [Icon Binary Generation](#community-14---icon-binary-generation)
-- [Development App Launcher](#community-15---development-app-launcher)
+- [AI Workflows and Onboarding](#community-0---ai-workflows-and-onboarding)
+- [Windows and IPC Coordination](#community-1---windows-and-ipc-coordination)
+- [AI Discovery and Provider Services](#community-2---ai-discovery-and-provider-services)
+- [Installer and Shipping Verification](#community-3---installer-and-shipping-verification)
+- [Account Routing and Synchronization](#community-4---account-routing-and-synchronization)
+- [Renderer Pet and Desktop Verification](#community-5---renderer-pet-and-desktop-verification)
+- [Manual Calendars and OAuth Configuration](#community-6---manual-calendars-and-oauth-configuration)
+- [Artwork and Typography](#community-7---artwork-and-typography)
+- [Synchronization and Reminder Scheduling](#community-8---synchronization-and-reminder-scheduling)
+- [Google Provider and Error Handling](#community-9---google-provider-and-error-handling)
+- [AI Command Confirmation](#community-10---ai-command-confirmation)
+- [OAuth Sign-In and Errors](#community-11---oauth-sign-in-and-errors)
+- [Icon Binary Generation](#community-12---icon-binary-generation)
+- [Development App Launcher](#community-13---development-app-launcher)
 
 ## God Nodes (most connected - your core abstractions)
-1. `Installation and recovery guide` - 20 edges
+1. `Installation and recovery guide` - 24 edges
 2. `MISO codebase overview` - 17 edges
 3. `Package scripts and shipping configuration` - 17 edges
-4. `AccountCalendarProvider` - 15 edges
-5. `Agent architecture and verification instructions` - 12 edges
-6. `Manual acceptance checklist` - 12 edges
+4. `Manual acceptance checklist` - 16 edges
+5. `AccountCalendarProvider` - 15 edges
+6. `Agent architecture and verification instructions` - 12 edges
 7. `SettingsStore` - 12 edges
 8. `Security boundaries and shipping requirements` - 11 edges
 9. `Artwork drop-in guide` - 11 edges
-10. `ManualCalendarService` - 11 edges
+10. `Protected onboarding completion and migration` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Security boundaries and shipping requirements` --documents_pkce_loopback_auth--> `connectGoogle()`  [INFERRED]
@@ -45,118 +43,100 @@
   README.md → src/renderer/idle-poses.ts
 - `Deadline based reminder scheduling` --implemented_by--> `ReminderEngine`  [INFERRED]
   docs/OPTIMIZATION.md → src/main/sync/reminders.ts
-- `Sandboxed renderer and trusted IPC boundary` --requires_trusted_main_frame--> `handle()`  [EXTRACTED]
-  docs/SECURITY-AND-SHIPPING.md → src/main/index.ts
 - `Package scripts and shipping configuration` --configures_matching_shortcut_identity--> `Windows AppUserModelID alignment`  [EXTRACTED]
   package.json → src/shared/brand.ts
+- `Installation and recovery guide` --explains_taskbar_identity_and_stale_pins--> `Windows AppUserModelID alignment`  [EXTRACTED]
+  docs/USER-GUIDE.md → src/shared/brand.ts
 
 ## Communities
 
-### Community 0 - "Windows and IPC Coordination"
+### Community 0 - "AI Workflows and Onboarding"
+Cohesion: 0.08
+Nodes (53): Installation and recovery guide, MISO codebase overview, Manual acceptance checklist, SettingsStore, Last-account removal returns to welcome, Protected onboarding completion and migration, Security boundaries and shipping requirements, Verified draft AI configuration (+45 more)
+
+### Community 1 - "Windows and IPC Coordination"
 Cohesion: 0.05
-Nodes (9): Windows AppUserModelID alignment, handle(), onboardingComplete(), openSettings(), openSetup(), secureWindow(), showPet(), Sandboxed renderer and trusted IPC boundary (+1 more)
+Nodes (51): index.ts, Windows AppUserModelID alignment, preload.ts, Sandboxed renderer and trusted IPC boundary, Onboarding gate for calendar actions, hotkey.ts, secureWindow(), handle() (+43 more)
 
-### Community 1 - "AI Workflows and Onboarding"
-Cohesion: 0.11
-Nodes (26): Persisted AI-assisted and User-assisted workflows, Verified draft AI configuration, AI-created event receipt and confirmed manual edits, Sanitized AI access and quota errors, Explicit onboarding sync completion gate, Manual acceptance checklist, Paginated text-model discovery and ranking, verifyAISetup() (+18 more)
+### Community 2 - "AI Discovery and Provider Services"
+Cohesion: 0.07
+Nodes (50): types.ts, ai.ts, errors.ts, input.ts, configure.ts, mapping.ts, models.ts, controller.ts (+42 more)
 
-### Community 2 - "Installer and Shipping Verification"
-Cohesion: 0.12
-Nodes (21): Contributor graph-first onboarding, Agent architecture and verification instructions, Embedded PE metadata and icon auditing, Contributor workflow, Windows installer CI verification, Branded NSIS wizard resources, Eleven compiled installer upgrade scenarios, Existing machine-wide scope and elevation (+13 more)
-
-### Community 3 - "Renderer Forms and Contracts"
-Cohesion: 0.12
-Nodes (4): setupPet(), calendarView(), choiceDialog(), quickAdd()
-
-### Community 4 - "Manual Calendars and OAuth Configuration"
-Cohesion: 0.1
-Nodes (1): ManualCalendarService
-
-### Community 5 - "Reminder and Desktop Verification"
-Cohesion: 0.1
-Nodes (2): IdlePoseCycle, Isolated synthetic-account verification
-
-### Community 6 - "Artwork and Typography"
-Cohesion: 0.12
-Nodes (19): Generated artwork manifest, Artwork drop-in guide, Branding replacement guide, Baloo 2 headings font, Inter interface font, Bundled typography and font licenses, SIL Open Font License, Alert mascot artwork guide (+11 more)
-
-### Community 7 - "AI Discovery and Provider Services"
-Cohesion: 0.12
-Nodes (7): AICredentialError, AIServiceError, readAIResponse(), discoverModels(), rankModels(), bindAI(), detectKeyProvider()
-
-### Community 8 - "Account Routing and Concurrency"
-Cohesion: 0.1
-Nodes (2): AccountCalendarProvider, mapLimited()
-
-### Community 9 - "Intent Parsing and Event Mapping"
+### Community 3 - "Installer and Shipping Verification"
 Cohesion: 0.14
-Nodes (2): createPayload(), InputService
+Nodes (30): Package scripts and shipping configuration, Agent architecture and verification instructions, audit-release.mjs, test-installer-upgrade.mjs, MISO installer artwork guide, Contributor workflow, Preserved accounts and settings across reinstalls, Branded NSIS wizard resources (+22 more)
 
-### Community 10 - "Synchronization and Reminder Scheduling"
+### Community 4 - "Account Routing and Synchronization"
+Cohesion: 0.07
+Nodes (28): AccountCalendarProvider, accounts.ts, SyncService, mapLimited(), performSync(), Serialized incremental calendar synchronization, .perform(), .rebuild() (+20 more)
+
+### Community 5 - "Renderer Pet and Desktop Verification"
+Cohesion: 0.09
+Nodes (25): app.ts, smoke.ts, IdlePoseCycle, Isolated synthetic-account verification, brand.ts, idle-poses.ts, site-links.ts, quick-add.ts (+17 more)
+
+### Community 6 - "Manual Calendars and OAuth Configuration"
+Cohesion: 0.1
+Nodes (22): store.ts, ManualCalendarService, manual.ts, accounts-manual.test.ts, oauth-config.ts, oauth-config.test.ts, .clear(), .cancel() (+14 more)
+
+### Community 7 - "Artwork and Typography"
 Cohesion: 0.12
-Nodes (6): performSync(), Serialized incremental calendar synchronization, Sync and timer optimization review, Deadline based reminder scheduling, ReminderEngine, SyncService
+Nodes (21): Artwork drop-in guide, build.mjs, Baloo 2 headings font, Generated artwork manifest, Inter interface font, MISO visual styling, Renderer HTML and content security policy, prepare-assets.mjs (+13 more)
 
-### Community 11 - "Google Provider and Error Handling"
+### Community 8 - "Synchronization and Reminder Scheduling"
+Cohesion: 0.11
+Nodes (18): ReminderEngine, reminders.ts, Sync and timer optimization review, performance.ts, .clear(), Deadline based reminder scheduling, .constructor(), .done() (+10 more)
+
+### Community 9 - "Google Provider and Error Handling"
 Cohesion: 0.12
-Nodes (1): GoogleCalendarProvider
+Nodes (17): provider.ts, GoogleCalendarProvider, sync.ts, google.ts, sync.test.ts, .constructor(), .createEvent(), .deleteEvent() (+9 more)
 
-### Community 12 - "AI Command Confirmation"
+### Community 10 - "AI Command Confirmation"
 Cohesion: 0.2
-Nodes (1): CommandController
+Nodes (10): CommandController, .command(), .choose(), .clear(), .confirm(), .constructor(), .isBusy(), .label() (+2 more)
 
-### Community 13 - "OAuth Sign-In and Errors"
+### Community 11 - "OAuth Sign-In and Errors"
 Cohesion: 0.25
-Nodes (2): connectGoogle(), GoogleSignInError
+Nodes (8): auth-errors.ts, auth.ts, GoogleSignInError, connectGoogle(), makeAuth(), .constructor(), auth-errors.test.ts, signInError()
+
+### Community 12 - "Icon Binary Generation"
+Cohesion: 0.5
+Nodes (4): make-icon.mjs, chunk(), crc(), writeFallback()
+
+### Community 13 - "Development App Launcher"
+Cohesion: 1.0
+Nodes (1): start.mjs
 
 ## Knowledge Gaps
 - **9 isolated node(s):** `Branding replacement guide`, `Alert mascot artwork guide`, `Happy mascot artwork guide`, `Idle mascot artwork guide`, `Sleep mascot artwork guide` (+4 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Manual Calendars and OAuth Configuration`** (22 nodes): `ManualCalendarService`, `.cancel()`, `.cancelEdit()`, `.clear()`, `.confirm()`, `.confirmEdit()`, `.constructor()`, `.create()`, `.finish()`, `.preview()`, `.previewEdit()`, `bundledOAuthConfig()`, `defaultOAuthConfig()`, `loadOAuthConfig()`, `manual.ts`, `oauth-config.ts`, `store.ts`, `manual()`, `raw()`, `accounts-manual.test.ts`, `store()`, `oauth-config.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Reminder and Desktop Verification`** (22 nodes): `capturePerformance()`, `wait()`, `delay()`, `smoke()`, `IdlePoseCycle`, `.constructor()`, `.dispose()`, `.enabled()`, `.schedule()`, `.setEnabled()`, `performance.ts`, `smoke.ts`, `reminders.ts`, `idle-poses.ts`, `eventStart()`, `inQuietHours()`, `plans()`, `idle-poses.test.ts`, `reminders.test.ts`, `store()`, `secure-store.test.ts`, `Isolated synthetic-account verification`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Account Routing and Concurrency`** (20 nodes): `AccountCalendarProvider`, `.add()`, `.call()`, `.constructor()`, `.createEvent()`, `.deleteEvent()`, `.ensureCalendar()`, `.getEvent()`, `.listCalendars()`, `.listEvents()`, `.remove()`, `.statuses()`, `.updateEvent()`, `.wrap()`, `scopedCalendar()`, `unpackCalendar()`, `accounts.ts`, `concurrency.ts`, `mapLimited()`, `concurrency.test.ts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Intent Parsing and Event Mapping`** (19 nodes): `allDayOffset()`, `createPayload()`, `eventTimes()`, `explicitReminders()`, `updatePayload()`, `InputService`, `.constructor()`, `.parse()`, `systemPrompt()`, `parseIntent()`, `mapping.ts`, `controller.ts`, `input.ts`, `schema.ts`, `fixture()`, `controller.test.ts`, `nlu.test.ts`, `fixture()`, `providers.test.ts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Google Provider and Error Handling`** (17 nodes): `GoogleCalendarProvider`, `.constructor()`, `.createEvent()`, `.deleteEvent()`, `.ensureCalendar()`, `.getEvent()`, `.listCalendars()`, `.listEvents()`, `.updateEvent()`, `calendarErrorMessage()`, `retryRead()`, `statusCode()`, `google.ts`, `provider.ts`, `sync.ts`, `calendar-errors.test.ts`, `sync.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `AI Command Confirmation`** (10 nodes): `CommandController`, `.choose()`, `.clear()`, `.command()`, `.confirm()`, `.constructor()`, `.isBusy()`, `.label()`, `.refreshAfterWrite()`, `.select()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `OAuth Sign-In and Errors`** (8 nodes): `connectGoogle()`, `GoogleSignInError`, `.constructor()`, `signInError()`, `makeAuth()`, `auth-errors.ts`, `auth.ts`, `auth-errors.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `MISO codebase overview` connect `AI Workflows and Onboarding` to `Installer and Shipping Verification`, `Synchronization and Reminder Scheduling`, `Reminder and Desktop Verification`, `Artwork and Typography`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
-- **Why does `AccountCalendarProvider` connect `Account Routing and Concurrency` to `AI Workflows and Onboarding`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `Agent architecture and verification instructions` connect `Installer and Shipping Verification` to `Windows and IPC Coordination`, `Renderer Forms and Contracts`, `AI Discovery and Provider Services`?**
-  _High betweenness centrality (0.075) - this node is a cross-community bridge._
+- **Why does `MISO codebase overview` connect `AI Workflows and Onboarding` to `Synchronization and Reminder Scheduling`, `Installer and Shipping Verification`, `Renderer Pet and Desktop Verification`, `Artwork and Typography`?**
+  _High betweenness centrality (0.112) - this node is a cross-community bridge._
+- **Why does `Installation and recovery guide` connect `AI Workflows and Onboarding` to `Windows and IPC Coordination`, `Installer and Shipping Verification`?**
+  _High betweenness centrality (0.084) - this node is a cross-community bridge._
+- **Why does `AccountCalendarProvider` connect `Account Routing and Synchronization` to `AI Workflows and Onboarding`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
 - **What connects `Branding replacement guide`, `Alert mascot artwork guide`, `Happy mascot artwork guide` to the rest of the system?**
   _9 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `AI Workflows and Onboarding` be split into smaller, more focused modules?**
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Windows and IPC Coordination` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
-- **Should `AI Workflows and Onboarding` be split into smaller, more focused modules?**
-  _Cohesion score 0.11 - nodes in this community are weakly interconnected._
-- **Should `Installer and Shipping Verification` be split into smaller, more focused modules?**
-  _Cohesion score 0.12 - nodes in this community are weakly interconnected._
-### Community 14 - "Icon Binary Generation"
-Cohesion: 0.5
-Nodes (4): chunk(), crc(), make-icon.mjs, writeFallback()
+- **Should `AI Discovery and Provider Services` be split into smaller, more focused modules?**
+  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
 
-### Community 15 - "Development App Launcher"
-Cohesion: 1.0
-Nodes (1): start.mjs
+## Extraction and Verification Limits
 
-## Extraction Audit
-
-- Snapshot: 2026-10-15, repository root; 86 maintained files, approximately 45,451 words. See [coverage and navigation](README.md).
-- Refreshed structure (259 AST nodes), four changed documents, and affected source semantics. Unchanged documentation and installer branding/upgrade relationships retain their verified cache evidence. Removed the obsolete AICredentialError node from input.ts after its move to errors.ts, and removed the former background-sync completion relationship.
-- Excluded all 209 AST call guesses because scope and caller direction are unreliable. Resolved 129 local imports to real file IDs; external internals and unsupported asset imports are excluded. Inspect source to trace actual execution.
-- All 16 communities appear here, in JSON and HTML. Added details omitted by the stock report with computed cohesion scores. The undirected simple graph coalesces repeated pairs; `_src` and `_tgt` retain extracted direction.
-- Current semantics cover paginated AI discovery, verified draft/atomic encrypted commit, sanitized errors, independent scheduling modes, direct create receipts and confirmed manual edits, duration mapping, and explicit successful onboarding sync after both AI choices. Synthetic provider checks and documented tests are not proof of live-provider access or quota. Application checks were not rerun by this map refresh.
-- One semantic extraction agent performed this refresh. Token telemetry is unavailable; zero counters are unmeasured sentinels. The benchmark estimates context size heuristically and does not measure billing savings or answer quality.
-- Paths are portable relative forward slashes. Generated application output, binaries, credentials, profiles and calendar data are excluded. NSIS/configuration semantics require direct source inspection because structural parsing does not cover these formats. HTML has static data and JavaScript syntax validation; browser visual verification was unavailable.
+- Snapshot: 88 maintained files; 64 code and 24 documents. Deterministic extraction refreshed all code; reviewed account-removal/dialog/storage semantics were retained, source positions updated, and bounded AI retry/capability-fallback relationships extracted from source, synthetic checks and two updated documents.
+- Resolved 137 project imports to file IDs; excluded 97 external imports, 4 imports of structurally unsupported files, and 215 structural call guesses. Inspect source for runtime calls and scope. No application checks are established by this map refresh.
+- Relative source paths and edge endpoints were checked. Community counts include file/method nodes and match JSON and HTML. The HTML uses a remote visualization library; static graph data and JavaScript syntax were checked, but browser visual verification was not performed.
+- Agent token telemetry is unavailable: cost counters are unmeasured sentinels. The benchmark estimates context size heuristically and does not measure billing savings or answer quality. Generated application output, artwork binaries, credentials, profiles and calendar data are excluded. NSIS/configuration files require direct source inspection.

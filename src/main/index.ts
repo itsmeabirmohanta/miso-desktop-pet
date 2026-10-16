@@ -177,6 +177,8 @@ let cursorPoll: ReturnType<typeof setInterval> | undefined;
 let connecting = false;
 let quitting = false;
 let onboardingSyncGeneration = -1;
+let setupNotice: Snapshot["setupNotice"];
+let setupNoticeId = 0;
 const patchSchema = z
   .object({
     hotkey: z
@@ -292,6 +294,7 @@ function snapshot(): Snapshot {
     !!defaultClient && store.settings.googleClientId === defaultClient;
   return {
     panelOpen: panelsVisible(),
+    setupNotice,
     petLayout,
     settings: {
       ...store.settings,
@@ -346,6 +349,7 @@ function closePetPopup() {
   pet?.webContents.send("close-popup");
 }
 function reply(value: Reply) {
+  if (!onboardingComplete()) return;
   if (pet && !pet.isDestroyed()) {
     if (!panelsVisible()) pet.showInactive();
     pet.webContents.send("reply", value);
@@ -486,6 +490,7 @@ async function initializeGoogle(force = true) {
   await sync(force);
 }
 function deliver(reminder: Reminder) {
+  if (!onboardingComplete()) return;
   reply({
     text: `${reminder.missed ? "Missed reminder" : "Time for"}: ${reminder.title}`,
     state: "alert",
@@ -780,6 +785,25 @@ function handle(channel: string, fn: (...args: any[]) => any) {
         event.senderFrame !== event.sender.mainFrame
       )
         return { ok: false, error: "Untrusted caller." };
+      if (
+        !onboardingComplete() &&
+        [
+          "command",
+          "choose",
+          "create-manual",
+          "get-calendar-event",
+          "open-calendar-event",
+          "preview-edit",
+          "confirm-edit",
+          "preview-delete",
+          "confirm-delete",
+          "snooze",
+          "done",
+        ].includes(channel)
+      ) {
+        openSetup();
+        throw new Error("Connect Google and complete onboarding to use MISO.");
+      }
       return { ok: true, value: await fn(...args) };
     } catch (error) {
       if (
@@ -984,6 +1008,10 @@ else {
         () => sync(true),
       );
       handle("begin-quick", () => {
+        if (!onboardingComplete()) {
+          openSetup();
+          return false;
+        }
         if (panelsVisible()) return false;
         if (workflowHome) return true;
         workflowHome = { ...petAnchor };
@@ -1152,7 +1180,10 @@ else {
         if (store.settings.aiEnabled && !aiVerified())
           throw new Error("Test your AI model or continue without AI first.");
         store.save({ onboardingCompleted: true });
+        setupNotice = undefined;
+        const generation = accountGeneration;
         setTimeout(() => {
+          if (generation !== accountGeneration || !onboardingComplete()) return;
           settingsWindow?.hide();
           setupWindow?.close();
           setupWindow = undefined;
@@ -1293,6 +1324,7 @@ else {
         connecting = true;
         try {
           const auth = await connectGoogle(store);
+          setupNotice = undefined;
           const existing = store.settings.accounts.find(
             (a) => a.id === auth.id,
           );
@@ -1390,52 +1422,81 @@ else {
       });
       handle("remove-account", async (value: unknown) => {
         const id = z.string().min(1).max(300).parse(value);
-        if (connecting || controller.isBusy || calendarWriting)
+        if (connecting || testingAI || controller.isBusy || calendarWriting)
           throw new Error(
             "Finish the current operation before removing an account.",
           );
         const account = store.settings.accounts.find((a) => a.id === id);
         if (!account) throw new Error("This account was already removed.");
-        const auth = makeAuth(store, id);
-        accountGeneration++;
-        syncServices.get(id)?.stop();
-        syncServices.delete(id);
-        rawProviders.delete(id);
-        provider!.remove(id);
-        calendars = calendars.filter((c) => c.accountId !== id);
-        controller.clear();
-        store.setSecret(`googleRefreshToken:${id}`, "");
-        const accounts = store.settings.accounts.filter((a) => a.id !== id);
-        const defaultAccount =
-          accounts.find((a) => a.id === store.settings.defaultAccountId) ??
-          accounts[0];
-        store.save({
-          accounts,
-          defaultAccountId: defaultAccount?.id ?? "",
-          petCalendars: defaultAccount?.petCalendars ?? {},
-          selectedCalendars: store.settings.selectedCalendars.filter(
-            (c) => unpackCalendar(c).accountId !== id,
-          ),
-        });
-        store.cache = store.cache.filter(
-          (e) => unpackCalendar(e.calendarId).accountId !== id,
-        );
-        engine.rebuild(store.cache);
-        let message = `Removed ${account.email} from MISO. Its Google events were kept. Other accounts are unchanged.`;
+        calendarWriting = true;
         try {
-          await auth.revokeCredentials();
-        } catch {
-          message +=
-            " Local access was removed, but Google could not confirm revocation. You can remove MISO in Google account permissions.";
+          const auth = makeAuth(store, id);
+          accountGeneration++;
+          onboardingSyncGeneration = -1;
+          syncServices.get(id)?.stop();
+          syncServices.delete(id);
+          rawProviders.delete(id);
+          provider!.remove(id);
+          calendars = calendars.filter((c) => c.accountId !== id);
+          controller.clear();
+          manual.clear();
+          store.setSecret(`googleRefreshToken:${id}`, "");
+          const accounts = store.settings.accounts.filter((a) => a.id !== id);
+          const defaultAccount =
+            accounts.find((a) => a.id === store.settings.defaultAccountId) ??
+            accounts[0];
+          store.save({
+            accounts,
+            onboardingCompleted:
+              accounts.length > 0 && store.settings.onboardingCompleted,
+            defaultAccountId: defaultAccount?.id ?? "",
+            petCalendars: defaultAccount?.petCalendars ?? {},
+            selectedCalendars: store.settings.selectedCalendars.filter(
+              (c) => unpackCalendar(c).accountId !== id,
+            ),
+          });
+          store.cache = store.cache.filter(
+            (e) => unpackCalendar(e.calendarId).accountId !== id,
+          );
+          let message = `Removed ${account.email} from MISO. Its Google calendars and events were kept.`;
+          if (accounts.length) {
+            engine.rebuild(store.cache);
+            message += " Other accounts are unchanged.";
+          } else {
+            engine.stop();
+            engine.clear(true);
+            message +=
+              " No Google accounts remain. Connect Google and complete onboarding to use MISO again.";
+            status = message;
+            setupNotice = undefined;
+            trayMenu();
+            openSetup();
+            publish();
+          }
+          try {
+            // This client has the saved refresh token, not a live access token.
+            // Bound the request so a network failure cannot lock onboarding.
+            const token = auth.credentials.refresh_token;
+            if (!token) throw new Error("No saved Google token to revoke.");
+            auth.transporter.defaults.signal = AbortSignal.timeout(10_000);
+            await auth.revokeToken(token);
+          } catch {
+            message +=
+              " Local access was removed, but Google could not confirm revocation. You can remove MISO in Google account permissions.";
+          }
+          status = message;
+          if (!accounts.length) {
+            setupNotice = {
+              id: ++setupNoticeId,
+              title: "Google account removed",
+              message,
+            };
+          }
+          publish();
+          return { success: true, message, snapshot: snapshot() };
+        } finally {
+          calendarWriting = false;
         }
-        status = message;
-        if (!accounts.length) {
-          pet.hide();
-          engine.stop();
-          trayMenu();
-        }
-        publish();
-        return { success: true, message, snapshot: snapshot() };
       });
       handle("reset-setup", async () => {
         if (connecting || testingAI || controller.isBusy || calendarWriting)
@@ -1467,6 +1528,11 @@ else {
           trayMenu();
           status =
             "MISO reset. All local accounts, AI keys, cached reminders and personal preferences were cleared. Google calendars and events were kept. Continue with Google to reconnect.";
+          setupNotice = {
+            id: ++setupNoticeId,
+            title: "MISO reset",
+            message: status,
+          };
           openSetup();
           publish();
           return { success: true, message: status, snapshot: snapshot() };

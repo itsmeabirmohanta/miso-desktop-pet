@@ -65,6 +65,7 @@ export function setupWizard(root: HTMLElement) {
   let wantsAI = false;
   let aiDirty = false;
   let initialized = false;
+  let seenSetupNotice = 0;
   const ai = bindAI("setup-ai", () => (aiDirty = true));
 
   function show(next: Slide) {
@@ -116,6 +117,7 @@ export function setupWizard(root: HTMLElement) {
   }
 
   function update(s: Snapshot) {
+    const lostLastAccount = !!current?.accounts.length && !s.accounts.length;
     current = s;
     if (!initialized) {
       initialized = true;
@@ -147,7 +149,7 @@ export function setupWizard(root: HTMLElement) {
             if (
               !(await confirmDialog(
                 "Remove Google account?",
-                `Remove ${a.email} from MISO? Its Google calendars and events will stay intact. Other accounts remain connected.`,
+                `Remove ${a.email} from MISO? Its Google calendars and events will stay intact. ${current.accounts.length === 1 ? "This is your last Google account. MISO will return to the welcome screen and require onboarding again." : "Other accounts remain connected."}`,
                 "Remove account",
               ))
             )
@@ -155,6 +157,8 @@ export function setupWizard(root: HTMLElement) {
             const result = await api.removeAccount(a.id);
             update(result.snapshot);
             get("feedback").textContent = result.message;
+            if (result.snapshot.accounts.length)
+              await resultDialog("Google account removed", result.message);
           });
         row.append(copy, remove);
         return row;
@@ -177,8 +181,15 @@ export function setupWizard(root: HTMLElement) {
       s.settings.aiEnabled && s.aiVerified
         ? "On · model verified"
         : "Off · enable anytime";
-    if (!s.accounts.length && ["assistant", "ai", "ready"].includes(slide))
-      show("google");
+    if (
+      lostLastAccount ||
+      (!s.accounts.length && !["welcome", "google"].includes(slide))
+    )
+      show("welcome");
+    if (s.setupNotice && s.setupNotice.id !== seenSetupNotice && !busy) {
+      seenSetupNotice = s.setupNotice.id;
+      void resultDialog(s.setupNotice.title, s.setupNotice.message);
+    }
   }
 
   async function run(fn: () => Promise<void>) {
@@ -189,6 +200,7 @@ export function setupWizard(root: HTMLElement) {
       await fn();
     } catch (error) {
       get("feedback").textContent = (error as Error).message;
+      await resultDialog("Could not finish", (error as Error).message);
     } finally {
       busy = false;
       update(current);
@@ -299,6 +311,10 @@ export function setupWizard(root: HTMLElement) {
       get<HTMLInputElement>("google-secret").value = "";
       get("feedback").textContent =
         "Default sign-in restored. Continue with Google.";
+      await resultDialog(
+        "Google sign-in restored",
+        "Default sign-in restored. Continue with Google.",
+      );
     });
   get("developer-form").onsubmit = (e) => {
     e.preventDefault();
@@ -314,6 +330,10 @@ export function setupWizard(root: HTMLElement) {
       get<HTMLInputElement>("google-secret").value = "";
       get("feedback").textContent =
         "Configuration saved. Continue with Google to sign in.";
+      await resultDialog(
+        "Google configuration saved",
+        "Continue with Google to sign in. Your configuration stays on this device.",
+      );
     });
   };
   get("google-help").onclick = () =>

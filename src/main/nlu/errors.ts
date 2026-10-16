@@ -1,4 +1,5 @@
 import type { AIProvider } from "../../shared/types";
+import { providers } from "../../shared/ai";
 export class AIServiceError extends Error {
   constructor(
     message: string,
@@ -62,6 +63,67 @@ export async function readAIResponse(
       "Your AI service is rate limited or its quota is exhausted. Check your project’s quota/billing or wait and retry. This does not mean the key is invalid.",
       "AI_QUOTA",
     );
+  const providerName = providers[provider].label;
+  // Match a small set of known diagnostics internally; never echo remote text.
+  const message =
+    typeof body?.error?.message === "string"
+      ? body.error.message.slice(0, 12000).toLowerCase()
+      : "";
+  const type = typeof body?.error?.type === "string" ? body.error.type : "";
+  const code = typeof body?.error?.code === "string" ? body.error.code : "";
+  if (
+    response.status === 402 ||
+    code === "insufficient_quota" ||
+    type === "billing_error" ||
+    (response.status === 400 &&
+      /billing|credit balance|spend limit/.test(message))
+  )
+    throw new AIServiceError(
+      `${providerName} requires API credits or billing access. Check the provider account's billing and spending limits.`,
+      "AI_BILLING",
+    );
+  if ([408, 500, 502, 503, 504, 529].includes(response.status))
+    throw new AIServiceError(
+      `${providerName} is temporarily unavailable or overloaded (HTTP ${response.status}). Retry shortly or choose another available model.`,
+      "AI_UNAVAILABLE",
+    );
+  if (response.status === 400 || response.status === 422) {
+    if (
+      /response.?json.?schema|response.?schema|structured.?output|json.?schema/.test(
+        message,
+      )
+    )
+      throw new AIServiceError(
+        `${providerName} rejected structured JSON output for this model (HTTP ${response.status}). Choose a text model with JSON support.`,
+        "AI_SCHEMA",
+      );
+    if (/response.?mime.?type|json.?mode|json_object/.test(message))
+      throw new AIServiceError(
+        `${providerName} rejected JSON response mode (HTTP ${response.status}). Choose another text model.`,
+        "AI_JSON_MODE",
+      );
+    if (
+      /system.?instruction|(?:system|developer).{0,40}(?:not supported|unsupported)|unsupported.{0,40}(?:system|developer)|messages\[0\]\.role/.test(
+        message,
+      )
+    )
+      throw new AIServiceError(
+        `${providerName} does not support this instruction message format (HTTP ${response.status}). Choose a compatible text model.`,
+        "AI_ROLE",
+      );
+    if (
+      code === "context_length_exceeded" ||
+      /context (?:length|window)|too many tokens/.test(message)
+    )
+      throw new AIServiceError(
+        `${providerName} could not fit the command in this model's context. Shorten it or choose a model with a larger context window.`,
+        "AI_CONTEXT",
+      );
+    throw new AIServiceError(
+      `${providerName} rejected the request format (HTTP ${response.status}). Check that the selected model supports this API, refresh the model list, and check the API base URL.`,
+      "AI_REQUEST",
+    );
+  }
   if (response.status === 404)
     throw new AIServiceError(
       "This model or API endpoint is unavailable. Refresh the model list, use Automatic, or check the base URL.",

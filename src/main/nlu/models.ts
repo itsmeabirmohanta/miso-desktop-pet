@@ -1,6 +1,7 @@
 import { providers, providerBaseUrl, type AIConfig } from "../../shared/ai";
 import type { AIModel, AIProvider } from "../../shared/types";
-import { AICredentialError, AIServiceError, readAIResponse } from "./errors";
+import { AICredentialError, AIServiceError } from "./errors";
+import { requestAI } from "./request";
 
 export function rankModels(models: AIModel[], provider: AIProvider): AIModel[] {
   const score = (id: string) => {
@@ -46,20 +47,25 @@ export async function discoverModels(
       url.searchParams.set("limit", "1000");
       if (token) url.searchParams.set("after_id", token);
     } else if (token) url.searchParams.set("after", token);
-    let response: Response;
+    let body: any;
     try {
-      response = await transport(url.toString(), {
-        headers,
-        redirect: "error",
-        signal: AbortSignal.timeout(20000),
-      });
-    } catch {
+      body = await requestAI(
+        url.toString(),
+        {
+          headers,
+          signal: AbortSignal.timeout(20000),
+        },
+        config.provider,
+        transport,
+      );
+    } catch (error) {
+      if (!(error instanceof AIServiceError) || error.code !== "AI_NETWORK")
+        throw error;
       throw new AIServiceError(
         "Could not load models. Check your network, API base URL, or local AI server.",
         "AI_NETWORK",
       );
     }
-    const body = await readAIResponse(response, config.provider);
     const entries = config.provider === "gemini" ? body.models : body.data;
     if (!Array.isArray(entries))
       throw new AIServiceError(

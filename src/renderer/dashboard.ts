@@ -63,14 +63,15 @@ export function setupDashboard(root: HTMLElement) {
             if (
               !(await confirmDialog(
                 "Remove Google account?",
-                `Remove ${a.email} from MISO? Google events stay in your calendar. Other connected accounts remain connected.`,
+                `Remove ${a.email} from MISO? Google events stay in your calendar. ${current.accounts.length === 1 ? "This is your last Google account. MISO will return to the welcome screen and require onboarding again." : "Other connected accounts remain connected."}`,
                 "Remove account",
               ))
             )
               return;
             const result = await api.removeAccount(a.id);
             update(result.snapshot);
-            await resultDialog("Account removed", result.message);
+            if (result.snapshot.accounts.length)
+              await resultDialog("Google account removed", result.message);
           });
         row.append(remove);
         return row;
@@ -326,6 +327,14 @@ export function setupDashboard(root: HTMLElement) {
           assistantMode: get<HTMLSelectElement>("assistant-mode").value as
             "ai" | "manual",
         }),
+      );
+      await resultDialog(
+        "Scheduling workflow saved",
+        current.settings.assistantMode === "ai"
+          ? current.aiVerified
+            ? "AI-assisted mode uses your verified model to interpret scheduling commands."
+            : "AI-assisted mode is selected. Configure and test a model before scheduling."
+          : "User-assisted mode guides you through the event details.",
       );
     });
   get("ai-form").onsubmit = (e) => {
