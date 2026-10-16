@@ -78,13 +78,14 @@ describe("AI request recovery", () => {
       fetcher,
     );
     const assertion = expect(pending).rejects.toMatchObject({
-      code: "AI_NETWORK",
+      code: "AI_TIMEOUT",
     });
     abort.abort();
     await assertion;
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
   it.each([
+    [400, "thinkingLevel is not supported", "AI_THINKING"],
     [400, "Unknown name responseJsonSchema", "AI_SCHEMA"],
     [400, "responseMimeType is not supported", "AI_JSON_MODE"],
     [400, "systemInstruction is not supported", "AI_ROLE"],
@@ -107,4 +108,32 @@ describe("AI request recovery", () => {
       );
     },
   );
+  it("reports a timeout while reading the body without leaking upstream details", async () => {
+    const controller = new AbortController();
+    const fetcher = vi.fn(
+      async () =>
+        new Response(
+          new ReadableStream({
+            start(stream) {
+              controller.signal.addEventListener("abort", () =>
+                stream.error(new Error("PRIVATE_KEY_TOKEN_URL_MUST_NOT_LEAK")),
+              );
+            },
+          }),
+        ),
+    );
+    const pending = requestAI(
+      "https://example.test/v1",
+      { signal: controller.signal },
+      "gemini",
+      fetcher,
+    );
+    const assertion = expect(pending).rejects.toMatchObject({
+      code: "AI_TIMEOUT",
+      message: expect.stringMatching(/Gemini did not respond/),
+    });
+    controller.abort();
+    await assertion;
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
 });

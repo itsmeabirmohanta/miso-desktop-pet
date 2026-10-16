@@ -557,6 +557,60 @@ export async function smoke(
   assert.equal(settings.isVisible(), false);
   assert.equal(setup.isDestroyed(), true);
   assert.equal(pet.isVisible(), true);
+  await waitForView(
+    pet,
+    "document.querySelector('#pet-image').complete && document.querySelector('#pet-image').naturalWidth > 0",
+  );
+  const assertPetOnScreen = async () => {
+    assert.equal(pet.isVisible(), true);
+    assert.equal(pet.isMinimized(), false);
+    const bounds = pet.getBounds();
+    const rect = await evaluate(
+      pet,
+      "(()=>{const r=document.querySelector('#pet').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()",
+    );
+    assert.ok(rect.x >= 0 && rect.y >= 0);
+    assert.ok(rect.x + rect.width <= bounds.width);
+    assert.ok(rect.y + rect.height <= bounds.height);
+    assert.ok(
+      screen
+        .getAllDisplays()
+        .some(
+          ({ workArea: area }) =>
+            bounds.x + rect.x >= area.x &&
+            bounds.y + rect.y >= area.y &&
+            bounds.x + rect.x + rect.width <= area.x + area.width &&
+            bounds.y + rect.y + rect.height <= area.y + area.height,
+        ),
+      "The rendered cat must be inside a connected display's work area",
+    );
+    const picture = await pet.webContents.capturePage({
+      x: Math.round(rect.x),
+      y: Math.round(rect.y),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+    });
+    const pixels = picture.toBitmap();
+    let painted = 0;
+    for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) painted++;
+    assert.ok(painted > 100, "The pet must paint visible pixels");
+  };
+  await assertPetOnScreen();
+  await writeFile(
+    join(output, "pet-after-onboarding.png"),
+    (await pet.webContents.capturePage()).toPNG(),
+  );
+  // An OS minimize or a removed display must not strand the companion.
+  pet.minimize();
+  await delay(100);
+  app.emit("activate");
+  await delay(150);
+  await assertPetOnScreen();
+  pet.setPosition(-50000, -50000);
+  pet.hide();
+  app.emit("activate");
+  await delay(150);
+  await assertPetOnScreen();
   assert.equal(
     await evaluate(pet, "document.querySelector('#command-form').hidden"),
     true,
@@ -717,7 +771,15 @@ export async function smoke(
     pet,
     "(()=>{const r=document.querySelector('#pet').getBoundingClientRect();return {x:window.screenX+r.x,y:window.screenY+r.y,width:r.width,below:document.querySelector('.pet-stage').classList.contains('popup-below'),name:getComputedStyle(document.querySelector('#pet-label')).visibility};})()",
   );
-  assert.equal(geometry.x, work.x);
+  assert.equal(
+    geometry.x,
+    work.x,
+    JSON.stringify({
+      geometry,
+      bounds: pet.getBounds(),
+      layout: (await evaluate(pet, "window.butler.snapshot()")).petLayout,
+    }),
+  );
   assert.equal(geometry.y, work.y);
   assert.equal(geometry.width, 110);
   assert.equal(geometry.below, true);

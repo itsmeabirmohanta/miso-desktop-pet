@@ -88,6 +88,11 @@ export async function readAIResponse(
       "AI_UNAVAILABLE",
     );
   if (response.status === 400 || response.status === 422) {
+    if (/thinking.?config|thinking.?budget|thinking.?level/.test(message))
+      throw new AIServiceError(
+        `${providerName} rejected the thinking settings for this model.`,
+        "AI_THINKING",
+      );
     if (
       /response.?json.?schema|response.?schema|structured.?output|json.?schema/.test(
         message,

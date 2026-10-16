@@ -49,6 +49,7 @@ Use a dedicated Google test account and a calendar containing no important data.
 - [ ] Toggle quiet hours across midnight and pause: no local delivery during suppression; catch up within grace only.
 - [ ] Change system timezone and test timed and all-day events around DST (New York spring and autumn transitions). Verify same actual instant for timed events.
 - [ ] Drag between displays, disconnect a display, restart with changed display arrangement: pet remains accessible via the tray.
+- [ ] After Start MISO, verify the cat image actually paints inside the screen, not just that its window is visible. Minimize the pet or move its native window off-screen, then activate MISO or use Show MISO from the tray: it restores on a connected display. Change resolution/scaling/work area while idle and while a popup is open; the cat stays reachable and closes stale popup placement.
 - [ ] Test native notification behavior with OS Do Not Disturb; independently check MISO quiet hours.
 - [ ] Enable and disable login startup and verify on Windows/macOS/Linux.
 - [ ] Build/install/uninstall on each target OS; check unsigned-app warnings and OS keyring availability.

@@ -145,6 +145,7 @@ if (!__BUTLER_RELEASE__ && isSmoke)
     join(app.getPath("temp"), `butler-smoke-${process.pid}`),
   );
 let pet: BrowserWindow;
+let petReady = false;
 let settingsWindow: BrowserWindow | undefined;
 let setupWindow: BrowserWindow | undefined;
 let tray: Tray;
@@ -651,14 +652,23 @@ function showPet() {
     return;
   }
   if (setupWindow && !setupWindow.isDestroyed()) {
+    if (setupWindow.isMinimized()) setupWindow.restore();
     setupWindow.show();
     setupWindow.focus();
     return;
   }
+  if (!petReady) return;
+  // Recover stale/off-screen native bounds before revealing a transparent window.
+  if (!workflowHome) placePet(petAnchor.x, petAnchor.y);
+  if (pet.isMinimized()) pet.restore();
+  pet.setAlwaysOnTop(true, "floating");
   pet.showInactive();
+  pet.webContents.invalidate();
+  pet.webContents.send("pet-visible", true);
   engine.start();
   engine.rebuild(store.cache);
   trayMenu();
+  publish();
 }
 function secureWindow(window: BrowserWindow) {
   window.webContents.on("render-process-gone", () => {
@@ -894,12 +904,14 @@ else {
       pet.setAlwaysOnTop(true, "floating");
       pet.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
       ignoreMouse(true);
+      pet.webContents.on("did-finish-load", () => {
+        petReady = true;
+        if (onboardingComplete() && !setupWindow && !isSmoke) showPet();
+        pet.webContents.send("pet-visible", pet.isVisible());
+      });
       void pet.loadFile(join(__dirname, "../renderer/index.html"));
       pet.on("show", () => pet.webContents.send("pet-visible", true));
       pet.on("hide", () => pet.webContents.send("pet-visible", false));
-      pet.webContents.on("did-finish-load", () =>
-        pet.webContents.send("pet-visible", pet.isVisible()),
-      );
       pet.on("close", (event) => {
         if (!quitting) {
           event.preventDefault();
@@ -1186,8 +1198,7 @@ else {
           if (generation !== accountGeneration || !onboardingComplete()) return;
           settingsWindow?.hide();
           setupWindow?.close();
-          setupWindow = undefined;
-          showPet();
+          if (!setupWindow) showPet();
           publish();
         }, 30);
         return snapshot();
@@ -1667,9 +1678,13 @@ else {
         void sync(true).catch(() => {});
         engine.tick();
       });
-      screen.on("display-removed", () => {
+      const recoverPetPlacement = () => {
+        closePetPopup();
         placePet(petAnchor.x, petAnchor.y);
-      });
+        publish();
+      };
+      screen.on("display-removed", recoverPetPlacement);
+      screen.on("display-metrics-changed", recoverPetPlacement);
       app.on("activate", () => {
         if (engine) showPet();
       });

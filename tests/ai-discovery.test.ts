@@ -190,6 +190,62 @@ describe("AI model discovery and setup", () => {
     expect(calls).toBe(2);
     expect(result.config.model).toBe("new-mini");
   });
+  it("tries another automatic model after a timeout, but stops on a network failure", async () => {
+    const controllers = new Map<AbortSignal, AbortController>();
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation(() => {
+      const controller = new AbortController();
+      controllers.set(controller.signal, controller);
+      return controller.signal;
+    });
+    try {
+      for (const timedOut of [true, false]) {
+        let calls = 0;
+        const pending = verifyAISetup(
+          {
+            provider: "gemini",
+            baseUrl: providers.gemini.baseUrl,
+            keyRequired: true,
+            model: "auto",
+            apiKey: "synthetic-key",
+          },
+          undefined,
+          async (_url, request) => {
+            if (!request?.method)
+              return json({
+                models: [
+                  {
+                    name: "models/gemini-new-flash",
+                    supportedGenerationMethods: ["generateContent"],
+                  },
+                  {
+                    name: "models/gemini-old-flash",
+                    supportedGenerationMethods: ["generateContent"],
+                  },
+                ],
+              });
+            if (++calls === 1) {
+              if (timedOut) controllers.get(request.signal!)!.abort();
+              throw new Error("private upstream details");
+            }
+            return json({
+              candidates: [
+                { content: { parts: [{ text: JSON.stringify(intent) }] } },
+              ],
+            });
+          },
+        );
+        if (timedOut) {
+          expect((await pending).config.model).toBe("gemini-new-flash");
+          expect(calls).toBe(2);
+        } else {
+          await expect(pending).rejects.toMatchObject({ code: "AI_NETWORK" });
+          expect(calls).toBe(1);
+        }
+      }
+    } finally {
+      timeout.mockRestore();
+    }
+  });
   it("tests a custom model even when a compatible server has no model-list API", async () => {
     const transport = vi.fn(async (url: string, request?: RequestInit) => {
       expect(url).toBe("http://localhost:11434/v1/chat/completions");

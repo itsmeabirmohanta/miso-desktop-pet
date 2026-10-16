@@ -24,21 +24,29 @@ export async function requestAI(
   transport: typeof fetch,
 ): Promise<any> {
   const signal = init.signal ?? AbortSignal.timeout(45000);
+  const timeoutError = () =>
+    new AIServiceError(
+      provider === "gemini"
+        ? "Gemini did not respond before the time limit. Retry, or select Automatic or an available Flash model in AI settings."
+        : "Your AI service did not respond in time. Retry or choose a faster model.",
+      "AI_TIMEOUT",
+    );
   for (let attempt = 0; ; attempt++) {
+    if (signal.aborted) throw timeoutError();
     let response: Response;
     try {
       response = await transport(url, { ...init, signal, redirect: "error" });
     } catch {
+      if (signal.aborted) throw timeoutError();
       throw new AIServiceError(
-        signal.aborted
-          ? "Your AI service did not respond in time. Retry or choose a faster model."
-          : "Could not reach your AI service. Check the API base URL, network or local server, then retry.",
+        "Could not reach your AI service. Check the API base URL, network or local server, then retry.",
         "AI_NETWORK",
       );
     }
     try {
       return await readAIResponse(response, provider);
     } catch (error) {
+      if (signal.aborted) throw timeoutError();
       if (
         !(error instanceof AIServiceError) ||
         error.code !== "AI_UNAVAILABLE" ||
@@ -61,10 +69,7 @@ export async function requestAI(
       try {
         await pause(wait, signal);
       } catch {
-        throw new AIServiceError(
-          "Your AI request timed out while waiting to retry. Please try again.",
-          "AI_NETWORK",
-        );
+        throw timeoutError();
       }
     }
   }

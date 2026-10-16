@@ -77,12 +77,23 @@ export class InputService {
     } else if (config.provider === "gemini") {
       path = `/models/${encodeURIComponent(config.model.replace(/^models\//, ""))}:generateContent`;
       headers["x-goog-api-key"] = key!;
+      const model = config.model.replace(/^models\//, "");
+      // Calendar interpretation needs little reasoning. Keep model-specific
+      // controls separate: Gemini 2.5 does not accept thinkingLevel.
+      const thinkingConfig = /^gemini-[34](?:\.\d+)?-/.test(model)
+        ? { thinkingLevel: "low" }
+        : /^gemini-2\.5-flash(?:-|$)/.test(model)
+          ? { thinkingBudget: 0 }
+          : /^gemini-2\.5-pro(?:-|$)/.test(model)
+            ? { thinkingBudget: 128 }
+            : undefined;
       body = {
         systemInstruction: { parts: [{ text: system }] },
         contents: [{ role: "user", parts: [{ text: user }] }],
         generationConfig: {
           responseMimeType: "application/json",
           responseJsonSchema: intentJSONSchema,
+          ...(thinkingConfig ? { thinkingConfig } : {}),
         },
       };
     } else {
@@ -107,7 +118,9 @@ export class InputService {
       };
     }
     let result: any;
-    const signal = AbortSignal.timeout(45000);
+    const signal = AbortSignal.timeout(
+      config.provider === "gemini" ? 90000 : 45000,
+    );
     let roleFallback = false;
     for (;;) {
       try {
@@ -129,14 +142,24 @@ export class InputService {
         // the same local intent validation before any calendar operation.
         if (config.provider === "gemini") {
           if (
+            error.code === "AI_THINKING" &&
+            body.generationConfig?.thinkingConfig
+          ) {
+            delete body.generationConfig.thinkingConfig;
+            continue;
+          }
+          if (
             error.code === "AI_SCHEMA" &&
             body.generationConfig?.responseJsonSchema
           ) {
             delete body.generationConfig.responseJsonSchema;
             continue;
           }
-          if (error.code === "AI_JSON_MODE" && body.generationConfig) {
-            delete body.generationConfig;
+          if (
+            error.code === "AI_JSON_MODE" &&
+            body.generationConfig?.responseMimeType
+          ) {
+            delete body.generationConfig.responseMimeType;
             continue;
           }
           if (error.code === "AI_ROLE" && body.systemInstruction) {

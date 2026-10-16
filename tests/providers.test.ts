@@ -69,6 +69,86 @@ describe("AI providers", () => {
       : provider === "anthropic"
         ? { content: [{ type: "text", text: JSON.stringify(intent) }] }
         : { choices: [{ message: { content: JSON.stringify(intent) } }] };
+  it.each([60000, 90001])(
+    "handles a Gemini response taking %i ms within a bounded deadline",
+    async (latency) => {
+      vi.useFakeTimers();
+      const timeout = vi
+        .spyOn(AbortSignal, "timeout")
+        .mockImplementation((ms) => {
+          const controller = new AbortController();
+          setTimeout(() => controller.abort(), ms);
+          return controller.signal;
+        });
+      try {
+        const fetcher = vi.fn(
+          async (_url: unknown, init?: RequestInit) =>
+            new Promise<Response>((resolve, reject) => {
+              const timer = setTimeout(
+                () =>
+                  resolve(new Response(JSON.stringify(responseFor("gemini")))),
+                latency,
+              );
+              init!.signal!.addEventListener("abort", () => {
+                clearTimeout(timer);
+                reject(new Error("private upstream details"));
+              });
+            }),
+        );
+        const service = new InputService(
+          () => "synthetic-key",
+          () => "gemini-3-flash",
+          fetcher,
+          () => ({
+            provider: "gemini",
+            model: "gemini-3-flash",
+            baseUrl: providers.gemini.baseUrl,
+            keyRequired: true,
+          }),
+        );
+        const pending = service.parse("Water tomorrow");
+        const assertion =
+          latency < 90000
+            ? expect(pending).resolves.toEqual(intent)
+            : expect(pending).rejects.toMatchObject({ code: "AI_TIMEOUT" });
+        await vi.advanceTimersByTimeAsync(latency);
+        await assertion;
+        expect(fetcher).toHaveBeenCalledTimes(1);
+      } finally {
+        timeout.mockRestore();
+        vi.useRealTimers();
+      }
+    },
+  );
+  it("removes rejected Gemini thinking controls while retaining structured output", async () => {
+    const fetcher = vi.fn(async (_url: unknown, init?: RequestInit) => {
+      const body = JSON.parse(init!.body as string);
+      expect(body.generationConfig.responseJsonSchema.required).toContain(
+        "action",
+      );
+      return new Response(
+        JSON.stringify(
+          body.generationConfig.thinkingConfig
+            ? { error: { message: "thinkingLevel is not supported" } }
+            : responseFor("gemini"),
+        ),
+        { status: body.generationConfig.thinkingConfig ? 400 : 200 },
+      );
+    });
+    const service = new InputService(
+      () => "synthetic-key",
+      () => "gemini-3-flash",
+      fetcher,
+      () => ({
+        provider: "gemini",
+        model: "gemini-3-flash",
+        baseUrl: providers.gemini.baseUrl,
+        keyRequired: true,
+      }),
+    );
+    expect(await service.parse("Water")).toEqual(intent);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
   it.each(["anthropic", "gemini", "openai", "compatible", "ollama"] as const)(
     "recovers from a temporary 503 on %s without replaying a calendar action",
     async (provider) => {
@@ -174,7 +254,7 @@ describe("AI providers", () => {
     expect(payloads[1].generationConfig).not.toHaveProperty(
       "responseJsonSchema",
     );
-    expect(payloads[2]).not.toHaveProperty("generationConfig");
+    expect(payloads[2].generationConfig).not.toHaveProperty("responseMimeType");
     expect(payloads[3]).not.toHaveProperty("systemInstruction");
     expect(payloads[3].contents[0].parts[0].text).toContain(
       "Current local time",
