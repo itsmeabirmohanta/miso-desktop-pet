@@ -27,3 +27,5 @@ Thumbs.db
 # Local Graphify caches and interpreter paths; keep the portable map outputs.
 graphify-out/cache/
 graphify-out/.graphify*
+
+/brag-output/
