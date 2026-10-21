@@ -1,5 +1,20 @@
 ﻿# Implementation verification
 
+## MISO 1.0.12 — 22 October 2026
+
+The Windows x64 release was rebuilt from current source using Node.js 22.14.0 and Electron 44.7.0. The build reused only the public Desktop OAuth app configuration from the existing publisher package; no personal profile was read.
+
+- `npm run format:check` and `npm run check` passed: TypeScript, all 188 tests in 16 test files, and the application build.
+- `npm run smoke` passed in a desktop session with isolated synthetic accounts. It covered onboarding, AI scheduling and editable receipts, sync retry, two accounts, last-account removal/cancellation with delayed failed revocation, accessible dialogs, and manual calendar writes.
+- `npm run dist` passed, including the clean-build and packaged archive/runtime-fuse audits. The additional `--require-oauth` audit confirmed that the publisher package includes its default Desktop OAuth configuration.
+- `npm run smoke:packaged` and the separate Safe Mode startup check passed with fresh temporary profiles, encrypted storage, setup-window checks, and disabled NODE_OPTIONS injection.
+- `npm run test:installer` passed all 11 compiled NSIS scenarios, including same/different-directory replacement and saved-profile preservation. Production registrations and user profiles were untouched.
+- `npm audit --omit=dev --audit-level=high` reported zero known production dependency vulnerabilities.
+
+The installer offers **Launch MISO** on the finish page and retains the stable app ID and installer GUID. A SHA-256 checksum accompanies the release. The installer is unsigned; Google OAuth production approval has not been confirmed. These checks do not establish live Google consent, live provider access/quota, or all manual acceptance scenarios. See [shipping requirements](SECURITY-AND-SHIPPING.md) and [manual acceptance](MANUAL_TESTS.md).
+
+## Historical MISO 1.0.7 verification
+
 MISO 1.0.7 was checked on 13 October 2026 on Windows x64 with Node.js 22 and Electron 44.7.0.
 
 - TypeScript checking, formatting, and application build passed.
@@ -11,7 +26,7 @@ MISO 1.0.7 was checked on 13 October 2026 on Windows x64 with Node.js 22 and Ele
 - All 16 original artwork files remained unchanged; both locally bundled fonts and their licenses matched the packaged files. Checked text contrast exceeded 4.5:1 and control boundaries exceeded 3:1.
 - The production dependency audit reported zero known vulnerabilities. This is not a formal security assessment.
 
-The installer audit now requires auto-launch at Finish to remain disabled and requires Safe Mode and Recovery Profile shortcuts. Earlier per-user silent installation checks completed with exit code 0; this final audit did not reinstall over the running user installation or reset its saved data.
+The 1.0.7 installer audit required auto-launch at Finish to remain disabled and required Safe Mode and Recovery Profile shortcuts. Earlier per-user silent installation checks completed with exit code 0; that audit did not reinstall over the running user installation or reset its saved data. The current release instead offers the Launch MISO checkbox described above.
 
 ## Preventing build regressions
 

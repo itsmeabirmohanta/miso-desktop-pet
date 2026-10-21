@@ -3,7 +3,7 @@
   <img src="src/assets/Miso-github-banner.jpg" alt="MISO — Your Little Butler, a desktop pet reminder companion" width="960">
   <p><strong>A little company on your desktop. A little help remembering what matters.</strong></p>
   <p>
-    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.7-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.7"></a>
+    <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest"><img src="https://img.shields.io/badge/release-v1.0.12-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="Release v1.0.12"></a>
     <a href="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml"><img src="https://github.com/itsmeabirmohanta/miso-desktop-pet/actions/workflows/check.yml/badge.svg" alt="Build and verification status"></a>
     <img src="https://img.shields.io/badge/platform-Windows_x64-7ED389?style=flat-square&amp;labelColor=1E1E2E" alt="Windows x64">
     <img src="https://img.shields.io/badge/AI-optional-FFC857?style=flat-square&amp;labelColor=1E1E2E" alt="AI is optional">
@@ -51,7 +51,7 @@ Optional AI setup accepts your provider key and can discover and verify a model 
 
 ## Start in three steps
 
-1. **Install:** download [MISO-Setup.exe](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe), run it, and open **MISO** from Start after clicking Finish. Node.js is not needed.
+1. **Install:** download [MISO-Setup.exe](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest/download/MISO-Setup.exe), run it, and leave **Launch MISO** checked on the finish page, or open **MISO** later from Start. Node.js is not needed.
 2. **Connect:** sign in to your own Google account in your browser. Add more accounts and select your calendars in Settings.
 3. **Ask:** click the cat or press **Ctrl+Alt+B** to add a reminder, task, important date, or view your calendar. Change the shortcut in Settings.
 
