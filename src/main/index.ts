@@ -57,6 +57,7 @@ import { ManualCalendarService } from "./calendar/manual";
 import { loadOAuthConfig, defaultOAuthConfig } from "./calendar/oauth-config";
 import type { CalendarProvider } from "./calendar/provider";
 import type { GoogleAccount } from "../shared/types";
+import { UpdateService, updatesSupported } from "./updates";
 declare const __BUTLER_RELEASE__: boolean;
 const isSmoke = !__BUTLER_RELEASE__ && process.argv.includes("--smoke-test");
 // A standard explicit profile override also permits isolated release verification.
@@ -177,6 +178,7 @@ let poll: ReturnType<typeof setInterval> | undefined;
 let cursorPoll: ReturnType<typeof setInterval> | undefined;
 let connecting = false;
 let quitting = false;
+let updates: UpdateService | undefined;
 let onboardingSyncGeneration = -1;
 let setupNotice: Snapshot["setupNotice"];
 let setupNoticeId = 0;
@@ -739,6 +741,23 @@ function trayMenu() {
         },
       },
       { type: "separator" },
+      ...(updates
+        ? [
+            {
+              label:
+                updates.status === "downloaded"
+                  ? `Restart to update to ${updates.pendingVersion}`
+                  : updates.status === "downloading"
+                    ? "Downloading update…"
+                    : updates.status === "checking"
+                      ? "Checking for updates…"
+                      : "Check for updates…",
+              enabled:
+                updates.status === "idle" || updates.status === "downloaded",
+              click: () => void updates?.check(true),
+            },
+          ]
+        : []),
       { label: "MISO website", click: () => openTrayLink("website") },
       { label: "Privacy policy", click: () => openTrayLink("privacy") },
       { label: "Terms of service", click: () => openTrayLink("terms") },
@@ -988,6 +1007,41 @@ else {
       tray = new Tray(image);
       tray.setToolTip(APP_FULL_NAME);
       tray.on("click", showPet);
+      if (
+        updatesSupported({
+          packaged: app.isPackaged,
+          platform: process.platform,
+          smoke: isSmoke,
+          isolatedProfile: !!profileDirectory,
+        })
+      ) {
+        // Updates are optional: a failure here must never stop MISO starting.
+        try {
+          const { autoUpdater } = await import("electron-updater");
+          autoUpdater.logger = null;
+          updates = new UpdateService({
+            updater: autoUpdater,
+            currentVersion: app.getVersion(),
+            prompt: async (options) =>
+              (
+                await dialog.showMessageBox({
+                  ...options,
+                  noLink: true,
+                  icon: appIcon,
+                })
+              ).response,
+            ready: () => onboardingComplete() && !setupWindow,
+            beforeInstall: () => {
+              quitting = true;
+            },
+            onChange: () => {
+              if (tray && !tray.isDestroyed()) trayMenu();
+            },
+          });
+        } catch {
+          updates = undefined;
+        }
+      }
       trayMenu();
       engine = new ReminderEngine(
         () => ({
@@ -1700,6 +1754,7 @@ else {
         publish();
       }
       polling();
+      updates?.start();
       startupPhase = "running";
       if (isSmoke) {
         openSettings();
@@ -1731,5 +1786,6 @@ app.on("before-quit", () => {
   if (poll) clearInterval(poll);
   if (cursorPoll) clearTimeout(cursorPoll);
   engine?.stop();
+  updates?.stop();
   for (const service of syncServices.values()) service.stop();
 });

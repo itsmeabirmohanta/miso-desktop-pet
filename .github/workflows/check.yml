@@ -44,6 +44,8 @@ jobs:
         with:
           name: MISO-Windows-x64${{ github.event_name == 'pull_request' && '-test-build' || '' }}
           path: |
-            release/MISO Setup *.exe
-            release/MISO Setup *.exe.sha256
+            release/MISO-Setup.exe
+            release/MISO-Setup.exe.sha256
+            release/MISO-Setup.exe.blockmap
+            release/latest.yml
           if-no-files-found: error

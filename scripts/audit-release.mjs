@@ -28,6 +28,23 @@ for (const [file, width, height] of [
   assert.equal(bmp.readUInt16LE(28), 24, "NSIS artwork must be a 24-bit BMP");
 }
 assert.equal(nsis.runAfterFinish, true, "Installer must offer Launch MISO");
+// In-app updates download the asset that latest.yml names from GitHub Releases.
+const INSTALLER = "MISO-Setup.exe";
+assert.equal(
+  nsis.artifactName,
+  "MISO-Setup.${ext}",
+  "Keep the published update asset name",
+);
+const [publish] = [packageConfig.build.publish].flat();
+assert.deepEqual(
+  { provider: publish?.provider, owner: publish?.owner, repo: publish?.repo },
+  {
+    provider: "github",
+    owner: "itsmeabirmohanta",
+    repo: "miso-desktop-pet",
+  },
+  "Updates must come from the public MISO GitHub releases",
+);
 const installerScript = await readFile(
   packageConfig.build.nsis.include,
   "utf8",
@@ -246,17 +263,45 @@ if (packaged) {
   ])
     if (wire[option] !== FuseState.ENABLE)
       throw new Error("A required protection fuse is disabled.");
+  const updateConfig = (
+    await readFile(join(releaseDir, "win-unpacked/resources/app-update.yml"))
+  )
+    .toString("utf8")
+    .split(/\r?\n/);
+  for (const line of [
+    "provider: github",
+    "owner: itsmeabirmohanta",
+    "repo: miso-desktop-pet",
+  ])
+    assert.ok(
+      updateConfig.includes(line),
+      `Packaged update configuration is missing "${line}"`,
+    );
   const releaseFiles = await readdir(releaseDir);
   const version = packageConfig.version;
-  const installer = `MISO Setup ${version}.exe`;
+  const installer = INSTALLER;
   if (releaseFiles.includes(installer)) {
     await verifyBranding(join(releaseDir, installer));
-    const sha256 = createHash("sha256")
-      .update(await readFile(join(releaseDir, installer)))
-      .digest("hex");
+    const bytes = await readFile(join(releaseDir, installer));
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
     await writeFile(
       join(releaseDir, `${installer}.sha256`),
       `${sha256}  ${installer}\n`,
+    );
+    // Installed copies trust this manifest; it must describe these exact bytes.
+    for (const file of ["latest.yml", `${installer}.blockmap`])
+      assert.ok(releaseFiles.includes(file), `Missing update asset: ${file}`);
+    const manifest = (await readFile(join(releaseDir, "latest.yml"))).toString(
+      "utf8",
+    );
+    const field = (name) =>
+      manifest.match(new RegExp(`^${name}: ['"]?([^'"\\r\\n]+)`, "m"))?.[1];
+    assert.equal(field("version"), version, "latest.yml has the wrong version");
+    assert.equal(field("path"), installer, "latest.yml names the wrong asset");
+    assert.equal(
+      field("sha512"),
+      createHash("sha512").update(bytes).digest("base64"),
+      "latest.yml checksum does not match the installer",
     );
   }
 }
