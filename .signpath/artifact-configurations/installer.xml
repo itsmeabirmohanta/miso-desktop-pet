@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reference copy of the SignPath artifact configuration "installer".
+     Paste it into the SignPath project; SignPath uses its own stored copy.
+     Signs the NSIS installer built from the already-signed MISO.exe. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file path="MISO-Setup.exe" product-name="MISO" product-version="${version}" file-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

@@ -17,6 +17,7 @@ Real Google consent requires live accounts. Automated smoke tests use mock provi
 
 Use a dedicated Google test account and a calendar containing no important data. Automated tests never require real keys.
 
+- [ ] In-app update (per-user and machine-wide installs): install version N, publish (or serve from a test repository) a release N+1 with `MISO-Setup.exe`, `.blockmap`, and `latest.yml`. Within a minute of launch MISO offers N+1; **Later** stays quiet until the next tray **Check for updates…**. **Download** then **Restart now** closes MISO, installs silently (machine-wide asks for UAC once), relaunches MISO, and preserves accounts and settings. **Later** after download installs on Quit. Offline, the background check shows nothing and the tray check reports a failure. An up-to-date tray check reports the installed version.
 - [ ] Installer finish page: Launch MISO checked opens onboarding and closes the installer without waiting for the app to exit. Unchecked does not launch; opening the shortcut later shows the same welcome slide.
 - [ ] First launch opens welcome with the pet hidden. Start onboarding shows Google sign-in and the optional AI checkbox; Google is mandatory. After consent, show sign-in completed and the Yes/No AI choice. Checkbox preference carries into that choice.
 - [ ] AI Yes opens configuration. Switch providers, verify required key behavior, fail a model test, then correct it. AI remains off until verified. Continue without AI and AI No both proceed to sync without requiring a key.

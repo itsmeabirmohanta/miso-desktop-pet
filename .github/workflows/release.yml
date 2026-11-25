@@ -1,0 +1,155 @@
+name: Signed release
+# Builds, signs (SignPath Foundation), verifies and drafts a GitHub release.
+# Push a tag v<package.json version>, or run manually, then approve the two
+# signing requests in SignPath. Review the draft release and publish it.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: signed-release
+  cancel-in-progress: false
+env:
+  SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+  SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG || 'miso-desktop-pet' }}
+  SIGNPATH_POLICY_SLUG: ${{ vars.SIGNPATH_POLICY_SLUG || 'release-signing' }}
+jobs:
+  release:
+    # SignPath origin verification for OSS requires GitHub-hosted runners.
+    runs-on: windows-latest
+    timeout-minutes: 240
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      BUTLER_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_ID }}
+      BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET: ${{ secrets.BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Check release inputs
+        id: version
+        shell: bash
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version."
+            exit 1
+          fi
+          if [ -z "$SIGNPATH_API_TOKEN" ] || [ -z "$SIGNPATH_ORGANIZATION_ID" ]; then
+            echo "::error::Configure the SIGNPATH_API_TOKEN secret and SIGNPATH_ORGANIZATION_ID variable."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Package unsigned application
+        shell: bash
+        run: |
+          npm run build:release
+          node scripts/audit-release.mjs --require-oauth
+          # An NSIS target (not --dir) is needed for electron-builder to write
+          # app-update.yml. This first installer is unsigned and is rebuilt below.
+          npx electron-builder --win nsis --publish=never --config scripts/electron-builder.signed.cjs
+          rm release/MISO-Setup.exe release/MISO-Setup.exe.blockmap release/latest.yml
+
+      - name: Upload MISO.exe for signing
+        id: unsigned-app
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-app
+          path: release/win-unpacked/MISO.exe
+          if-no-files-found: error
+      - name: Sign MISO.exe
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ env.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 7200
+          output-artifact-directory: signed-app
+          parameters: |
+            version: ${{ toJSON(steps.version.outputs.version) }}
+      - name: Use signed MISO.exe
+        shell: pwsh
+        run: |
+          Copy-Item signed-app/MISO.exe release/win-unpacked/MISO.exe -Force
+          $signature = Get-AuthenticodeSignature release/win-unpacked/MISO.exe
+          if ($signature.Status -ne "Valid") { throw "MISO.exe signature is $($signature.Status)" }
+          $signature.SignerCertificate.Subject
+
+      - name: Build installer from signed application
+        shell: pwsh
+        run: |
+          npx electron-builder --win nsis --prepackaged release/win-unpacked --publish=never --config scripts/electron-builder.signed.cjs
+          if ($LASTEXITCODE -ne 0) { throw "Installer build failed" }
+          # The installer must carry the signed executable unchanged.
+          $signature = Get-AuthenticodeSignature release/win-unpacked/MISO.exe
+          if ($signature.Status -ne "Valid") { throw "MISO.exe signature is $($signature.Status) after packaging" }
+      - name: Upload installer for signing
+        id: unsigned-installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installer
+          path: release/MISO-Setup.exe
+          if-no-files-found: error
+      - name: Sign installer
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ env.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 7200
+          output-artifact-directory: signed-installer
+          parameters: |
+            version: ${{ toJSON(steps.version.outputs.version) }}
+      - name: Use signed installer
+        shell: pwsh
+        run: |
+          Copy-Item signed-installer/MISO-Setup.exe release/MISO-Setup.exe -Force
+          $signature = Get-AuthenticodeSignature release/MISO-Setup.exe
+          if ($signature.Status -ne "Valid") { throw "Installer signature is $($signature.Status)" }
+          # electron-updater accepts a later update only when its signer CN equals
+          # publisherName in app-update.yml. A mismatch would strand signed users.
+          $cn = $signature.SignerCertificate.GetNameInfo([System.Security.Cryptography.X509Certificates.X509NameType]::SimpleName, $false)
+          $match = Select-String -Path release/win-unpacked/resources/app-update.yml -Pattern '^publisherName:' -Context 0,1
+          if (-not $match) { throw "app-update.yml lacks publisherName" }
+          $expected = $match.Context.PostContext[0] -replace '^\s*-\s*', ''
+          if ($cn -ne $expected) { throw "Signer CN '$cn' does not match publisherName '$expected'. Update scripts/electron-builder.signed.cjs." }
+          "Installer signed by $cn"
+
+      - name: Refresh update manifest and verify release
+        shell: bash
+        run: |
+          node scripts/refresh-update-manifest.mjs
+          node scripts/audit-release.mjs --packaged --require-oauth
+          npm run smoke:packaged
+          node scripts/verify-packaged.mjs --safe-mode
+          npm run test:installer
+      - name: Draft GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          cp docs/USER-GUIDE.md release/USER-GUIDE.md
+          gh release create "v$VERSION" --draft --verify-tag --title "MISO $VERSION" \
+            --notes "Signed Windows release. Edit these notes before publishing. Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org). See the [code signing policy](https://github.com/$GITHUB_REPOSITORY#code-signing-policy)." \
+            release/MISO-Setup.exe release/MISO-Setup.exe.blockmap release/latest.yml \
+            release/MISO-Setup.exe.sha256 release/USER-GUIDE.md

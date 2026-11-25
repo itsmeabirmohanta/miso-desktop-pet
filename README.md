@@ -71,7 +71,7 @@ For a checksum, download [MISO-Setup.exe.sha256](https://github.com/itsmeabirmoh
 
 - **Stored on your device:** accounts, calendar cache, preferences, refresh tokens, and AI keys use operating-system-backed local encryption.
 - **AI is your choice:** it is off by default. When enabled, typed commands and clarification context go to the provider or local server you select.
-- **No analytics or crash-upload service is configured.** Calendar synchronization communicates with Google.
+- **No analytics or crash-upload service is configured.** Calendar synchronization communicates with Google. Installed copies check GitHub Releases for updates; that check sends no account, calendar, or AI data.
 - **Separate installations, separate data:** the installer excludes personal profiles, calendar data, private keys, and test screenshots.
 - **Google app configuration is public-client configuration:** the bundled Desktop OAuth client ID and client secret are hidden in the settings UI but remain extractable from the installer. They are separate from personal account tokens.
 
@@ -109,7 +109,7 @@ npm run smoke:packaged    # Windows archive/fuse audit and fresh-profile startup
 node scripts/verify-packaged.mjs --safe-mode
 ```
 
-Installers are generated as `release/MISO Setup <version>.exe`, alongside a SHA-256 checksum. macOS/Linux packaging targets exist but have not been verified here. CI uploads Windows build artifacts; it does not automatically publish a GitHub release.
+Installers are generated as `release/MISO-Setup.exe`, alongside a SHA-256 checksum and the `latest.yml`/`.blockmap` update assets. Installed copies prompt users when a newer GitHub release is published; see [Publishing a release with in-app updates](docs/SECURITY-AND-SHIPPING.md#publishing-a-release-with-in-app-updates). macOS/Linux packaging targets exist but have not been verified here. CI uploads Windows build artifacts; it does not automatically publish a GitHub release.
 
 For a configured publisher build, supply `BUTLER_PUBLIC_GOOGLE_CLIENT_ID` and `BUTLER_PUBLIC_GOOGLE_CLIENT_SECRET`. To explicitly reuse the Desktop app configuration saved in your local MISO profile, run `npm run dist:configured`. This exports only the app's OAuth client configuration into the build environment; account tokens, AI keys, and calendar data are excluded.
 
@@ -150,7 +150,18 @@ Each pose uses the same `mascot` base name. Build-time priority is WebP, PNG, GI
 | [Privacy and security](docs/SECURITY-AND-SHIPPING.md)                                  | [Optimization notes](docs/OPTIMIZATION.md) |
 | [Security reporting](SECURITY.md)                                                      | [Brand styling](docs/UI-BRANDING.md)       |
 
-No project-wide license has been selected. Bundled fonts retain their respective [Baloo 2](src/assets/fonts/Baloo2-OFL.txt) and [Inter](src/assets/fonts/Inter-OFL.txt) licenses.
+MISO is released under the [MIT License](LICENSE). Bundled fonts retain their respective [Baloo 2](src/assets/fonts/Baloo2-OFL.txt) and [Inter](src/assets/fonts/Inter-OFL.txt) licenses.
+
+## Code signing policy
+
+> **Status:** signing through SignPath Foundation is pending approval. Releases up to and including 1.0.12 are unsigned.
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers:** [itsmeabirmohanta](https://github.com/itsmeabirmohanta)
+- **Approvers:** [itsmeabirmohanta](https://github.com/itsmeabirmohanta)
+
+Only MISO's own binaries built from this repository are signed. Signed releases are built on GitHub-hosted runners by [.github/workflows/release.yml](.github/workflows/release.yml), and every signing request is approved manually. Privacy: see the [privacy policy](https://miso.abirmahanta.in/privacy-policy) and [Your data](#your-data). MISO contacts Google for calendar sync, your chosen AI provider only when AI is enabled, and GitHub to check for updates.
 
 ## Help MISO reach more desktops
 

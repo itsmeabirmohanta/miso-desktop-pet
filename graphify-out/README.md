@@ -27,6 +27,7 @@ For targeted lookup, search node labels or `source_file` with `rg`, load the mat
 | Synchronization and reminders | `src/main/sync/sync.ts`, `reminders.ts`, `concurrency.ts` | `tests/sync.test.ts`, `reminders.test.ts`, `concurrency.test.ts` |
 | Settings and secret storage | `src/main/settings/store.ts`, `login.ts` | `tests/secure-store.test.ts` |
 | Renderer, pet, placement | `src/renderer/app.ts`, `setup.ts`, `dialogs.ts`, `dashboard.ts`, `idle-poses.ts`, `src/shared/pet-layout.ts` | `tests/pet-layout.test.ts`, `idle-poses.test.ts`, `hotkey.test.ts`, Electron smoke |
+| In-app updates | `src/main/updates.ts`, `src/main/index.ts` (tray item and startup), `package.json` `build.publish` / `nsis.artifactName` | `tests/updates.test.ts`, `scripts/audit-release.mjs --packaged`, update item in `docs/MANUAL_TESTS.md` |
 | Build and distribution | `package.json`, `scripts/build.mjs`, `build-configured-release.mjs`, `audit-release.mjs`, `verify-packaged.mjs` | `npm run dist`, `npm run smoke:packaged`, `.github/workflows/check.yml` |
 
 Typical manual flow: renderer -> `window.butler` preload bridge -> main IPC handler -> account/manual calendar services -> Google provider -> sync/snapshot -> renderer. Optional natural-language commands pass through `InputService` and `CommandController`; this is a separate entry into the calendar operations. Check source for the precise path used by the task.

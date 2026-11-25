@@ -1,6 +1,6 @@
 # Installing MISO
 
-1. Install the Windows x64 installer (`MISO Setup 1.0.12.exe` for the local build), or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest). Leave **Launch MISO** checked on the finish page to open it immediately, or open it later from Start.
+1. Install the Windows x64 installer (`release/MISO-Setup.exe` for a local build), or use the published `MISO-Setup.exe` from [GitHub Releases](https://github.com/itsmeabirmohanta/miso-desktop-pet/releases/latest). Leave **Launch MISO** checked on the finish page to open it immediately, or open it later from Start.
 2. On first launch, choose **Start onboarding** on the welcome screen and sign in with Google. Google sign-in is required. The **Enable AI Assistant** checkbox is optional; it enables natural-language events and reminders after configuration.
 3. After the Google sign-in success screen, choose **Yes, enable AI** or **No, thanks**. Yes opens AI setup: choose a provider, paste its API key, leave **Automatic (recommended)** selected, and choose **Save & test AI**. MISO discovers available text models and tests a suitable model before saving. You can also continue without AI. No goes directly to calendar sync. Manual calendar features never require an AI key.
 4. Wait for **Sync completed**, then choose **Start MISO**. Setup closes and the pet appears. A failed sync offers retry; an interrupted first setup resumes before the pet starts. Completed setup is remembered across launches and upgrades. **Start from scratch** restores first-run onboarding.
@@ -38,6 +38,8 @@ Advanced developer configuration lets users supply their own Desktop OAuth clien
 If sign-in fails after returning from Google, share the displayed stage and `GOOGLE_...` support code. Version 1.0.4 distinguishes rejected client configuration, rejected sign-in codes, permission denial, connection/TLS errors, and missing offline access or account identity. These messages do not include tokens or raw server responses.
 
 ## Reinstalling and upgrading
+
+MISO checks for new releases shortly after it starts and every few hours. When one is available, MISO asks whether to download it; when the download finishes, choose **Restart now** to install it, or **Later** to install it the next time you quit MISO. Use **Check for updates…** in the tray menu to check at any time. If MISO is installed for the whole computer, Windows asks for administrator approval during the update. Versions released before automatic updates (1.0.12 and earlier) must install the new version manually once.
 
 Run the new installer to replace a registered MISO installation. The installer keeps the same installation ID across releases, removes the previous version before copying the new files, and refreshes its desktop and Start menu shortcuts. This also works when choosing a different installation directory. Versions from this project's earlier Butler branding are replaced when they use the same installation ID.
 
